@@ -1,0 +1,40 @@
+/* eslint-disable */
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const Discord = require('discord.js');
+const warnSchema = require('../../schemas/warn-schema');
+module.exports = {
+    data: new SlashCommandBuilder()
+    .setName('case')
+    .setDescription('Shows information about an ad warning.')
+    .addStringOption((op) => op.setName('punishment_id').setDescription('ID of the punishment you want to check.').setRequired(true))
+    .addBooleanOption((op => op.setName('ephemeral').setDescription('Should the reply be shown only to you?'))),
+    async execute(interaction) {
+        const punishmentId = interaction.options.getString('punishment_id');
+        const ephemeral = interaction.options.getBoolean('ephemeral');
+        await interaction.deferReply({ ephemeral: ephemeral });
+
+        const guildId = process.env.MAIN_GUILD ?? interaction.guild.id
+        let arr = await warnSchema.find({
+            guildId
+        })
+        if (!Array.isArray(arr)) arr = [arr]
+
+        const warningarr = arr.find(e => e.warnings.find(w => w.punishmentId == punishmentId))
+        if (!warningarr) return interaction.editReply(`No such warn found..`);
+        const warn = warningarr.warnings.find(e => e.punishmentId == punishmentId)
+        if (!warn) return interaction.editReply(`No such warn found...`);
+
+        const embed = new Discord.MessageEmbed()
+            .setAuthor(`Punishment Info`)
+            .setColor("RANDOM")
+            .addField('User', `<@${warningarr.userId}>\n(\`${warningarr.userId}\`)`, true)
+            .addField('Moderator', `<@${warn.author}>\n(\`${warn.author}\`)`, true)
+            .addField('Channel', `<#${warn.channel}>`, true)
+            .addField('Issued at', `<t:${(warn.at / 1000).toString().split('.')[0]}>\n<t:${(warn.at / 1000).toString().split('.')[0]}:R>`, true)
+        warn.belongsto ? embed.addField('Belongs to', `<#${warn.belongsto}>`, true) : null
+        embed.addField('Appealed', (warn.appealed == true) ? 'Yes' : 'No', true)
+        embed.addField('Reason', `${warn.reason}`)
+        embed.setFooter(`Punishment ID: ${punishmentId}`)
+        interaction.editReply({ embeds: [embed] })
+    },
+};
