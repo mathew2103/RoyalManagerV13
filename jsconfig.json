@@ -2,7 +2,9 @@
     "compilerOptions": {
         "baseUrl": "./",
         "paths": {
-            "@schemas/*": ["schemas/*"]
+            "schemas/*": ["schemas/*"],
+            "config": ["config.json"]
         }
-    }
+    },
+    "exclude": ["node_modules"]
 }
