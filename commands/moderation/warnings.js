@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 // const warnSchema = require('../../schemas/warn-schema'); Instead of this, i can do the 4th line
 const DjsBuilder = require('@discordjs/builders');
-const warnSchema = require('@schemas/warn-schema');
+const warnSchema = require('../../schemas/warn-schema');
 module.exports = {
 	data: new DjsBuilder.SlashCommandBuilder()
 		.setName('warnings')

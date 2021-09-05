@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 const uniqid = require('uniqid');
+// const warnSchema = require('../../schemas/warn-schema');
 const warnSchema = require('../../schemas/warn-schema');
 const settingsSchema = require('../../schemas/settings-schema');
 const warnCountSchema = require('../../schemas/warnCount-schema');
@@ -29,7 +30,8 @@ module.exports = {
 		.addChannelOption((op) => op.setName('channel').setDescription('The channel you found the advertisement in.').setRequired(true))
 		.addStringOption((op) => op.setName('reason').setDescription('The reason for which you want to warn the user.').setRequired(true)
 			.addChoices(reasons))
-		.addChannelOption((op) => op.setName('belongs_to').setDescription('The channel that the advertisement belongs to.').setRequired(false)),
+		.addChannelOption((op) => op.setName('belongs_to').setDescription('The channel that the advertisement belongs to.').setRequired(false))
+		.setDefaultPermission(true),
 	// name: 'ad',
 	// description: 'Ad warns a user.',
 	async execute(interaction) {

@@ -2,48 +2,51 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
 
-const warnSchema = require('schemas/warn-schema.js');
-const config = require('config')
+// import warnSchema from '@/schemas/warn-schema';
+const warnSchema = require('../schemas/warn-schema');
+const config = require('../config.json')
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('appeal')
         .setDescription('Appeal an ad warning.')
         .addStringOption((op) => op.setName('punishment_id').setDescription('The ID of the punishment that you want to appeal.').setRequired(true))
-        .addStringOption((op) => op.setName('reason').setDescription('The reason for which you want to appeal this warning.')),
+        .addStringOption((op) => op.setName('reason').setDescription('The reason for which you want to appeal this warning.').setRequired(true)),
     async execute(interaction) {
 
         const punishmentId = interaction.options.getString('punishment_id');
         const appealReason = interaction.options.getString('reason');
 
-
         const warningData = await warnSchema.findOne({ userId: interaction.user.id })
-
-        const warning = warningData.find(e => e.punishmentId == punishmentId)
+        if (!warningData) return interaction.reply({ content: 'You do not have any warnings.', ephemeral: true })
+        console.log(warningData)
+        const warning = warningData.warnings.find(e => e.punishmentId == punishmentId)
         if (!warning) return interaction.reply({ content: 'No such warning found.', ephemeral: true })
 
 
         const channel = interaction.channel.type !== 'dm' ? await interaction.user.createDM() : interaction.channel;
-        if (interaction.channel.type !== 'dm') interaction.message.react('📫')
+        if (interaction.channel.type !== 'dm') interaction.reply('Check dms.')
         channel.send('Send your advertisement for the appeal.')
 
-        interaction.reply('Next, Please send your ad ( the one that you got warned for )') //PLEASE IMPROVE THIS, This is literally rly bad :(
+
+        // interaction.reply('Next, Please send your ad ( the one that you got warned for )') //PLEASE IMPROVE THIS, This is literally rly bad :(
 
 
         const filter = m => m.author.id == interaction.user.id;
 
-        const collector = channel.createMessageCollector({ filter, time: 120000, max: 1 })
+        const collector = channel.createMessageCollector({ filter, time: 120000 })
 
 
 
-        collector.on('collect', async interaction => {
-            const appealsChannel = interaction.client.channels.cache.get(config.appealsChannel)
+        collector.on('collect', async msg => {
+            console.log(msg.content)
+            const appealsChannel = interaction.client.channels.cache.get(config.appealsChannel) || interaction.channel
 
 
             const embed = new Discord.MessageEmbed()
                 .setAuthor('Appeals')
                 .addFields({
                     name: 'User',
-                    value: `${interaction.user.tag}\n\`${interaction.user.id}\``,
+                    value: `${msg.user.tag}\n\`${msg.user.id}\``,
                     inline: true
                 }, {
                     name: 'Moderator',
@@ -58,7 +61,7 @@ module.exports = {
                     value: appealReason,
                 }, {
                     name: 'Advertisement',
-                    value: interaction.content
+                    value: msg.content
                 })
                 .setColor("RANDOM")
 
@@ -67,8 +70,8 @@ module.exports = {
             const webhooks = await appealsChannel.fetchWebhooks()
             const webhook = webhooks.first()
             if(!webhook) {
-                appealsChannel.createWebhook(interaction.guild.name, {
-                    avatar: interaction.guild.iconURL()
+                appealsChannel.createWebhook(msg.guild.name, {
+                    avatar: msg.guild.iconURL()
                 })
             }
 

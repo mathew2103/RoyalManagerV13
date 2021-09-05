@@ -1,6 +1,7 @@
 /* eslint-disable */
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
+// const warnSchema = require('../../schemas/warn-schema');
 const warnSchema = require('../../schemas/warn-schema');
 module.exports = {
     data: new SlashCommandBuilder()
