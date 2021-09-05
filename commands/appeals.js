@@ -26,7 +26,7 @@ module.exports = {
         if (interaction.channel.type !== 'dm') interaction.message.react('📫')
         channel.send('Send your advertisement for the appeal.')
 
-        interaciton.reply('Next, Please send your ad ( the one that you got warned for )') //PLEASE IMPROVE THIS, This is literally rly bad :(
+        interaction.reply('Next, Please send your ad ( the one that you got warned for )') //PLEASE IMPROVE THIS, This is literally rly bad :(
 
 
         const filter = m => m.author.id == interaction.user.id;
