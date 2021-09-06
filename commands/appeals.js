@@ -35,22 +35,32 @@ module.exports = {
 
         const collector = channel.createMessageCollector({ filter, time: 120000 })
 
+        const yesButton = new Discord.MessageButton()
+        .setLabel('Accept')
+        .setStyle('SUCCESS')
+        .setCustomId(`appeal_accept_${warning.punishmentId}`)
+        const noButton = new Discord.MessageButton()
+        .setLabel('Deny')
+        .setStyle('DANGER')
+        .setCustomId(`appeal_deny_${warning.punishmentId}`)
+        const row = new Discord.MessageActionRow()
+        .addComponents([yesButton, noButton])
 
 
         collector.on('collect', async msg => {
-            console.log(msg.content)
+            collector.stop();
+            
             const appealsChannel = interaction.client.channels.cache.get(config.appealsChannel) || interaction.channel
-
 
             const embed = new Discord.MessageEmbed()
                 .setAuthor('Appeals')
                 .addFields({
                     name: 'User',
-                    value: `${msg.user.tag}\n\`${msg.user.id}\``,
+                    value: `${msg.author.tag}\n\`${msg.author.id}\``,
                     inline: true
                 }, {
                     name: 'Moderator',
-                    value: `<@${warning.author.id}>\n\`${warning.author.id}\``,
+                    value: `<@${warning.author}>\n\`${warning.author}\``,
                     inline: true
                 }, {
                     name: 'Reason',
@@ -64,19 +74,19 @@ module.exports = {
                     value: msg.content
                 })
                 .setColor("RANDOM")
-
+                .setFooter(`Punishment ID: ${warning.punishmentId}`)
                 .setTimestamp()
 
             const webhooks = await appealsChannel.fetchWebhooks()
-            const webhook = webhooks.first()
+            let webhook = webhooks.first()
             if(!webhook) {
-                appealsChannel.createWebhook(msg.guild.name, {
+                webhook = await appealsChannel.createWebhook(msg.guild.name, {
                     avatar: msg.guild.iconURL()
                 })
             }
 
 
-            webhook.send({ embeds: [embed], username: interaction.user.username, avatarURL: interaction.user.displayAvatarURL() })
+            webhook.send({ embeds: [embed], username: interaction.user.username, avatarURL: interaction.user.displayAvatarURL(), components: [row] })
 
             interaction.followUp('Appeal Submitted, Please wait for us to review your appeal')
         })

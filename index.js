@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 const fs = require('fs');
 const { join } = require('path');
 const mongo = require('./mongo');
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.DIRECT_MESSAGES] });
 dotenv.config();
 
 client.commands = new Collection();
@@ -16,23 +16,31 @@ const connectToMongoDB = async () => {
 connectToMongoDB();
 
 
-client.once('ready', () => {
-	console.log('Ready!');
-});
+const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 
-client.on('interactionCreate', async interaction => {
-	if (!interaction.isCommand()) return;
-	console.log(interaction);
-	if (!client.commands.has(interaction.commandName)) return;
+for (const file of eventFiles) {
+	const event = require(`./events/${file}`);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	}
+	else {
+		client.on(event.name, (...args) => event.execute(...args));
+	}
+}
 
-	try {
-		await client.commands.get(interaction.commandName).execute(interaction);
-	}
-	catch (error) {
-		console.error(error);
-		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-	}
-});
+// client.on('interactionCreate', async interaction => {
+// 	if (!interaction.isCommand()) return;
+// 	console.log(interaction);
+// 	if (!client.commands.has(interaction.commandName)) return;
+
+// 	try {
+// 		await client.commands.get(interaction.commandName).execute(interaction);
+// 	}
+// 	catch (error) {
+// 		console.error(error);
+// 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+// 	}
+// });
 
 const readCommands = async (dir) => {
 	const files = fs.readdirSync(join(__dirname, dir));
