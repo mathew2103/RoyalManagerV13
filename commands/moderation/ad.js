@@ -1,26 +1,31 @@
 /* eslint-disable no-unused-vars */
 const uniqid = require('uniqid');
 // const warnSchema = require('../../schemas/warn-schema');
-const warnSchema = require('../../schemas/warn-schema');
+// const warnSchema = require('../../schemas/warn-schema');
+const punishmentSchema = require('../../schemas/punishments-schema');
 const settingsSchema = require('../../schemas/settings-schema');
 const warnCountSchema = require('../../schemas/warnCount-schema');
 const coinsSchema = require('../../schemas/coins-schema');
 const Discord = require('discord.js');
+// const config = require('config')
+const config = require('../../config.json');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
-const reasons = [];
-async () => {
-	const mainGuildData = await settingsSchema.findOne({ guildId: process.env.MAIN_GUILD });
+const reasons = new Array();
 
+async () => {
+	const mainGuildData = await settingsSchema.findOne({ guildId: config.mainServer.id });
 
 	for (let i = 0; i < mainGuildData.reasons.length; i++) {
 		let r = mainGuildData.reasons[i];
 		r = r.length > 100 ? r.slice(0, 100) : r;
 		reasons.push([r, i.toString()]);
+		console.log(r);
 		// reasons.push({ 'name': r, 'value': i.toString() });
 	}
 };
 
+console.log(reasons);
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -48,12 +53,18 @@ module.exports = {
 
 		const adWarnTemplate = mainGuildData.modMsg;
 		const adWarnChannel = interaction.guild.channels.cache.get('826045281824931882') ?? interaction.guild.channels.cache.get('758725733840846858');
-		const oldWarns = await warnSchema.findOne({ guildId: interaction.guild.id, userId: targetMember.id });
-		if (oldWarns?.warnings.length) {
-			const oldwarn = oldWarns.warnings[oldWarns.warnings.length - 1];
+		// const oldWarns = await warnSchema.findOne({ guildId: interaction.guild.id, userId: targetMember.id });
+		const oldWarns = await punishmentSchema.find({ user: targetMember.id });
+		if (oldWarns?.length) {
+			const oldwarn = oldWarns[oldWarns.length - 1];
 			if (oldwarn?.at
 				&& ((Date.now() - oldwarn.at) < 7.2e+6)) return await interaction.editReply(`This user was warned <t:${(oldwarn.at / 1000).toString().split('.')[0]}:R>, so you can't warn the user again.`);
 		}
+		// if (oldWarns?.warnings.length) {
+		// 	const oldwarn = oldWarns.warnings[oldWarns.warnings.length - 1];
+		// 	if (oldwarn?.at
+		// 		&& ((Date.now() - oldwarn.at) < 7.2e+6)) return await interaction.editReply(`This user was warned <t:${(oldwarn.at / 1000).toString().split('.')[0]}:R>, so you can't warn the user again.`);
+		// }
 
 		if (adDeletedIn.id == '699319697706975262' && reason.includes('incorrect')) return await interaction.editReply('You cannot have reason as `incorrect` if the channel is <#699319697706975262>');
 
@@ -87,14 +98,16 @@ module.exports = {
 			};
 		}
 
+		const warning = await new punishmentSchema(warningData);
+		await warning.save();
 
-		await warnSchema.findOneAndUpdate({ guildId: interaction.guild.id, userId: targetMember.id }, {
-			guildId: interaction.guild.id,
-			userId: targetMember.id,
-			$push: {
-				warnings: warningData,
-			},
-		}, { upsert: true });
+		// await warnSchema.findOneAndUpdate({ guildId: interaction.guild.id, userId: targetMember.id }, {
+		// 	guildId: interaction.guild.id,
+		// 	userId: targetMember.id,
+		// 	$push: {
+		// 		warnings: warningData,
+		// 	},
+		// }, { upsert: true });
 
 		await warnCountSchema.findOneAndUpdate({ userId: interaction.member.id }, {
 			userID: interaction.member.id,
@@ -104,7 +117,8 @@ module.exports = {
 			},
 		});
 
-		const newTargetData = await warnSchema.findOne({ guildId: interaction.guild.id, userId: targetMember.id });
+		const newTargetData = await punishmentSchema.find({ user: targetMember.id });
+		// const newTargetData = await warnSchema.findOne({ guildId: interaction.guild.id, userId: targetMember.id });
 
 		const randomBetween = (min, max) => {
 			return Math.round(Math.random() * (max - min) + min);
@@ -119,7 +133,7 @@ module.exports = {
 
 		const adWarnEmbed = new Discord.MessageEmbed()
 			.setAuthor('Ad Warning')
-			.setDescription(adWarnTemplate.replace('{member}', targetMember).replace('{reason}', reason).replace('{wc}', newTargetData.warnings.length).replace('{channel}', adDeletedIn))
+			.setDescription(adWarnTemplate.replace('{member}', targetMember).replace('{reason}', reason).replace('{wc}', newTargetData.length).replace('{channel}', adDeletedIn))
 			.setFooter(`Warning ID: ${punishmentId}`)
 			.setTimestamp();
 		if (belongstoChannel?.id) adWarnEmbed.addField('Your advertisment belongs to', belongstoChannel);
@@ -145,7 +159,7 @@ module.exports = {
 
 		const dmEmbed = new Discord.MessageEmbed()
 			.setAuthor('Ad Warning')
-			.setDescription(`Your ad has been deleted in ${adDeletedIn}.\n**Reason:** ${reason}\nNow you have ${newTargetData.warnings.length} ad warning${(newTargetData.warnings.length > 1) ? 's' : ''}\nIf you think that this is a mistake or if you want to appeal this punishment, use \`r!appeal ${punishmentId}\` in <#678181401157304321> or in this DM to appeal.`)
+			.setDescription(`Your ad has been deleted in ${adDeletedIn}.\n**Reason:** ${reason}\nNow you have ${newTargetData.length} ad warning${(newTargetData.warnings.length > 1) ? 's' : ''}\nIf you think that this is a mistake or if you want to appeal this punishment, use \`r!appeal ${punishmentId}\` in <#678181401157304321> or in this DM to appeal.`)
 			.setFooter('Warning ID:' + punishmentId);
 
 		await targetMember.send(dmEmbed).catch(e => e);
@@ -163,8 +177,8 @@ module.exports = {
 			);
 
 		await interaction.editReply({ embeds: [adWarnEmbed.setFooter(`You received ${amountEarned} coins.	`)] });
-		if (newTargetData.warnings.length > 1) {
-			const cmd = await interaction.channel.send(`\`?${newTargetData.warnings.length < 7 ? newTargetData.warnings.length : '6'}aw ${targetMember.id}\``);
+		if (newTargetData.length > 1) {
+			const cmd = await interaction.channel.send(`\`?${newTargetData.length < 7 ? newTargetData.length : '6'}aw ${targetMember.id}\``);
 			setTimeout(() => {
 				cmd.delete();
 			}, 10 * 1000);

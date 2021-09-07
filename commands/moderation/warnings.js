@@ -1,7 +1,8 @@
 const Discord = require('discord.js');
 // const warnSchema = require('../../schemas/warn-schema'); Instead of this, i can do the 4th line
 const DjsBuilder = require('@discordjs/builders');
-const warnSchema = require('../../schemas/warn-schema');
+// const warnSchema = require('../../schemas/warn-schema');
+const punishmentSchema = require('../../schemas/punishments-schema');
 module.exports = {
 	data: new DjsBuilder.SlashCommandBuilder()
 		.setName('warnings')
@@ -21,8 +22,9 @@ module.exports = {
 			.setAuthor(target.username, target.displayAvatarURL())
 			.setTimestamp();
 
-		const warningData = await warnSchema.findOne({ guildId: process.env.MAIN_GUILD, userId: target.id });
-		const desc = warningData?.warnings?.map(e => {
+		// const warningData = await warnSchema.findOne({ guildId: process.env.MAIN_GUILD, userId: target.id });
+		const warningData = await punishmentSchema.find({ user: target.id });
+		const desc = warningData?.map(e => {
 			const mod = interaction.client.users.cache.get(e.author);
 			const st = `**ID:** \`${e.punishmentId}\`\n**Moderator:** ${(moderator == false) ? 'Anonymous#0001' : `${mod?.tag ?? 'Unknown'} \`${e.author}\``}\n**Reason:** ${e.reason}\n**Issued At:** <t:${(e.at / 1000).toString().split('.')[0]}> | <t:${(e.at / 1000).toString().split('.')[0]}:R>`;
 			return st;

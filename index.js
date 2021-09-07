@@ -55,7 +55,7 @@ const readCommands = async (dir) => {
 			option.name ? client.commands.set(option.name.toLowerCase(), option) : client.commands.set(option.data.name.toLowerCase(), option);
 		}
 	}
-	console.log(client.commands);
+	// console.log(client.commands);
 };
 
 readCommands('./commands');
@@ -74,14 +74,13 @@ client.on('messageCreate', async message => {
 				}
 				else {
 					const option = require(join(__dirname, dir, file));
-					console.log(option);
-					const optionCmd = !option.data ? {
-						name: option.name,
-						description: option.description,
-						options: option.options ?? [],
-					} : undefined;
+					// const optionCmd = !option.data ? {
+					// 	name: option.name,
+					// 	description: option.description,
+					// 	options: option.options ?? [],
+					// } : undefined;
 
-					await client.guilds.cache.get('825958701487620107')?.commands.create(option.data || optionCmd);
+					await client.guilds.cache.get('825958701487620107')?.commands.create(option.data);
 
 				}
 			}
