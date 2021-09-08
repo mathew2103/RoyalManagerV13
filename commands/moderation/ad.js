@@ -11,19 +11,19 @@ const Discord = require('discord.js');
 const config = require('../../config.json');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
-const reasons = new Array();
+const reasons = [['Sending an advertisement without a description in the server advertising channels', '0'], ['Sending an advertisement which server revolves around invite rewards', '1'], ['Sending an advertisement containing a ping', '2'], ['Sending an advertisement back to back', '3'], ['Sending an advertisement in an incorrect channel', '4'], ['Sending an advertisement which description is vague and/or contains less than 20 characters', '5'], ['Advertising an NSFW server and/or advertising a server that isn\'t suitable for children', '6'], ['Sending an advertisement containing an invalid invite', '7'], ['Sending an advertisement that is not in English language', '8'], ['Sending an advertisement without a link', '9']];
 
-async () => {
-	const mainGuildData = await settingsSchema.findOne({ guildId: config.mainServer.id });
+// async () => {
+// 	const mainGuildData = await settingsSchema.findOne({ guildId: config.mainServer.id });
 
-	for (let i = 0; i < mainGuildData.reasons.length; i++) {
-		let r = mainGuildData.reasons[i];
-		r = r.length > 100 ? r.slice(0, 100) : r;
-		reasons.push([r, i.toString()]);
-		console.log(r);
-		// reasons.push({ 'name': r, 'value': i.toString() });
-	}
-};
+// 	for (let i = 0; i < mainGuildData.reasons.length; i++) {
+// 		let r = mainGuildData.reasons[i];
+// 		r = r.length > 100 ? r.slice(0, 100) : r;
+// 		reasons.push([r, i.toString()]);
+// 		console.log(r);
+// 		// reasons.push({ 'name': r, 'value': i.toString() });
+// 	}
+// };
 
 console.log(reasons);
 
@@ -35,8 +35,14 @@ module.exports = {
 		.addChannelOption((op) => op.setName('channel').setDescription('The channel you found the advertisement in.').setRequired(true))
 		.addStringOption((op) => op.setName('reason').setDescription('The reason for which you want to warn the user.').setRequired(true)
 			.addChoices(reasons))
-		.addChannelOption((op) => op.setName('belongs_to').setDescription('The channel that the advertisement belongs to.').setRequired(false))
-		.setDefaultPermission(true),
+		.addChannelOption((op) => op.setName('belongs_to').setDescription('The channel that the advertisement belongs to.').setRequired(false)),
+	permissions: [
+		{
+			id: '834680586970071121',
+			type: 'ROLE',
+			permission: true,
+		},
+	],
 	// name: 'ad',
 	// description: 'Ad warns a user.',
 	async execute(interaction) {
@@ -46,7 +52,7 @@ module.exports = {
 		const reasonString = interaction.options.getString('reason');
 		let belongstoChannel = interaction.options.getChannel('belongs_to');
 
-		if (targetMember.roles.highest.position >= interaction.member.roles.highest.position) return await interaction.editReply('You cannot warn a member having a role higher than or equal to you.');
+		// if (targetMember.roles.highest.position >= interaction.member.roles.highest.position) return await interaction.editReply('You cannot warn a member having a role higher than or equal to you.');
 
 		const mainGuildData = await settingsSchema.findOne({ guildId: process.env.MAIN_GUILD });
 		const reason = mainGuildData.reasons[parseInt(reasonString)];
@@ -68,14 +74,15 @@ module.exports = {
 
 		if (adDeletedIn.id == '699319697706975262' && reason.includes('incorrect')) return await interaction.editReply('You cannot have reason as `incorrect` if the channel is <#699319697706975262>');
 
-		if (reason.includes('incorrect') && !belongstoChannel.id) return await interaction.editReply('You must provide a `belongs-to` channel for the `incorrect` reason.');
+		if (reason.includes('incorrect') && !belongstoChannel) return await interaction.editReply('You must provide a `belongs-to` channel for the `incorrect` reason.');
 
 		if (!reason.includes('incorrect') && belongstoChannel) belongstoChannel = undefined;
 
 		const punishmentId = uniqid();
 		let warningData = new Object();
-		if (belongstoChannel?.id) {
+		if (belongstoChannel) {
 			warningData = {
+				guild: interaction.guild.id,
 				user: targetMember.id,
 				author: interaction.member.id,
 				at: Date.now(),
@@ -88,6 +95,7 @@ module.exports = {
 		}
 		else {
 			warningData = {
+				guild: interaction.guild.id,
 				user: targetMember.id,
 				author: interaction.member.id,
 				at: Date.now(),
@@ -100,14 +108,6 @@ module.exports = {
 
 		const warning = await new punishmentSchema(warningData);
 		await warning.save();
-
-		// await warnSchema.findOneAndUpdate({ guildId: interaction.guild.id, userId: targetMember.id }, {
-		// 	guildId: interaction.guild.id,
-		// 	userId: targetMember.id,
-		// 	$push: {
-		// 		warnings: warningData,
-		// 	},
-		// }, { upsert: true });
 
 		await warnCountSchema.findOneAndUpdate({ userId: interaction.member.id }, {
 			userID: interaction.member.id,
@@ -159,7 +159,7 @@ module.exports = {
 
 		const dmEmbed = new Discord.MessageEmbed()
 			.setAuthor('Ad Warning')
-			.setDescription(`Your ad has been deleted in ${adDeletedIn}.\n**Reason:** ${reason}\nNow you have ${newTargetData.length} ad warning${(newTargetData.warnings.length > 1) ? 's' : ''}\nIf you think that this is a mistake or if you want to appeal this punishment, use \`r!appeal ${punishmentId}\` in <#678181401157304321> or in this DM to appeal.`)
+			.setDescription(`Your ad has been deleted in ${adDeletedIn}.\n**Reason:** ${reason}\nNow you have ${newTargetData.length} ad warning${(newTargetData.length > 1) ? 's' : ''}\nIf you think that this is a mistake or if you want to appeal this punishment, use \`r!appeal ${punishmentId}\` in <#678181401157304321> or in this DM to appeal.`)
 			.setFooter('Warning ID:' + punishmentId);
 
 		await targetMember.send(dmEmbed).catch(e => e);

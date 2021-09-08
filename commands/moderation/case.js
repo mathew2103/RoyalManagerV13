@@ -13,7 +13,7 @@ module.exports = {
         const punishmentId = interaction.options.getString('punishment_id');
         const ephemeral = interaction.options.getBoolean('ephemeral');
         await interaction.deferReply({ ephemeral: ephemeral });
-        const showMod = !interaction.member.permissions.has("MANAGE_MESSAGES") ? true : false
+        const showMod = interaction.member.permissions.has("MANAGE_MESSAGES") ? true : false
 
         const warn = await punishmentSchema.findOne({ punishmentId })
         if(!warn)return interaction.editReply('No warn found with ID:' + punishmentId);

@@ -74,14 +74,13 @@ client.on('messageCreate', async message => {
 				}
 				else {
 					const option = require(join(__dirname, dir, file));
-					// const optionCmd = !option.data ? {
-					// 	name: option.name,
-					// 	description: option.description,
-					// 	options: option.options ?? [],
-					// } : undefined;
+					const perms = option.permissions;
 
 					await client.guilds.cache.get('825958701487620107')?.commands.create(option.data);
-
+					if (perms) {
+						await console.log(perms);
+						// await cmd.permissions.set({ perms });
+					}
 				}
 			}
 		};
