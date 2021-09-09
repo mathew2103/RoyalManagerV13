@@ -15,7 +15,7 @@ module.exports = {
 		// 	for (const warning of data.warnings) {
 		// 		const warn = await new punishments({
 		// 			guild: data.guildId,
-		// 			user: data.userId,
+		// 			user: data.userId,F
 		// 			author: warning.author,
 		// 			at: warning.at,
 		// 			punishmentId: warning.punishmentId,

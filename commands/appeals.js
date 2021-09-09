@@ -17,20 +17,14 @@ module.exports = {
         const punishmentId = interaction.options.getString('punishment_id');
         const appealReason = interaction.options.getString('reason');
 
-        // const warningData = await warnSchema.findOne({ userId: interaction.user.id })
-        // if (!warningData) return interaction.reply({ content: 'You do not have any warnings.', ephemeral: true })
-        // console.log(warningData)
-        // const warning = warningData.warnings.find(e => e.punishmentId == punishmentId)
-    
         const warning = await punishmentsSchema.findOne({ punishmentId, user: interaction.user.id })
+        console.log(warning)
         if (!warning) return interaction.reply({ content: 'No such warning found.', ephemeral: true })
+        if (warning.appealed) return interaction.reply({ content: 'You have already appealed this punishment.', ephemeral: true })
 
         const dmChannel = interaction.channel.type !== 'dm' ? await interaction.user.createDM() : interaction.channel;
         if (interaction.channel.type !== 'dm') interaction.reply('Check dms.')
         dmChannel.send('Send your advertisement for the appeal.')
-
-
-        // interaction.reply('Next, Please send your ad ( the one that you got warned for )') //PLEASE IMPROVE THIS, This is literally rly bad :(
 
 
         const filter = m => m.author.id == interaction.user.id;
@@ -38,20 +32,20 @@ module.exports = {
         const collector = dmChannel.createMessageCollector({ filter, time: 120000 })
 
         const yesButton = new Discord.MessageButton()
-        .setLabel('Accept')
-        .setStyle('SUCCESS')
-        .setCustomId(`appeal_accept_${warning.punishmentId}`)
+            .setLabel('Accept')
+            .setStyle('SUCCESS')
+            .setCustomId(`appeal_accept_${warning.punishmentId}`)
         const noButton = new Discord.MessageButton()
-        .setLabel('Deny')
-        .setStyle('DANGER')
-        .setCustomId(`appeal_deny_${warning.punishmentId}`)
+            .setLabel('Deny')
+            .setStyle('DANGER')
+            .setCustomId(`appeal_deny_${warning.punishmentId}`)
         const row = new Discord.MessageActionRow()
-        .addComponents([yesButton, noButton])
+            .addComponents([yesButton, noButton])
 
 
         collector.on('collect', async msg => {
             collector.stop();
-            
+
             const appealsChannel = interaction.client.channels.cache.get(config.appealsChannel) || interaction.channel
 
             const embed = new Discord.MessageEmbed()
@@ -79,9 +73,10 @@ module.exports = {
                 .setFooter(`Punishment ID: ${warning.punishmentId}`)
                 .setTimestamp()
 
+            await punishmentsSchema.findOneAndUpdate({ user: interaction.user.id, punishmentId }, { appealed: true })
             const webhooks = await appealsChannel.fetchWebhooks()
             let webhook = webhooks.first()
-            if(!webhook) {
+            if (!webhook) {
                 webhook = await appealsChannel.createWebhook(msg.guild.name, {
                     avatar: msg.guild.iconURL()
                 })

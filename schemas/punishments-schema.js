@@ -21,4 +21,5 @@ const punishmentSchema = mongoose.Schema({
 	reason: String,
 });
 
+
 module.exports = mongoose.model('punishments', punishmentSchema);

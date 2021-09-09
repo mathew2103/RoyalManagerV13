@@ -8,7 +8,7 @@ module.exports = {
 		if (!interaction.isButton()) return;
 
 		const embed = new MessageEmbed();
-
+		const webhook = await interaction.message.fetchWebhook();
 		const buttonIdParts = interaction.customId.split('_');
 		const [label, trigger, id] = buttonIdParts;
 		switch (label) {
@@ -22,8 +22,8 @@ module.exports = {
 			let reason = await interaction.channel.awaitMessages({ filter, time: 2 * 60 * 1000, max: 1 });
 			reason = reason.first();
 
-			const moderator = await interaction.guild.members.fetch(punishment.author);
-			const punishedUser = await interaction.guild.members.fetch(punishment.user);
+			const moderator = await interaction.guild.members.fetch(punishment.author).catch(e => e);
+			const punishedUser = await interaction.guild.members.fetch(punishment.user).catch(e => e);
 
 			if (trigger == 'accept') {
 				if (moderator) {
@@ -36,10 +36,10 @@ module.exports = {
 					await moderator.send('An ad warning issued by you has been removed. Reason: ' + reason.content);
 				}
 				await punishmentsSchema.findOneAndDelete({ punishmentId: id });
-				await interaction.update({ content: `Accepted by ${interaction.user.tag}. Reason: ${reason.content}`, embeds: interaction.message.embeds, components: [] });
+				// await interaction.update({ content: `Accepted by ${interaction.user.tag}. Reason: ${reason.content}`, embeds: interaction.message.embeds, components: [] });
 				if (punishedUser) {
-					embed.setDescription(`Your appeal for punishment with ID: \`${id}\` has been accepted\n**Reason:** ${reason.content}`);
-					punishedUser.send(embed)
+					embed.setDescription(`Your appeal for punishment with ID: \`${id}\` has been accepted\n**Reason:** ${reason.content}`).setColor('GREEN');
+					punishedUser.send({ embeds: [embed] })
 						.catch(e => e);
 					await interaction.editReply('Done!');
 				}
@@ -48,11 +48,14 @@ module.exports = {
 				}
 			}
 			else {
-				await interaction.update({ content: `Denied by ${interaction.user.tag}. Reason: ${reason}`, embeds: interaction.message.embeds, components: [] });
+				await webhook.editMessage(interaction.message, { content: `Denied by ${interaction.user.tag}. Reason: ${reason}`, embeds: interaction.message.embeds, components: [] });
+				// await interaction.update({ content: `Denied by ${interaction.user.tag}. Reason: ${reason}`, embeds: interaction.message.embeds, components: [] });
 				if (punishedUser) {
-					embed.setDescription(`Your appeal for punishment with ID: \`${id}\` has been denied.\n**Reason:** ${reason}**`);
-					punishedUser.send(embed)
+					embed.setDescription(`Your appeal for punishment with ID: \`${id}\` has been denied.\n**Reason:** ${reason}`)
+						.setColor('RED');
+					punishedUser.send({ embeds: [embed] })
 						.catch(e => e);
+					await interaction.editReply('Done!');
 				}
 				else {
 					await interaction.editReply('The user has left the server.');

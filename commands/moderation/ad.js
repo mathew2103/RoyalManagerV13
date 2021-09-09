@@ -13,20 +13,6 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 
 const reasons = [['Sending an advertisement without a description in the server advertising channels', '0'], ['Sending an advertisement which server revolves around invite rewards', '1'], ['Sending an advertisement containing a ping', '2'], ['Sending an advertisement back to back', '3'], ['Sending an advertisement in an incorrect channel', '4'], ['Sending an advertisement which description is vague and/or contains less than 20 characters', '5'], ['Advertising an NSFW server and/or advertising a server that isn\'t suitable for children', '6'], ['Sending an advertisement containing an invalid invite', '7'], ['Sending an advertisement that is not in English language', '8'], ['Sending an advertisement without a link', '9']];
 
-// async () => {
-// 	const mainGuildData = await settingsSchema.findOne({ guildId: config.mainServer.id });
-
-// 	for (let i = 0; i < mainGuildData.reasons.length; i++) {
-// 		let r = mainGuildData.reasons[i];
-// 		r = r.length > 100 ? r.slice(0, 100) : r;
-// 		reasons.push([r, i.toString()]);
-// 		console.log(r);
-// 		// reasons.push({ 'name': r, 'value': i.toString() });
-// 	}
-// };
-
-console.log(reasons);
-
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ad')
@@ -66,11 +52,6 @@ module.exports = {
 			if (oldwarn?.at
 				&& ((Date.now() - oldwarn.at) < 7.2e+6)) return await interaction.editReply(`This user was warned <t:${(oldwarn.at / 1000).toString().split('.')[0]}:R>, so you can't warn the user again.`);
 		}
-		// if (oldWarns?.warnings.length) {
-		// 	const oldwarn = oldWarns.warnings[oldWarns.warnings.length - 1];
-		// 	if (oldwarn?.at
-		// 		&& ((Date.now() - oldwarn.at) < 7.2e+6)) return await interaction.editReply(`This user was warned <t:${(oldwarn.at / 1000).toString().split('.')[0]}:R>, so you can't warn the user again.`);
-		// }
 
 		if (adDeletedIn.id == '699319697706975262' && reason.includes('incorrect')) return await interaction.editReply('You cannot have reason as `incorrect` if the channel is <#699319697706975262>');
 
