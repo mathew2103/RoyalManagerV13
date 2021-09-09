@@ -36,7 +36,7 @@ module.exports = {
 					await moderator.send('An ad warning issued by you has been removed. Reason: ' + reason.content);
 				}
 				await punishmentsSchema.findOneAndDelete({ punishmentId: id });
-
+				await interaction.update({ content: `Accepted by ${interaction.user.tag}. Reason: ${reason.content}`, embeds: interaction.message.embeds, components: [] });
 				if (punishedUser) {
 					embed.setDescription(`Your appeal for punishment with ID: \`${id}\` has been accepted\n**Reason:** ${reason.content}`);
 					punishedUser.send(embed)
@@ -46,10 +46,9 @@ module.exports = {
 				else {
 					await interaction.editReply('User is no longer in the server, but I removed the punished.');
 				}
-
-				await interaction.update({ content: `Accepted by ${interaction.user.tag}. Reason: ${reason.content}`, embeds: interaction.message.embeds, components: [] });
 			}
 			else {
+				await interaction.update({ content: `Denied by ${interaction.user.tag}. Reason: ${reason}`, embeds: interaction.message.embeds, components: [] });
 				if (punishedUser) {
 					embed.setDescription(`Your appeal for punishment with ID: \`${id}\` has been denied.\n**Reason:** ${reason}**`);
 					punishedUser.send(embed)
@@ -58,8 +57,6 @@ module.exports = {
 				else {
 					await interaction.editReply('The user has left the server.');
 				}
-
-				await interaction.update({ content: `Denied by ${interaction.user.tag}. Reason: ${reason}`, embeds: interaction.message.embeds, components: [] });
 			}
 
 
