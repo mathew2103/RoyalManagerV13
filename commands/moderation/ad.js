@@ -54,7 +54,7 @@ module.exports = {
 
 		// if (targetMember.roles.highest.position >= interaction.member.roles.highest.position) return await interaction.editReply('You cannot warn a member having a role higher than or equal to you.');
 
-		const mainGuildData = await settingsSchema.findOne({ guildId: process.env.MAIN_GUILD });
+		const mainGuildData = await settingsSchema.findOne({ guildId: config.mainServer.id });
 		const reason = mainGuildData.reasons[parseInt(reasonString)];
 
 		const adWarnTemplate = mainGuildData.modMsg;
