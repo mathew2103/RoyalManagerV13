@@ -22,15 +22,14 @@ module.exports = {
 		.addStringOption((op) => op.setName('reason').setDescription('The reason for which you want to warn the user.').setRequired(true)
 			.addChoices(reasons))
 		.addChannelOption((op) => op.setName('belongs_to').setDescription('The channel that the advertisement belongs to.').setRequired(false)),
-	permissions: [
-		{
-			id: '834680586970071121',
-			type: 'ROLE',
-			permission: true,
-		},
-	],
-	// name: 'ad',
-	// description: 'Ad warns a user.',
+	global: false,
+	guilds: '825958701487620107',
+	permissions:
+	{
+		id: '834680586970071121',
+		type: 'ROLE',
+		permission: true,
+	},
 	async execute(interaction) {
 		await interaction.deferReply({ ephemeral: true });
 		const targetMember = interaction.options.getMember('member');

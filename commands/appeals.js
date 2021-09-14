@@ -12,6 +12,7 @@ module.exports = {
         .setDescription('Appeal an ad warning.')
         .addStringOption((op) => op.setName('punishment_id').setDescription('The ID of the punishment that you want to appeal.').setRequired(true))
         .addStringOption((op) => op.setName('reason').setDescription('The reason for which you want to appeal this warning.').setRequired(true)),
+    global: true,
     async execute(interaction) {
 
         const punishmentId = interaction.options.getString('punishment_id');

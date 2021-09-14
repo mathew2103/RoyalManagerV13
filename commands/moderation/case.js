@@ -9,6 +9,8 @@ module.exports = {
     .setDescription('Shows information about an ad warning.')
     .addStringOption((op) => op.setName('punishment_id').setDescription('ID of the punishment you want to check.').setRequired(true))
     .addBooleanOption((op => op.setName('ephemeral').setDescription('Should the reply be shown only to you?'))),
+    global: false,
+	guilds: '825958701487620107',
     async execute(interaction) {
         const punishmentId = interaction.options.getString('punishment_id');
         const ephemeral = interaction.options.getBoolean('ephemeral');
