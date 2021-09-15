@@ -77,8 +77,8 @@ module.exports = {
             const webhooks = await appealsChannel.fetchWebhooks()
             let webhook = webhooks.first()
             if (!webhook) {
-                webhook = await appealsChannel.createWebhook(msg.guild.name, {
-                    avatar: msg.guild.iconURL()
+                webhook = await appealsChannel.createWebhook(interaction.guild.name, {
+                    avatar: interaction.guild.iconURL()
                 })
             }
 
