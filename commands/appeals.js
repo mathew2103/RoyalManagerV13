@@ -21,12 +21,15 @@ module.exports = {
         const warning = await punishmentsSchema.findOne({ punishmentId, user: interaction.user.id })
         console.log(warning)
         if (!warning) return interaction.reply({ content: 'No such warning found.', ephemeral: true })
-        if (warning.appealed) return interaction.reply({ content: 'You have already appealed this punishment.', ephemeral: true })
+        //!!! if (warning.appealed) return interaction.reply({ content: 'You have already appealed this punishment.', ephemeral: true })
 
-        const dmChannel = interaction.channel.type !== 'dm' ? await interaction.user.createDM() : interaction.channel;
-        if (interaction.channel.type !== 'dm') interaction.reply('Check dms.')
-        dmChannel.send('Send your advertisement for the appeal.')
-
+        const dmChannel = interaction?.channel?.type !== 'dm' ? await interaction.user.createDM() : interaction.channel;
+        console.log(dmChannel)
+        if (interaction.channelId !== dmChannel.id) {
+            interaction.reply({ content: 'Check dms.', ephemeral: true })
+            dmChannel.send('Send your advertisement for the appeal.')
+        } else interaction.reply('Send your advertisement for the appeal.');
+        
 
         const filter = m => m.author.id == interaction.user.id;
 

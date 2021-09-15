@@ -36,39 +36,49 @@ module.exports = {
 			 .setTimestamp()
 			 .setColor("YELLOW")
 
-        const breakChannel = await interaction.guild.channels.cache.get(config.breakRequestChannel) || interaction.channel
-
         try {
-            await breakSchema.findOneAndUpdate({ user: interaction.user.id }, {
-                reason,
-                expires: time,
-                at: Date.now(),
-                user: msg.author.id,
-                accepted: false
-            }, { upsert: true, new: true })
+			const breakData = await new breakSchema({
+				user: interaction.user.id,
+				reason,
+				expires: time,
+				at: Date.now(),
+				accepted: false
+			})
+			breakData.save()
+            // await breakSchema.findOneAndUpdate({ user: interaction.user.id }, {
+            //     reason,
+            //     expires: time,
+            //     at: Date.now(),
+            //     user: msg.author.id,
+            //     accepted: false
+            // }, { upsert: true, new: true })
         } catch (e) { return interaction.reply(`Failed to update database.`) }
 
         const yesButton = new Discord.MessageButton()
-        .setCustomId(`break_${interaction.user.id}_yes`)
+        .setCustomId(`break_yes_${interaction.user.id}`)
         .setLabel('Accept')
         .setStyle('SUCCESS')
         
         const noButton = new Discord.MessageButton()
-        .setCustomId(`break_${interaction.user.id}_no`)
+        .setCustomId(`break_no_${interaction.user.id}`)
         .setLabel('Deny')
         .setStyle('DANGER')
 
         const row = new Discord.MessageActionRow()
         .addComponents([yesButton, noButton])
 
-        await breakChannel.send({ content: '@here', embeds: [embed], components: row })
+		const breakChannel = await interaction.guild.channels.cache.get(config.breakRequestChannel) || interaction.channel
+		const webhooks = await breakChannel.fetchWebhooks()
+		let webhook = webhooks.first()
+		if (!webhook) {
+			webhook = await breakChannel.createWebhook(msg.guild.name, {
+				avatar: msg.guild.iconURL()
+			})
+		}
+		
+		await webhook.send({ content: '@here', embeds: [embed], components: [row] })
+        // await breakChannel.send({ content: '@here', embeds: [embed], components: [row] })
 
         interaction.reply({ content: 'Your break has been requested. You will receive a DM soon about the status of your break request.', ephemeral: true})
-		/*
- 
-		 await brChannel.send('@here', { embed: embed, components: row })
- 
-		 return msg.reply(`Your break has been requested. You will receive a DM soon about the status of your break request.`)
-		 */
 	},
 };
