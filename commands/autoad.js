@@ -123,7 +123,7 @@ module.exports = {
 
                     //u there ?
                     //yes.
-                    //push once more, ad
+                    //push once more, and start the bot ;)
                     try {
                         await autoads.findOneAndUpdate({ interval: 4 }, {
                             interval: 4,
