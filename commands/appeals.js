@@ -82,7 +82,6 @@ module.exports = {
                 })
             }
 
-
             webhook.send({ embeds: [embed], username: interaction.user.username, avatarURL: interaction.user.displayAvatarURL(), components: [row] })
             dmChannel.send('Your appeal has been submitted. Please wait for us to review your appeal.')
 
