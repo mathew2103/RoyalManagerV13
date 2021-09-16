@@ -15,11 +15,7 @@ module.exports = {
     guilds: ['825958701487620107'],
     async execute(interaction) {
         const trigger = interaction.options.getString('option')
-        //start. // wouldnt it say
-        //no it wont
-        //dw
-//just start.
-        //Time arg is not def
+        
         const rdata = await autoads.find({ interval: 4 });
         if (!rdata) return interaction.reply(`No data found...`)
 
@@ -40,7 +36,7 @@ module.exports = {
 
         const createButton = (ID, Emoji, Label, Style) => {
             const createdButton = new Discord.MessageButton()
-                .setID(ID)
+                .setCustomId(ID)
                 .setEmoji(Emoji)
                 .setStyle(Style)
 
@@ -55,7 +51,7 @@ module.exports = {
             deleteButton = createButton('delete', '❌', 'Delete', 'PRIMARY')
 
         const allActionRow = new Discord.MessageActionRow()
-            .addComponentss([firstPageButton, previousPageButton, destroyButton, nextPageButton, lastPageButton])
+            .addComponents([firstPageButton, previousPageButton, destroyButton, nextPageButton, lastPageButton])
 
         const secondActionRow = new Discord.MessageActionRow()
             .addComponents(deleteButton)
@@ -67,13 +63,12 @@ module.exports = {
             .addComponents([firstPageButton.setDisabled(false), previousPageButton.setDisabled(false), destroyButton, nextPageButton.setDisabled(true), lastPageButton.setDisabled(true)])
 
 
-        const sent = (data.length > 1) ? await interaction.reply({ embeds: [embed], components: [first2Off, secondActionRow] }) : await interaction.reply({ embeds: [embed] })
+        const sent = (data.length > 1) ? await interaction.reply({ embeds: [embed], components: [first2Off, secondActionRow], fetchReply: true }) : await interaction.reply({ embeds: [embed], fetchReply: true })
         if (data.length == 1) return;
-        //join: https://discord.gg/8wsyrNR3
-        //nice music ^ sus but ok / oh lofi ? YUS
+       
         const filter = b => true;
-
-        const collector = sent.createMessageCollector({ filter, time: 5 * 60 * 1000 })
+        
+        const collector = interaction.channel.createMessageCollector({ filter, time: 5 * 60 * 1000 })
 
         collector.on('collect', async i => {
             switch (i.customId) {
@@ -235,7 +230,7 @@ module.exports = {
         //         return await b.reply.edit(`Couldnt remove the ad`)
         //     }
         // })
-
+/*
         if (trigger.toLowerCase() !== 'add' && trigger.toLowerCase() !== 'remove') return msg.reply(`You have to provide add or remove instead of \`${args[1]}\`.`)
         if (trigger.toLowerCase() === 'add') {
             const timeToDeleteIn = timeArg ? ms(timeArg) : null
@@ -281,5 +276,6 @@ module.exports = {
                 return interaction.reply(`Couldnt remove the ad`)
             }
         }
+        */
     },
 };
