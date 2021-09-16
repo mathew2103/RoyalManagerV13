@@ -3,17 +3,23 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js')
 const uniqid = require('uniqid')
 const ms = require('ms')
-const autoads = require('../schemas/auto-ad-schema')
+const autoads = require('../schemas/autoAd-schema')
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('autoad')
         .setDescription('Add or remove an auto ad.')
-        .addChannelOption((op) => op.setName('channel').setDescription('Channel for Advertisement').setRequired(true))
-        .addStringOption((op) => op.setName('option').setDescription('Add/Remove').addChoice('Add', 'add').addChoice('Remove', 'remove').setRequired(true)),
-    async execute(client, interaction) {
+        .addChannelOption((op) => op.setName('channel').setDescription('Channel for Advertisement').setRequired(false))
+        .addStringOption((op) => op.setName('option').setDescription('Add/Remove').addChoice('Add', 'add').addChoice('Remove', 'remove').setRequired(false)),
+    global: false,
+    guilds: ['825958701487620107'],
+    async execute(interaction) {
         const trigger = interaction.options.getString('option')
-        const [channelID, timeArg] = args
+        //start. // wouldnt it say
+        //no it wont
+        //dw
+//just start.
+        //Time arg is not def
         const rdata = await autoads.find({ interval: 4 });
         if (!rdata) return interaction.reply(`No data found...`)
 
