@@ -77,12 +77,7 @@ module.exports = {
                     embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
                     await sent.edit({ embeds: [embed], components: [first2Off, secondActionRow] })
                     break;
-//me gona go at down cya~
-//u gonna close live share?
-//if yes, then push and u may leav.
-//ok but not now lol
-//fine smh
-            //u        
+        
                 case 'previousPage':
 
 
