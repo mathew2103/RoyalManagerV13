@@ -72,6 +72,7 @@ module.exports = {
         collector.on('collect', async i => {
             switch (i.customId) {
                 case 'firstPage':
+                    await i.deferReply({ ephemeral: true });
                     if (page === 1) return;
                     page = 1
                     embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
@@ -79,6 +80,7 @@ module.exports = {
                     break;
 
                 case 'previousPage':
+                    await i.deferReply({ ephemeral: true });
                     if (page === 1) return;//copypasta.
                     page--;
 
@@ -88,6 +90,7 @@ module.exports = {
                     break;
 
                 case 'nextPage':
+                    await i.deferReply({ ephemeral: true });
                     if (page === data.length) return;//copypasta.
 
                     page++;
@@ -98,12 +101,13 @@ module.exports = {
                     break;
 
                 case 'stop':
+                    await i.deferReply({ ephemeral: true });
                     collector.stop();
                     await sent.edit({ embeds: [embed], components: [] })
                     break;
 
                 case 'lastPage':
-                    await i.deferReply()
+                    await i.deferReply({ ephemeral: true });
                     if (page === data.length) return;
                     page = data.length
                     embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
@@ -112,8 +116,14 @@ module.exports = {
 
                 case 'deleteButton':
                     const adToDelete = data[page - 1]
-                    //oy ima push this first just in case idk proly me shower after dis
-                    //fine
+                    data = data.filter(e => e.ad !== adToDelete.ad);
+                    page = 1
+                    embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
+                    await sent.edit({ embeds: [embed], components: [first2Off, secondActionRow] })
+
+                    //u there ?
+                    //yes.
+                    //push once more, ad
                     try {
                         await autoads.findOneAndUpdate({ interval: 4 }, {
                             interval: 4,
@@ -121,12 +131,12 @@ module.exports = {
                                 ads: adToDelete
                             }
                         })
-                        await b.reply.edit(`Removed the auto ad.`)
-                        await msg.delete()
-                        await sent.delete()
+                        await b.reply.edit('Removed the auto ad.')
+                        // await msg.delete()
+                        // await sent.delete()
                     } catch (e) {
-                        return await b.reply.edit(`Couldnt remove the ad`)
-                    } await
+                        return await i.editReply('Couldnt remove the ad')
+                    }
                     break;
             }
         })
