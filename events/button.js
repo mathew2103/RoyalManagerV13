@@ -9,9 +9,10 @@ module.exports = {
 	name: 'interactionCreate',
 	async execute(interaction) {
 		if (!interaction.isButton()) return;
+		if (!interaction.customId.includes('_')) return;
 
 		const embed = new MessageEmbed();
-		const oldEmbeds = interaction.message.embeds
+		const oldEmbeds = interaction.message.embeds;
 		const webhook = await interaction.message.fetchWebhook();
 		const filter = m => m.author.id == interaction.user.id;
 		const buttonIdParts = interaction.customId.split('_');
@@ -97,16 +98,16 @@ module.exports = {
 						.catch(e => interaction.editReply('Couldn\'t update nickname.'))
 
 					embed.setAuthor('Break Accepted')
-						.setDescription(`Your break has been accepted and your break ends ${time((Date.now() + parseInt(breakData.expires)/ 1000), 'R')}\nIf you feel like you can meet the quota and want to be off break, use \`r!leave\` in <#748188786386665592>`)
+						.setDescription(`Your break has been accepted and your break ends ${time((Date.now() + parseInt(breakData.expires) / 1000), 'R')}\nIf you feel like you can meet the quota and want to be off break, use \`r!leave\` in <#748188786386665592>`)
 						.addField(`Reason`, breakReason.content)
 						.setTimestamp()
 						.setColor("GREEN")
 					member.send({ embeds: [embed] }).catch(e => interaction.editReply('Seems the user has closed their dms.'));
 				} else {
 
-					try{
+					try {
 						await breakSchema.findOneAndDelete({ user: id })
-					}catch(e){ interaction.editReply('Couldn\'t decline the break in the database.')}
+					} catch (e) { interaction.editReply('Couldn\'t decline the break in the database.') }
 
 					embed.setAuthor(`Break Denied`)
 						.setDescription(`Your break request has been declined.`)

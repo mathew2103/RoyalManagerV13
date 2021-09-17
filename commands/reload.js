@@ -13,7 +13,8 @@ module.exports = {
 
         if (!command) return interaction.reply(`There is no command with name or alias \`${commandName}\`, ${interaction.user}!`);
 
-        delete require.cache[require.resolve(`./${command.name.toLowerCase()}.js`)];
+        delete require.cache[require.resolve(`./${command.category ? `${command.category}/` : ''}${command.name.toLowerCase()}.js`)];    
+        
         try {
             const props = require(`./${command.name.toLowerCase()}.js`);
             console.log(`Reloaded ${props.name}`)

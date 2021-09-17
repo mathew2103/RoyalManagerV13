@@ -8,14 +8,14 @@ module.exports = {
         .setName('config')
         .setDescription('Configuration for the server.')
         .addStringOption((op) => op.setName('query').setDescription('Config Settings').addChoice('Reason', 'reason').addChoice('Add', 'add').addChoice('Remove', 'remove').addChoice('Message', 'message').addChoice('Logs', 'logs'))
-        .addChannelOption((op) => op.setName('logsChannel').setDescription('Pick this if you choose logs in query')),
+        .addChannelOption((op) => op.setName('logschannel').setDescription('Pick this if you choose logs in query')),
     async execute(client, interaction) {
         const guildId = interaction.guild.id
         // const options = ['reason', 'message', 'logs']
         // if(!options.includes(args[0].toLowerCase()))return interaction.reply(`Your options are \`${options}\`.`)
 
         const query = interaction.options.getString('query')
-        const logsChannel = interaction.options.getString('logsChannel')
+        const logsChannel = interaction.options.getString('logschannel')
 
 
         switch (query) {

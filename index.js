@@ -52,7 +52,9 @@ const readCommands = async (dir) => {
 		else {
 			const option = require(join(__dirname, dir, file));
 			// console.log(option);
-			option.name ? client.commands.set(option.name.toLowerCase(), option) : client.commands.set(option.data.name.toLowerCase(), option);
+			if(dir !== './commands')option.category = dir.split('\\\\')[1];
+			console.log(option)
+			client.commands.set(option.data.name.toLowerCase(), option)
 		}
 	}
 	// console.log(client.commands);
