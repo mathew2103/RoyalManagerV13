@@ -40,7 +40,7 @@ for (const file of eventFiles) {
 // 		console.error(error);
 // 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 // 	}
-// });
+// }); USE THE LIVESHARE CHAT YEA YEA
 
 const readCommands = async (dir) => {
 	const files = fs.readdirSync(join(__dirname, dir));
@@ -63,7 +63,9 @@ readCommands('./commands');
 client.on('messageCreate', async message => {
 
 
-	if (message.content.toLowerCase() === '!deploy' && message.author.id === '378025254125305867' || message.author.id === '605061180599304212') {
+
+	if (message.content.toLowerCase() === '!deploy' && (message.author.id === '378025254125305867' || message.author.id === '605061180599304212')) {
+
 
 		const registerCmd = async (dir) => {
 			const files = fs.readdirSync(join(__dirname, dir));
@@ -74,21 +76,44 @@ client.on('messageCreate', async message => {
 				}
 				else {
 					const option = require(join(__dirname, dir, file));
-					const perms = option.permissions;
+					// const perms = option.permissions;
 
-					await client.guilds.cache.get('825958701487620107')?.commands.create(option.data);
-					if (perms) {
-						await console.log(perms);
-						// await cmd.permissions.set({ perms });
+					if (option.global || !option.guilds?.length) {
+						try {
+							client.application.commands.create(option.data);
+						}
+						catch (err) {
+							console.error(err);
+						}
 					}
+					else {
+						let guilds = option.guilds;
+						if (!Array.isArray(guilds)) guilds = [guilds];
+
+						for (const guildId of guilds) {
+							const guild = client.guilds.cache.get(guildId);
+							if (!guild) continue;
+							try {
+								const cmd = await guild.commands.create(option.data);
+								if (option.permissions) {
+									await guild.commands.permissions.add({ command: cmd.id, permissions: [option.permissions] });
+								}
+								// if(option.permissions) await cmd.permissions.add({ permissions: option.permissions})
+							}
+							catch (e) {
+								console.error(e);
+							}
+						}
+					}
+
 				}
 			}
+
 		};
 
 		registerCmd('./commands');
 
 		// await client.guilds.cache.get('825958701487620107')?.commands.create(adCmdData);
-
 	}
 });
 

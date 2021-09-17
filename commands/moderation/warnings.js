@@ -9,6 +9,8 @@ module.exports = {
 		.setDescription('Check the warnings of a user.')
 		.addUserOption((option) => option.setName('user').setDescription('The user whose warnings you would like to see.'))
 		.addBooleanOption((option) => option.setName('ephemeral').setDescription('Should the reply be shown only to you?')),
+	global: false,
+	guilds: '825958701487620107',
 	async execute(interaction) {
 		const ephemeral = interaction.options.get('ephemeral');
 		await interaction.deferReply({ ephemeral: ephemeral });
