@@ -81,11 +81,10 @@ module.exports = {
             const webhooks = await appealsChannel.fetchWebhooks()
             let webhook = webhooks.first()
             if (!webhook) {
-                webhook = await appealsChannel.createWebhook(msg.guild.name, {
-                    avatar: msg.guild.iconURL()
+                webhook = await appealsChannel.createWebhook(interaction.guild.name, {
+                    avatar: interaction.guild.iconURL()
                 })
             }
-
 
             webhook.send({ embeds: [embed], username: interaction.user.username, avatarURL: interaction.user.displayAvatarURL(), components: [row] })
             dmChannel.send('Your appeal has been submitted. Please wait for us to review your appeal.')

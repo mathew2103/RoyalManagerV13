@@ -3,12 +3,14 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js')
 const uniqid = require('uniqid')
 const ms = require('ms')
-const autoads = require('../schemas/autoAd-schema')
+const autoads = require('../schemas/auto-ad-schema')
+
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('autoad')
         .setDescription('Add or remove an auto ad.')
+
         .addChannelOption((op) => op.setName('channel').setDescription('Channel for Advertisement').setRequired(false))
         .addStringOption((op) => op.setName('option').setDescription('Add/Remove').addChoice('Add', 'add').addChoice('Remove', 'remove').setRequired(false)),
     global: false,
@@ -63,12 +65,14 @@ module.exports = {
             .addComponents([firstPageButton.setDisabled(false), previousPageButton.setDisabled(false), destroyButton, nextPageButton.setDisabled(true), lastPageButton.setDisabled(true)])
 
 
+
         const sent = (data.length > 1) ? await interaction.reply({ embeds: [embed], components: [first2Off, secondActionRow], fetchReply: true }) : await interaction.reply({ embeds: [embed], fetchReply: true })
         if (data.length == 1) return;
        
         const filter = b => true;
         
         const collector = interaction.channel.createMessageCollector({ filter, time: 5 * 60 * 1000 })
+
 
         collector.on('collect', async i => {
             switch (i.customId) {
@@ -126,9 +130,6 @@ module.exports = {
                     //yes.
                     //push once more, and start the bot ;)
 
-                    //also wait gona push at the uh main
-
-                    //started
                     try {
                         await autoads.findOneAndUpdate({ interval: 4 }, {
                             interval: 4,
@@ -230,7 +231,9 @@ module.exports = {
         //         return await b.reply.edit(`Couldnt remove the ad`)
         //     }
         // })
+
 /*
+
         if (trigger.toLowerCase() !== 'add' && trigger.toLowerCase() !== 'remove') return msg.reply(`You have to provide add or remove instead of \`${args[1]}\`.`)
         if (trigger.toLowerCase() === 'add') {
             const timeToDeleteIn = timeArg ? ms(timeArg) : null
@@ -276,6 +279,8 @@ module.exports = {
                 return interaction.reply(`Couldnt remove the ad`)
             }
         }
+
         */
+
     },
 };

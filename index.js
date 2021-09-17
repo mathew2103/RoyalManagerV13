@@ -63,7 +63,9 @@ readCommands('./commands');
 client.on('messageCreate', async message => {
 
 
+
 	if (message.content.toLowerCase() === '!deploy' && (message.author.id === '378025254125305867' || message.author.id === '605061180599304212')) {
+
 
 		const registerCmd = async (dir) => {
 			const files = fs.readdirSync(join(__dirname, dir));
