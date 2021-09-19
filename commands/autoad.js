@@ -9,30 +9,18 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('autoad')
         .setDescription('Add or remove an auto ad.')
-        .addSubcommand(subCmd =>
-            subCmd
-                .setName('show')
-                .setDescription('Shows the autoad menu')
-                .addChannelOption((op) =>
-                    op
-                        .setName('channel')
-                        .setDescription('Channel for Advertisement')
-                        .setRequired(false)))
-        .addSubcommand(subCmd =>
-            subCmd
-                .setName('add')
-                .setDescription('Add an autoad')
-                .addChannelOption((op) =>
-                    op
-                        .setName('channel')
-                        .setDescription('Channel for Advertisement')
-                        .setRequired(true)
-                )
-        ),
+        .addSubcommand(subCommand => subCommand
+            .setName('show')
+            .setDescription('Shows the autoad menu')
+            .addChannelOption(op => op.setName('channel').setDescription('Only autoads of this channel will be shown')))
+        .addSubcommand(subCommand => subCommand
+            .setName('add')
+            .setDescription('Add an autoad')
+            .addChannelOption(op => op.setName('channel').setDescription('The channel in which this autoad should be'))),
     global: false,
     guilds: ['825958701487620107'],
     async execute(interaction) {
-        console.log(interaction)
+        console.log(interaction.options)
 
         const rdata = await autoads.find({ interval: 4 });
         if (!rdata) return interaction.reply(`No data found...`)

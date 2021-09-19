@@ -79,6 +79,8 @@ client.on('messageCreate', async message => {
 				else {
 					const option = require(join(__dirname, dir, file));
 					// const perms = option.permissions;
+					if(option.data.options[0]?.options)option.data.options[0].type = 1
+					if(option.data.options[1]?.options)option.data.options[1].type = 1
 					console.log(option.data.options)
 					if (option.global || !option.guilds?.length) {
 						try {
@@ -108,6 +110,7 @@ client.on('messageCreate', async message => {
 							}
 							catch (e) {
 								console.error(e);
+								process.exit()
 							}
 						}
 					}
