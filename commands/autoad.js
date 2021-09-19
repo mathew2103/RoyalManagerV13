@@ -9,13 +9,30 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('autoad')
         .setDescription('Add or remove an auto ad.')
-
-        .addChannelOption((op) => op.setName('channel').setDescription('Channel for Advertisement').setRequired(false))
-        .addStringOption((op) => op.setName('option').setDescription('Add/Remove').addChoice('Add', 'add').addChoice('Remove', 'remove').setRequired(false)),
+        .addSubcommand(subCmd =>
+            subCmd
+                .setName('show')
+                .setDescription('Shows the autoad menu'))
+                .addChannelOption((op) =>
+                    op
+                        .setName('channel')
+                        .setDescription('Channel for Advertisement')
+                        .setRequired(false))
+        .addSubcommand(subCmd =>
+            subCmd
+                .setName('add')
+                .setDescription('Add an autoad')
+                .addChannelOption((op) =>
+                    op
+                        .setName('channel')
+                        .setDescription('Channel for Advertisement')
+                        .setRequired(true)
+                )
+        ),
     global: false,
     guilds: ['825958701487620107'],
     async execute(interaction) {
-        const trigger = interaction.options.getString('option')
+        console.log(interaction)
 
         const rdata = await autoads.find({ interval: 4 });
         if (!rdata) return interaction.reply(`No data found...`)
@@ -134,13 +151,13 @@ module.exports = {
                             $pull: {
                                 ads: adToDelete
                             }
-                        }, {upsert: true})
-                        await i.editReply({content: 'Removed the autoad.', ephemeral: true})
+                        }, { upsert: true })
+                        await i.followUp({ content: 'Removed the autoad.', ephemeral: true })
                         // await msg.delete()
                         // await sent.delete()
                     } catch (e) {
                         console.error(e)
-                        return await i.editReply({content: 'Couldnt remove the ad', ephemeral: true})
+                        return await i.followUp({ content: 'Couldnt remove the ad', ephemeral: true })
                     }
                     break;
             }

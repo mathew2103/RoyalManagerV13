@@ -53,7 +53,7 @@ const readCommands = async (dir) => {
 			const option = require(join(__dirname, dir, file));
 			// console.log(option);
 			if(dir !== './commands')option.category = dir.split('\\\\')[1];
-			console.log(option)
+			
 			client.commands.set(option.data.name.toLowerCase(), option)
 		}
 	}
@@ -64,7 +64,7 @@ readCommands('./commands');
 
 client.on('messageCreate', async message => {
 
-
+	if(!message.guild)return;
 
 	if (message.content.toLowerCase() === '!deploy' && (message.author.id === '378025254125305867' || message.author.id === '605061180599304212')) {
 
@@ -79,7 +79,7 @@ client.on('messageCreate', async message => {
 				else {
 					const option = require(join(__dirname, dir, file));
 					// const perms = option.permissions;
-
+					console.log(option.data.options)
 					if (option.global || !option.guilds?.length) {
 						try {
 							client.application.commands.create(option.data);
@@ -95,12 +95,16 @@ client.on('messageCreate', async message => {
 						for (const guildId of guilds) {
 							const guild = client.guilds.cache.get(guildId);
 							if (!guild) continue;
+							const guildCmds = await guild.commands.fetch();
 							try {
-								const cmd = await guild.commands.create(option.data);
-								if (option.permissions) {
-									await guild.commands.permissions.add({ command: cmd.id, permissions: [option.permissions] });
-								}
-								// if(option.permissions) await cmd.permissions.add({ permissions: option.permissions})
+								const oldCmd = guildCmds.find(e => e.name == option.data.name)
+								let cmd = ''
+								if(oldCmd) cmd = await guild.commands.edit(oldCmd, option.data);
+								else cmd = await guild.commands.create(option.data);
+
+								if (option.permissions) await guild.commands.permissions.add({ command: cmd.id, permissions: [option.permissions] });
+								
+								
 							}
 							catch (e) {
 								console.error(e);
@@ -116,6 +120,17 @@ client.on('messageCreate', async message => {
 		registerCmd('./commands');
 
 		// await client.guilds.cache.get('825958701487620107')?.commands.create(adCmdData);
+	}
+
+	if (message.content.toLowerCase().startsWith('!eval') && (message.author.id === '378025254125305867' || message.author.id === '605061180599304212')){
+		const code = message.content.split('!eval ')[1]
+		if(!code)return message.reply('Provide some code nerd.')
+
+		try{
+			eval(code)
+		}catch(e){
+			console.error(e)
+		}
 	}
 });
 
