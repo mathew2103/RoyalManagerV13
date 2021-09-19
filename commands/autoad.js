@@ -12,12 +12,12 @@ module.exports = {
         .addSubcommand(subCmd =>
             subCmd
                 .setName('show')
-                .setDescription('Shows the autoad menu'))
+                .setDescription('Shows the autoad menu')
                 .addChannelOption((op) =>
                     op
                         .setName('channel')
                         .setDescription('Channel for Advertisement')
-                        .setRequired(false))
+                        .setRequired(false)))
         .addSubcommand(subCmd =>
             subCmd
                 .setName('add')
