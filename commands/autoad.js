@@ -16,226 +16,150 @@ module.exports = {
         .addSubcommand(subCommand => subCommand
             .setName('add')
             .setDescription('Add an autoad')
-            .addChannelOption(op => op.setName('channel').setDescription('The channel in which this autoad should be'))),
+            .addChannelOption(op => op.setName('duration').setDescription('The duration for which the autoad be posted.').setRequired(true))
+            .addChannelOption(op => op.setName('channel').setDescription('The channel in which this autoad should be').setRequired(true))),
     global: false,
     guilds: ['825958701487620107'],
     async execute(interaction) {
-        console.log(interaction.options)
+
 
         const rdata = await autoads.find({ interval: 4 });
         if (!rdata) return interaction.reply(`No data found...`)
 
-        const data2 = rdata[0].ads;
-        if (!data2) return interaction.reply(`No data found..`)
+        if (interaction.options.getSubcommand() == 'show') {
 
-        const channel = interaction.options.getChannel('channel')
-        let data = data2
-        if (channel) data = data2.filter(e => e.channel === channel.id)
+            const data2 = rdata[0].ads;
+            if (!data2) return interaction.reply(`No data found..`)
 
-        if (!data || data.length < 1) return interaction.reply(`No data found.`)
-        let page = 1;
-        const embed = new Discord.MessageEmbed()
-            .setAuthor(`Auto Advertisement Menu`)
-            .setColor(`RANDOM`)
-            .setFooter(`Page: ${page}/${data.length}`)
-        embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`)
+            const channel = interaction.options.getChannel('channel')
+            let data = data2
+            if (channel) data = data2.filter(e => e.channel === channel.id)
 
-        const createButton = (ID, Emoji, Label, Style) => {
-            const createdButton = new Discord.MessageButton()
-                .setCustomId(ID)
-                .setEmoji(Emoji)
-                .setStyle(Style)
+            if (!data || data.length < 1) return interaction.reply(`No data found.`)
+            let page = 1;
+            const embed = new Discord.MessageEmbed()
+                .setAuthor(`Auto Advertisement Menu`)
+                .setColor(`RANDOM`)
+                .setFooter(`Page: ${page}/${data.length}`)
+            embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`)
 
-            Label ? createdButton.setLabel(Label) : null;
-            return createdButton
-        }
-        const firstPageButton = createButton('firstPage', '⏪', null, 'PRIMARY'),
-            previousPageButton = createButton('previousPage', '◀', null, 'PRIMARY'),
-            nextPageButton = createButton('nextPage', '▶', null, 'PRIMARY'),
-            lastPageButton = createButton('lastPage', '⏩', null, 'PRIMARY'),
-            destroyButton = createButton('stop', '❌', null, 'SUCCESS'),
-            deleteButton = createButton('deleteButton', '❌', 'Delete', 'PRIMARY')
+            const createButton = (ID, Emoji, Label, Style) => {
+                const createdButton = new Discord.MessageButton()
+                    .setCustomId(ID)
+                    .setEmoji(Emoji)
+                    .setStyle(Style)
 
-        const allActionRow = new Discord.MessageActionRow()
-            .addComponents([firstPageButton, previousPageButton, destroyButton, nextPageButton, lastPageButton])
-
-        const secondActionRow = new Discord.MessageActionRow()
-            .addComponents([deleteButton])
-
-        const first2Off = new Discord.MessageActionRow()
-            .addComponents([firstPageButton.setDisabled(true), previousPageButton.setDisabled(true), destroyButton, nextPageButton.setDisabled(false), lastPageButton.setDisabled(false)])
-
-        const last2Off = new Discord.MessageActionRow()
-            .addComponents([firstPageButton.setDisabled(false), previousPageButton.setDisabled(false), destroyButton, nextPageButton.setDisabled(true), lastPageButton.setDisabled(true)])
-
-
-        await interaction.reply({ embeds: [embed], components: [first2Off, secondActionRow], fetchReply: true })
-
-        // (data.length > 1) ?  : await interaction.reply({ embeds: [embed], fetchReply: true })
-        if (data.length == 1) return;
-        const sent = await interaction.fetchReply()
-
-        const filter = i => i.user.id == interaction.user.id;
-
-        const collector = sent.createMessageComponentCollector({ filter, time: 5 * 60 * 1000 })
-
-
-        collector.on('collect', async i => {
-            // await i.deferReply();
-            switch (i.customId) {
-                case 'firstPage':
-
-                    if (page === 1) return;
-                    page = 1
-                    embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
-                    await i.update({ embeds: [embed], components: [first2Off, secondActionRow] })
-                    break;
-
-                case 'previousPage':
-
-                    if (page === 1) return;//copypasta.
-                    page--;
-
-                    embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
-                    if (page === 1) await interaction.update({ embeds: [embed], components: [first2Off, secondActionRow] });
-                    else await i.update({ embeds: [embed], components: [allActionRow, secondActionRow] });
-                    break;
-
-                case 'nextPage':
-
-                    if (page === data.length) return;//copypasta.
-
-                    page++;
-                    embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
-
-                    if (page === data.length) await interaction.update({ embeds: [embed], components: [last2Off, secondActionRow] });
-                    else await i.update({ embeds: [embed], components: [allActionRow, secondActionRow] })
-                    break;
-
-                case 'stop':
-
-                    collector.stop();
-                    await i.update({ embeds: [embed], components: [] })
-                    break;
-
-                case 'lastPage':
-
-                    if (page === data.length) return;
-                    page = data.length
-                    embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
-                    await i.update({ embeds: [embed], components: [last2Off, secondActionRow] })
-                    break;
-
-                case 'deleteButton':
-                    const adToDelete = data[page - 1];
-                    data = data.filter(e => e.ad !== adToDelete.ad);
-                    page = 1;
-                    embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
-                    await i.update({ embeds: [embed], components: [first2Off, secondActionRow] })
-
-                    try {
-                        await autoads.findOneAndUpdate({ interval: 4 }, {
-                            interval: 4,
-                            $pull: {
-                                ads: adToDelete
-                            }
-                        }, { upsert: true })
-                        await i.followUp({ content: 'Removed the autoad.', ephemeral: true })
-                        // await msg.delete()
-                        // await sent.delete()
-                    } catch (e) {
-                        console.error(e)
-                        return await i.followUp({ content: 'Couldnt remove the ad', ephemeral: true })
-                    }
-                    break;
+                Label ? createdButton.setLabel(Label) : null;
+                return createdButton
             }
-        })
+            const firstPageButton = createButton('firstPage', '⏪', null, 'PRIMARY'),
+                previousPageButton = createButton('previousPage', '◀', null, 'PRIMARY'),
+                nextPageButton = createButton('nextPage', '▶', null, 'PRIMARY'),
+                lastPageButton = createButton('lastPage', '⏩', null, 'PRIMARY'),
+                destroyButton = createButton('stop', '❌', null, 'SUCCESS'),
+                deleteButton = createButton('deleteButton', '❌', 'Delete', 'PRIMARY')
 
-        collector.on('end', async i => {
+            const allActionRow = new Discord.MessageActionRow()
+                .addComponents([firstPageButton, previousPageButton, destroyButton, nextPageButton, lastPageButton])
 
-        })
+            const secondActionRow = new Discord.MessageActionRow()
+                .addComponents([deleteButton])
 
-        // const firstPagefilter = (button) => button.clicker.user.id === msg.author.id && button.id == 'firstPage'
-        // const previousPagefilter = (button) => button.clicker.user.id === msg.author.id && button.id == 'previousPage';
-        // const nextPagefilter = (button) => button.clicker.user.id === msg.author.id && button.id == 'nextPage';
-        // const lastPagefilter = (button) => button.clicker.user.id === msg.author.id && button.id == 'lastPage';
-        // const destroyfilter = (button) => button.clicker.user.id === msg.author.id && button.id == 'destroy';
-        // const deleteFilter = (button) => button.clicker.user.id == msg.author.id && button.id == 'delete';
+            const first2Off = new Discord.MessageActionRow()
+                .addComponents([firstPageButton.setDisabled(true), previousPageButton.setDisabled(true), destroyButton, nextPageButton.setDisabled(false), lastPageButton.setDisabled(false)])
 
-        // const firstPageCollector = sent.createButtonCollector(firstPagefilter, { time: 1000 * 60 * 5 }),
-        //     previousPageCollector = sent.createButtonCollector(previousPagefilter, { time: 1000 * 60 * 5 }),
-        //     nextPageCollector = sent.createButtonCollector(nextPagefilter, { time: 1000 * 60 * 5 }),
-        //     lastPageCollector = sent.createButtonCollector(lastPagefilter, { time: 1000 * 60 * 5 }),
-        //     destroyCollector = sent.createButtonCollector(destroyfilter, { time: 1000 * 60 * 5 }),
-        //     deleteCollector = sent.createButtonCollector(deleteFilter, { time: 1000 * 60 * 5 })
+            const last2Off = new Discord.MessageActionRow()
+                .addComponents([firstPageButton.setDisabled(false), previousPageButton.setDisabled(false), destroyButton, nextPageButton.setDisabled(true), lastPageButton.setDisabled(true)])
 
-        // firstPageCollector.on('collect', async b => {
-        //     await b.reply.defer()
-        //     if (page == 1) return;
-        //     page = 1
-        //     embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
-        //     await interaction.editReply({ embed: embed, components: [first2Off, secondActionRow] })
-        // })
 
-        // previousPageCollector.on('collect', async b => {
-        //     await b.reply.defer()
-        //     if (page == 1) return;
-        //     page--
-        //     embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
-        //     if (page == 1) await interaction.editReply({ embed: embed, components: [first2Off, secondActionRow] });
-        //     else await interaction.editReply({ embed: embed, components: [allActionRow, secondActionRow] });
-        // })
+            await interaction.reply({ embeds: [embed], components: [first2Off, secondActionRow], fetchReply: true })
 
-        // nextPageCollector.on('collect', async b => {
-        //     await b.reply.defer()
-        //     if (page == data.length) return;
-        //     page++
-        //     embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
+            // (data.length > 1) ?  : await interaction.reply({ embeds: [embed], fetchReply: true })
+            if (data.length == 1) return;
+            const sent = await interaction.fetchReply()
 
-        //     if (page == data.length) await interaction.editReply({ embed: embed, components: [last2Off, secondActionRow] });
-        //     else await interaction.editReply({ embed: embed, components: [allActionRow, secondActionRow] });
+            const filter = i => i.user.id == interaction.user.id;
 
-        // })
+            const collector = sent.createMessageComponentCollector({ filter, time: 5 * 60 * 1000 })
 
-        // lastPageCollector.on('collect', async b => {
-        //     await b.reply.defer()
-        //     if (page == data.length) return;
-        //     page = data.length
-        //     embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
-        //     await interaction.editReply({ embed: embed, components: [last2Off, secondActionRow] })
-        // })
 
-        // destroyCollector.on('collect', async b => {
-        //     await b.reply.defer()
-        //     await msg.delete()
-        //     await sent.delete()
-        //     firstPageCollector.stop()
-        //     lastPageCollector.stop()
-        //     nextPageCollector.stop()
-        //     lastPageCollector.stop()
-        //     destroyCollector.stop()
-        //     deleteCollector.stop()
-        // })
+            collector.on('collect', async i => {
+                // await i.deferReply();
+                switch (i.customId) {
+                    case 'firstPage':
 
-        // deleteCollector.on('collect', async b => {
-        //     await b.reply.think(true)
-        //     const adToDelete = data[page - 1]
+                        if (page === 1) return;
+                        page = 1
+                        embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
+                        await i.update({ embeds: [embed], components: [first2Off, secondActionRow] })
+                        break;
 
-        //     try {
-        //         await autoads.findOneAndUpdate({ interval: 4 }, {
-        //             interval: 4,
-        //             $pull: {
-        //                 ads: adToDelete
-        //             }
-        //         })
-        //         await b.reply.edit(`Removed the auto ad.`)
-        //         await msg.delete()
-        //         await sent.delete()
-        //     } catch (e) {
-        //         return await b.reply.edit(`Couldnt remove the ad`)
-        //     }
-        // })
+                    case 'previousPage':
 
+                        if (page === 1) return;//copypasta.
+                        page--;
+
+                        embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
+                        if (page === 1) await interaction.update({ embeds: [embed], components: [first2Off, secondActionRow] });
+                        else await i.update({ embeds: [embed], components: [allActionRow, secondActionRow] });
+                        break;
+
+                    case 'nextPage':
+
+                        if (page === data.length) return;//copypasta.
+
+                        page++;
+                        embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
+
+                        if (page === data.length) await interaction.update({ embeds: [embed], components: [last2Off, secondActionRow] });
+                        else await i.update({ embeds: [embed], components: [allActionRow, secondActionRow] })
+                        break;
+
+                    case 'stop':
+
+                        collector.stop();
+                        await i.update({ embeds: [embed], components: [] })
+                        break;
+
+                    case 'lastPage':
+
+                        if (page === data.length) return;
+                        page = data.length
+                        embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
+                        await i.update({ embeds: [embed], components: [last2Off, secondActionRow] })
+                        break;
+
+                    case 'deleteButton':
+                        const adToDelete = data[page - 1];
+                        data = data.filter(e => e.ad !== adToDelete.ad);
+                        page = 1;
+                        embed.setDescription(`${data[page - 1].ad}\nID: \`${page}\`\nChannel: <#${data[page - 1].channel}>`).setFooter(`Page: ${page}/${data.length}`)
+                        await i.update({ embeds: [embed], components: [first2Off, secondActionRow] })
+
+                        try {
+                            await autoads.findOneAndUpdate({ interval: 4 }, {
+                                interval: 4,
+                                $pull: {
+                                    ads: adToDelete
+                                }
+                            }, { upsert: true })
+                            await i.followUp({ content: 'Removed the autoad.', ephemeral: true })
+                            // await msg.delete()
+                            // await sent.delete()
+                        } catch (e) {
+                            console.error(e)
+                            return await i.followUp({ content: 'Couldnt remove the ad', ephemeral: true })
+                        }
+                        break;
+                }
+            })
+
+            collector.on('end', async i => {
+
+            })
+        } else {
+
+        }
         /*
         
                 if (trigger.toLowerCase() !== 'add' && trigger.toLowerCase() !== 'remove') return msg.reply(`You have to provide add or remove instead of \`${args[1]}\`.`)

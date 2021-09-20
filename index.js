@@ -68,6 +68,10 @@ client.on('messageCreate', async message => {
 
 	if (message.content.toLowerCase() === '!deploy' && (message.author.id === '378025254125305867' || message.author.id === '605061180599304212')) {
 
+		message.guild.commands.create({
+			name: 'test',
+			type: "MESSAGE"
+		}).then((cmd) => console.log(cmd)) 
 
 		const registerCmd = async (dir) => {
 			const files = fs.readdirSync(join(__dirname, dir));
@@ -81,7 +85,7 @@ client.on('messageCreate', async message => {
 					// const perms = option.permissions;
 					if(option.data.options[0]?.options)option.data.options[0].type = 1
 					if(option.data.options[1]?.options)option.data.options[1].type = 1
-					console.log(option.data.options)
+					// console.log(option.data.options)
 					if (option.global || !option.guilds?.length) {
 						try {
 							client.application.commands.create(option.data);
