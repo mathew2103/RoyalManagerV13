@@ -68,10 +68,11 @@ client.on('messageCreate', async message => {
 
 	if (message.content.toLowerCase() === '!deploy' && (message.author.id === '378025254125305867' || message.author.id === '605061180599304212')) {
 
-		message.guild.commands.create({
-			name: 'test',
+		const clientCmds = await client.commands.fetch();
+		await message.guild.commands.create({
+			name: 'AD WARN',
 			type: "MESSAGE"
-		}).then((cmd) => console.log(cmd)) 
+		})
 
 		const registerCmd = async (dir) => {
 			const files = fs.readdirSync(join(__dirname, dir));

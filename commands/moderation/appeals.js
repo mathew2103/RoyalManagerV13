@@ -4,8 +4,8 @@ const Discord = require('discord.js');
 
 // import warnSchema from '@/schemas/warn-schema';
 // const warnSchema = require('../schemas/warn-schema');
-const punishmentsSchema = require('../schemas/punishments-schema');
-const config = require('../config.json')
+const punishmentsSchema = require('../../schemas/punishments-schema');
+const config = require('../../config.json')
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('appeal')

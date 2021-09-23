@@ -1,6 +1,6 @@
 /* eslint-disable */
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const breakSchema = require('../schemas/break-schema')
+const breakSchema = require('../../schemas/break-schema')
 
 module.exports = {
     data: new SlashCommandBuilder()

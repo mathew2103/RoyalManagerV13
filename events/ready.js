@@ -19,6 +19,26 @@ module.exports = {
 			content: 'my code',
 			type: 'Streaming',
 			url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+		}, {
+			content: 'appeals',
+			type: 'watching'
+		}, {
+			content: 'people advertise',
+			type: 'watching'
+		}, {
+			content: 'moderators',
+			type: 'listening'
+		}, {
+			content: 'CustomName\'s videos',
+			type: 'watching'
+		}, {
+			content: 'with my life',
+		}, {
+			content: 'typeracer',
+			type: 'competing'
+		}, {
+			content: 'you read my status',
+			type: 'watching'
 		}]
 
 		setInterval(() => {
@@ -26,7 +46,7 @@ module.exports = {
 
 			client.user.setActivity(activity.content, { type: activity.type?.toUpperCase(), url: activity.url });
 			
-		}, 10 * 1000)
+		}, 5 * 1000)
 
 	},
 };

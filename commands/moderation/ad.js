@@ -1,13 +1,10 @@
 /* eslint-disable no-unused-vars */
 const uniqid = require('uniqid');
-// const warnSchema = require('../../schemas/warn-schema');
-// const warnSchema = require('../../schemas/warn-schema');
 const punishmentSchema = require('../../schemas/punishments-schema');
 const settingsSchema = require('../../schemas/settings-schema');
 const warnCountSchema = require('../../schemas/warnCount-schema');
 const coinsSchema = require('../../schemas/coins-schema');
 const Discord = require('discord.js');
-// const config = require('config')
 const config = require('../../config.json');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 

@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js')
 const uniqid = require('uniqid')
 const ms = require('ms')
-const autoads = require('../schemas/autoAd-schema');
+const autoads = require('../../schemas/autoAd-schema');
 
 module.exports = {
     data: new SlashCommandBuilder()

@@ -1,7 +1,7 @@
 /*eslint-disable*/
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const config = require('../config.json')
-const warnCountSchema = require('../schemas/warnCount-schema')
+const config = require('../../config.json')
+const warnCountSchema = require('../../schemas/warnCount-schema')
 // const punishments = require('../schemas/punishments-schema');
 // const warnschema = require('../schemas/warn-schema')
 module.exports = {
