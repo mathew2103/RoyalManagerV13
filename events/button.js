@@ -3,6 +3,7 @@ const { MessageEmbed } = require('discord.js');
 const punishmentsSchema = require('../schemas/punishments-schema');
 const warnCountSchema = require('../schemas/warnCount-schema');
 const breakSchema = require('../schemas/break-schema');
+const votesSchema = require('../schemas/votes-schema');
 const config = require('../config.json');
 const { time } = require('@discordjs/builders');
 module.exports = {
@@ -124,6 +125,35 @@ module.exports = {
 				await breakReason.delete()
 				// await interaction.editReply()
 				break;
-		}
+		
+			case 'votes':
+
+				const oldUserData = await votesSchema.findOne({ userID: id })
+				if (!oldUserData) return await interaction.reply(`No data found for you.`);
+		
+				const newToggle = (oldUserData.reminders == true) ? false : true
+				await votesSchema.findOneAndUpdate({ userID: userID }, {
+					reminders: newToggle
+				}, { upsert: true })
+
+				await interaction.reply(`Turned ${newToggle == true ? 'on' : 'off'} vote reminders.`)
+				
+			break;
+			
+			case 'banrequest':
+				const reason = oldEmbeds[0].fields.find(e => e.name == 'Reason');
+				const targetBan = await interaction.guild.members.fetch(id).catch(e => e);
+				const evidence = oldEmbeds[0].fields.find(e => e.name == 'Evidence');
+
+				if(!targetBan)return await interaction.update({ content: 'User left the server', components: []});
+
+				if(trigger == 'yes'){
+					await targetBan.ban({ reason: `${reason} | Banned by ${interaction.user.tag}`})
+					const evidenceChannel = await client.channels.cache.get(config.evidenceChannel);
+
+					evidenceChannel.send(`**User:** \`${memberId}\`\n**Moderator:** \`${author.id}\`\n**Reason:** ${reason.value}`)
+				}
+			break;
+			}
 	},
 };
