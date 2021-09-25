@@ -34,15 +34,15 @@ module.exports = {
 		const reasonString = interaction.options.getString('reason');
 		let belongstoChannel = interaction.options.getChannel('belongs_to');
 
-		// if (targetMember.roles.highest.position >= interaction.member.roles.highest.position) return await interaction.editReply('You cannot warn a member having a role higher than or equal to you.');
+		//!!! if (targetMember.roles.highest.position >= interaction.member.roles.highest.position) return await interaction.editReply('You cannot warn a member having a role higher than or equal to you.');
 
 		const mainGuildData = await settingsSchema.findOne({ guildId: config.mainServer.id });
 		const reason = mainGuildData.reasons[parseInt(reasonString)];
 
 		const adWarnTemplate = mainGuildData.modMsg;
 		const adWarnChannel = interaction.guild.channels.cache.get('826045281824931882') ?? interaction.guild.channels.cache.get('758725733840846858');
-		// const oldWarns = await warnSchema.findOne({ guildId: interaction.guild.id, userId: targetMember.id });
-		const oldWarns = await punishmentSchema.find({ user: targetMember.id });
+		
+		const oldWarns = await punishmentSchema.find({ user: targetMember.id, guild: interaction.guild.id });
 		if (oldWarns?.length) {
 			const oldwarn = oldWarns[oldWarns.length - 1];
 			if (oldwarn?.at

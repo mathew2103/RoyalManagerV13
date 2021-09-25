@@ -68,7 +68,7 @@ client.on('messageCreate', async message => {
 
 	if (message.content.toLowerCase() === '!deploy' && (message.author.id === '378025254125305867' || message.author.id === '605061180599304212')) {
 
-		const clientCmds = await client.commands.fetch();
+		// const clientCmds = await client.commands.fetch();
 		await message.guild.commands.create({
 			name: 'AD WARN',
 			type: "MESSAGE"
@@ -141,5 +141,6 @@ client.on('messageCreate', async message => {
 		}
 	}
 });
+
 
 client.login(process.env.TOKEN);

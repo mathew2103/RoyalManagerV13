@@ -1,8 +1,11 @@
+// const utils = require('../structures/utils');
+const autoBreaks = require('../structures/auto-break');
 module.exports = {
 	name: 'ready',
 	once: true,
 	execute(client) {
 		console.log(`Ready! Logged in as ${client.user.tag}`);
+		// autoBreaks.run(client);
 
 		const activities = [{
 			content: 'Menin and Nothingness struggle',

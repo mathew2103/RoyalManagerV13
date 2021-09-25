@@ -96,8 +96,8 @@ module.exports = {
         // const reply = await interaction.fetchReply();
 
         let reasonID = await reply.awaitMessageComponent({ filter, componentType: 'SELECT_MENU', time: 5 * 1000 })
-            .catch(e => { return interaction.editReply({ content: 'Looks like you didnt choose in time.', components: [] }) })
-        if(!reasonID?.values)return;
+            .catch(async e => { return await interaction.editReply({ content: 'Looks like you didnt choose in time.', components: [] }) })
+        // if(!reasonID?.values)return;
         reasonID = reasonID.values[0]
 
         const mainGuildData = await settingsSchema.findOne({ guildId: config.mainServer.id });

@@ -70,21 +70,17 @@ module.exports = {
 
         const button1 = new Discord.MessageButton()
             .setStyle('SUCCESS')
-            .setLabel('Accept!')
-            .setID(`banrequest-${member.id}-yes-${reason}`)
-            .setEmoji('750328771810426980'),
+            .setLabel('Accept')
+            .setCustomId(`banrequest_yes_${member.id}`)
+            .setEmoji('<:RAS_passed:750328771810426980> '),
             button2 = new Discord.MessageButton()
                 .setStyle('DANGER')
-                .setLabel('Deny.')
-                .setID(`banrequest-${member.id}-no-${reason}`)
-                .setEmoji('750328723626000535')
+                .setLabel('Deny')
+                .setCustomId(`banrequest_no_${member.id}`)
+                .setEmoji('<:RAS_failed:750328723626000535> ')
 
         const row = new Discord.MessageActionRow()
             .addComponents(button1, button2)
-
-        const stoppedRow = new MessageActionRow()
-            .addComponent(button1.setDisabled())
-            .addComponent(button1.setDisabled())
 
         await banreqchannel.send('@here', { embeds: [embed], components: [row] })
         await interaction.reply(`Ban successfully requested.`)

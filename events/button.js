@@ -144,15 +144,23 @@ module.exports = {
 				const reason = oldEmbeds[0].fields.find(e => e.name == 'Reason');
 				const targetBan = await interaction.guild.members.fetch(id).catch(e => e);
 				const evidence = oldEmbeds[0].fields.find(e => e.name == 'Evidence');
+				let moderatorId = oldEmbeds[0].filends.find(e => e.name == 'Moderator')
+				moderatorId = moderatorId.value.split('\`')[1]
+				const banModerator = await interaction.guilds.members.fetch(id).catch(e => e);
 
 				if(!targetBan)return await interaction.update({ content: 'User left the server', components: []});
 
 				if(trigger == 'yes'){
 					await targetBan.ban({ reason: `${reason} | Banned by ${interaction.user.tag}`})
 					const evidenceChannel = await client.channels.cache.get(config.evidenceChannel);
-
-					evidenceChannel.send(`**User:** \`${memberId}\`\n**Moderator:** \`${author.id}\`\n**Reason:** ${reason.value}`)
-				}
+					
+					await evidenceChannel.send(`**User:** \`${targetBan.id}\`\n**Moderator:** \`${interaction.user.id}\`\n**Reason:** ${reason.value}\n**Evidence:**${evidence.value}`)
+					await interaction.update({ content: `Accepted by ${interaction.user.tag}`, components: []})
+					await banModerator?.send(`A ban requested by you for ${targetBan.id} has been accepted.`)
+				} else {
+					await interaction.update({ content: `Denied by ${interaction.user.tag}`, components: []})
+					await banModerator?.send(`A ban requested by you for ${targetBan.id} has been denied.`)
+				}	
 			break;
 			}
 	},

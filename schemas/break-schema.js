@@ -6,7 +6,6 @@ const reqString = {
 
 
 const breakSchema = mongoose.Schema({
-    id: String,
     expires: String,
     at: Number,
     user: String,

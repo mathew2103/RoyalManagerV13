@@ -5,11 +5,11 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('hire')
         .setDescription('Hire a trial moderator/partnership manager.')
-        .addStringOption((op) => op.setName('option').setDescription('TM/PM').addChoice('TM', 'tm').addChoice('PM', 'pm').setRequired(true))
+        .addStringOption((op) => op.setName('team').setDescription('TM/PM').addChoice('TM', 'tm').addChoice('PM', 'pm').setRequired(true))
         .addUserOption((op) => op.setName('user').setDescription('User to hire').setRequired(true)),
     async execute(client, interaction) {
         const smember = interaction.options.getMember('user');
-        const option = interaction.options.getString('option');
+        const option = interaction.options.getString('team');
 
 
         const maing = await client.guilds.cache.get(config.mainServer.id)
@@ -22,7 +22,7 @@ module.exports = {
 
         switch (option) {
             case 'tm':
-                if (!interaction.member.roles.cache.find(e => e.name.includes('Head Moderator') || e.name.includes('Management Team') || e.name.includes('Bot Developer'))) return interaction.reply({content: 'Nope', ephemeral: true})
+                if (!interaction.member.roles.cache.find(e => e.name.includes('Head Moderator') || e.name.includes('Management Team') || e.name.includes('Bot Developer'))) return interaction.reply({content: 'Only a head moderator or above can use this command.', ephemeral: true})
                 // if(!smember)return intereaction.reply(`You have to provide a member instead of \`${args[1]}\``)
 
 
