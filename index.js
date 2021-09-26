@@ -69,6 +69,10 @@ client.on('messageCreate', async message => {
 	if (message.content.toLowerCase() === '!deploy' && (message.author.id === '378025254125305867' || message.author.id === '605061180599304212')) {
 
 		// const clientCmds = await client.commands.fetch();
+		let guilds = await client.guilds.fetch();
+		guilds = Array.from(guilds.values())
+		console.log(guilds)
+		let allCmds = []
 		await message.guild.commands.create({
 			name: 'AD WARN',
 			type: "MESSAGE"
@@ -83,49 +87,61 @@ client.on('messageCreate', async message => {
 				}
 				else {
 					const option = require(join(__dirname, dir, file));
-					// const perms = option.permissions;
+					
 					if(option.data.options[0]?.options)option.data.options[0].type = 1
 					if(option.data.options[1]?.options)option.data.options[1].type = 1
-					// console.log(option.data.options)
-					if (option.global || !option.guilds?.length) {
-						try {
-							client.application.commands.create(option.data);
-						}
-						catch (err) {
-							console.error(err);
-						}
-					}
-					else {
-						let guilds = option.guilds;
-						if (!Array.isArray(guilds)) guilds = [guilds];
 
-						for (const guildId of guilds) {
-							const guild = client.guilds.cache.get(guildId);
-							if (!guild) continue;
-							const guildCmds = await guild.commands.fetch();
-							try {
-								const oldCmd = guildCmds.find(e => e.name == option.data.name)
-								let cmd = ''
-								if(oldCmd) cmd = await guild.commands.edit(oldCmd, option.data);
-								else cmd = await guild.commands.create(option.data);
+					if(option.guilds && !Array.isArray(option.guilds))option.guilds = [option.guilds]
+					allCmds.push(option)
+					
+					// if (option.global || !option.guilds?.length) {
+					// 	try {
+					// 		client.application.commands.create(option.data);
+					// 	}
+					// 	catch (err) {
+					// 		console.error(err);
+					// 	}
+					// }
+					// else {
+					// 	let guilds = option.guilds;
+					// 	if (!Array.isArray(guilds)) guilds = [guilds];
 
-								if (option.permissions) await guild.commands.permissions.add({ command: cmd.id, permissions: [option.permissions] });
+					// 	for (const guildId of guilds) {
+					// 		const guild = client.guilds.cache.get(guildId);
+					// 		if (!guild) continue;
+					// 		const guildCmds = await guild.commands.fetch();
+					// 		try {
+					// 			const oldCmd = guildCmds.find(e => e.name == option.data.name)
+					// 			let cmd = ''
+					// 			if(oldCmd) cmd = await guild.commands.edit(oldCmd, option.data);
+					// 			else cmd = await guild.commands.create(option.data);
+
+					// 			if (option.permissions) await guild.commands.permissions.add({ command: cmd.id, permissions: [option.permissions] });
 								
 								
-							}
-							catch (e) {
-								console.error(e);
-								process.exit()
-							}
-						}
-					}
+					// 		}
+					// 		catch (e) {
+					// 			console.error(e);
+					// 			process.exit()
+					// 		}
+					// 	}
+					// }
 
 				}
 			}
 
 		};
-
 		registerCmd('./commands');
+
+		const globalCmdsData = allCmds.filter(e => e.global)
+
+		await client.application.commands.set(globalCmdsData.map(e => e.data))
+		for(let guild of guilds){
+			if(!guild.commands)guild = await guild.fetch()
+			const guildCmdsData = allCmds.filter(e => e.guilds?.includes(guild.id) || e.guilds?.includes('all') || !e.global)			
+			const cmds = guildCmdsData.map(e => e.data)
+			await guild.commands.set(cmds);
+		}
 
 		// await client.guilds.cache.get('825958701487620107')?.commands.create(adCmdData);
 	}

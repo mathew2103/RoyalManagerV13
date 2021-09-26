@@ -6,7 +6,7 @@ module.exports = {
 		.setName('ping')
 		.setDescription('Replies with pong.')
 		.addBooleanOption((op) => op.setName('ephemeral').setDescription('Should the reply be only shown to you?')),
-	global: true,
+	global: false,
 	async execute(interaction) {
 		// await interaction.deferReply({ ephemeral: true });
 		// const allData = await warnschema.find({});
