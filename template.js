@@ -7,8 +7,8 @@ module.exports = {
 		.setName('')
 		.setDescription(''),
 		// .addStringOption((op) => op.setName('ephemeral').setDescription('Should the reply be only shown to you?')),
+	permissions: [],
 	global: false,
-	guilds: [],
 	async execute(interaction) {
 		
 
