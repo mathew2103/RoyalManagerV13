@@ -1,7 +1,13 @@
-const Discord = require("discord.js");
+const Discord, { Client } = require("discord.js");
 const autoads = require("../schemas/autoAd-schema");
 const config = require('../config.json');
 const utils = require('./utils')
+
+/**
+ * 
+ * @param {Client} client 
+ */
+
 module.exports.run = async (client) => {
 //   const ra_guild = await client.guilds.cache.get(config.mainServer.id);
 //   if (!ra_guild) return console.log(`Default guild not found`);
@@ -52,7 +58,8 @@ module.exports.run = async (client) => {
       }
     });
 
-    utils.log(client, '**[AUTO-POST]** Posted all autoads successfully.', 'auto')
+    utils.log(client, '**[AUTO-POST]** Posted all autoads successfully', 'auto')
+    // utils.log(client, '**[AUTO-POST]** Posted all autoads successfully.', 'auto')
     // client.log('**[AUTO-POST]** Posted all autoads.')
   }, 1000 * 60 * 60 * 4);
 

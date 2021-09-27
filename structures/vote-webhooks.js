@@ -1,12 +1,17 @@
 const express = require('express')
 const { Webhook } = require('@top-gg/sdk')
 const coinsSchema = require('../schemas/open-coins-schema');
-const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
+const { MessageEmbed, MessageActionRow, MessageButton, Client } = require('discord.js');
 const votesSchema = require('../schemas/votes-schema');
 const ms = require('ms');
 
 const config = require('../config.json');
 const utils = require('./utils');
+
+/**
+ * 
+ * @param {Client} client 
+ */
 
 module.exports = (client) => {
     const wh = new Webhook(process.env.TOPGG_PASS)

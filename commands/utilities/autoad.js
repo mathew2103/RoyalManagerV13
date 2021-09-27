@@ -1,10 +1,10 @@
 /* eslint-disable */
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const Discord = require('discord.js')
+const Discord, { Interaction } = require('discord.js')
 const uniqid = require('uniqid')
 const ms = require('ms')
 const autoads = require('../../schemas/autoAd-schema');
-
+const utils = require('../../structures/utils');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('autoad')
@@ -22,18 +22,16 @@ module.exports = {
     guilds: ['825958701487620107'],
     async execute(interaction) {
 
-
         const rdata = await autoads.find({ interval: 4 });
         if (!rdata) return interaction.reply(`No data found...`)
+        const channel = interaction.options.getChannel('channel')
 
         if (interaction.options.getSubcommand() == 'show') {
 
-            const data2 = rdata[0].ads;
-            if (!data2) return interaction.reply(`No data found..`)
+            const data = rdata[0].ads;
+            if (!data) return interaction.reply(`No data found..`)
 
-            const channel = interaction.options.getChannel('channel')
-            let data = data2
-            if (channel) data = data2.filter(e => e.channel === channel.id)
+            if (channel) data = data.filter(e => e.channel === channel.id)
 
             if (!data || data.length < 1) return interaction.reply(`No data found.`)
             let page = 1;
@@ -158,57 +156,26 @@ module.exports = {
 
             })
         } else {
+            let duration = interaction.options.getString('duration')
+            duration = ms(duration)
+            const ad = await utils.getMessage(interaction, 'Please send the advertisemnet');
+            if(!ad?.content)return;
 
-        }
-        /*
-        
-                if (trigger.toLowerCase() !== 'add' && trigger.toLowerCase() !== 'remove') return msg.reply(`You have to provide add or remove instead of \`${args[1]}\`.`)
-                if (trigger.toLowerCase() === 'add') {
-                    const timeToDeleteIn = timeArg ? ms(timeArg) : null
-                    if (!timeToDeleteIn) return msg.reply(`You need to provide a duration in which the autoad will be deleted in.`)
-                    // if (!args[2]) return msg.reply(`You have to provide an advertisement to add.`)
-                    const ad = args.splice(3).join(' ')
-                    if (!ad) return msg.reply(`You have to provide an advertisement.`)
-                    try {
-                        await autoads.findOneAndUpdate({ interval: 4 }, {
-                            interval: 4,
-                            $push: {
-                                ads: {
-                                    ad,
-                                    channel: channel.id,
-                                    expires: Date.now() + timeToDeleteIn
-                                }
-                            }
-                        }, { upsert: true })
-                    } catch (e) {
-                        return interaction.reply(`Couldn't add the autoad.`)
-                    }
-                    const sent = await interaction.reply({ content: 'Added the auto ad. (I will delete the ad and this msg in 5 seconds.)', fetchReply: true })
-                    setTimeout(async () => {
-                        await sent.deleteReply()
-                        await interaction.delete()
-                    }, 5 * 1000);
-                } else if (trigger.toLowerCase() === 'remove') {
-                    if (!args[2]) return interaction.reply(`You have to proide an ad id to remove.`)
-                    if (isNaN(args[2])) return interaction.reply(`You have to proide an ad id to remove.`)
-        
-                    if (args[2] < 1 || args[2] > data.length) return interaction.reply(`The max number of pages is \`${data.length}\``)
-        
-                    const ad = data[args[2] - 1]
-                    try {
-                        await autoads.findOneAndUpdate({ interval: 4 }, {
-                            interval: 4,
-                            $pull: {
-                                ads: ad
-                            }
-                        })
-                        interaction.reply(`Removed the auto ad.`)
-                    } catch (e) {
-                        return interaction.reply(`Couldnt remove the ad`)
+            await autoads.findOneAndUpdate({ interval: 4 }, {
+                interval: 4,
+                $push: {
+                    ads: {
+                        ad,
+                        channel: channel.id,
+                        expires: Date.now() + timeToDeleteIn
                     }
                 }
-        
-                */
+            }, { upsert: true })
+
+            await ad.delete();
+            await interaction.editReply('Added the autoad')
+
+        }
 
     },
 };

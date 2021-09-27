@@ -28,20 +28,6 @@ for (const file of eventFiles) {
 	}
 }
 
-// client.on('interactionCreate', async interaction => {
-// 	if (!interaction.isCommand()) return;
-// 	console.log(interaction);
-// 	if (!client.commands.has(interaction.commandName)) return;
-
-// 	try {
-// 		await client.commands.get(interaction.commandName).execute(interaction);
-// 	}
-// 	catch (error) {
-// 		console.error(error);
-// 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-// 	}
-// }); USE THE LIVESHARE CHAT YEA YEA
-
 const readCommands = async (dir) => {
 	const files = fs.readdirSync(join(__dirname, dir));
 	for (const file of files) {
