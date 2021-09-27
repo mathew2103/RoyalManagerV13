@@ -34,7 +34,7 @@ async function log(client, message, type) {
 async function getMessage(interaction, message) {
     const sent = interaction.replied ? await interaction.editReply(message) : interaction.reply(message)
 
-    const filter = m => m.author.id == interaction.author.id
+    const filter = m => m.author.id == interaction.user.id
     const reply = await interaction.channel.awaitMessages({ filter, time: 3 * 60 * 1000, max: 1 })
         .catch(e => { return interaction.channel.send('You didnt reply in time..') })
 

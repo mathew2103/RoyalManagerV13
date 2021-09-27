@@ -1,6 +1,7 @@
 /* eslint-disable */
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const Discord, { Interaction } = require('discord.js')
+const { Interaction } = require('discord.js')
+const Discord = require('discord.js')
 const uniqid = require('uniqid')
 const ms = require('ms')
 const autoads = require('../../schemas/autoAd-schema');
@@ -16,7 +17,7 @@ module.exports = {
         .addSubcommand(subCommand => subCommand
             .setName('add')
             .setDescription('Add an autoad')
-            .addChannelOption(op => op.setName('duration').setDescription('The duration for which the autoad be posted.').setRequired(true))
+            .addStringOption(op => op.setName('duration').setDescription('The duration for which the autoad be posted.').setRequired(true))
             .addChannelOption(op => op.setName('channel').setDescription('The channel in which this autoad should be').setRequired(true))),
     global: false,
     guilds: ['825958701487620107'],
@@ -28,7 +29,7 @@ module.exports = {
 
         if (interaction.options.getSubcommand() == 'show') {
 
-            const data = rdata[0].ads;
+            let data = rdata[0].ads;
             if (!data) return interaction.reply(`No data found..`)
 
             if (channel) data = data.filter(e => e.channel === channel.id)
@@ -165,14 +166,14 @@ module.exports = {
                 interval: 4,
                 $push: {
                     ads: {
-                        ad,
+                        ad: ad.content,
                         channel: channel.id,
-                        expires: Date.now() + timeToDeleteIn
+                        expires: Date.now() + duration
                     }
                 }
             }, { upsert: true })
 
-            await ad.delete();
+            
             await interaction.editReply('Added the autoad')
 
         }
