@@ -92,11 +92,13 @@ module.exports = {
             return i.user.id === interaction.user.id;
         };
 
-        const reply = await interaction.reply({ content: 'Choose a reason for this warn:', components: [row], fetchReply: true })
+        await interaction.reply({ content: 'Choose a reason for this warn:', components: [row], ephemeral: true })
         // const reply = await interaction.fetchReply();
 
-        let reasonID = await reply.awaitMessageComponent({ filter, componentType: 'SELECT_MENU', time: 5 * 1000 })
-            .catch(async e => { return await interaction.editReply({ content: 'Looks like you didnt choose in time.', components: [] }) })
+        let reasonID = await interaction.channel.awaitMessageComponent({ filter, componentType: 'SELECT_MENU', time: 5*1000})
+        .catch(async e => { return await interaction.editReply({ content: 'Looks like you didnt choose in time.', components: [] }) })
+        // let reasonID = await reply.awaitMessageComponent({ filter, componentType: 'SELECT_MENU', time: 5 * 1000 })
+            
         // if(!reasonID?.values)return;
         reasonID = reasonID.values[0]
 
@@ -203,7 +205,7 @@ module.exports = {
         // await interaction.deleteReply();
         await interaction.editReply({ content: newTargetData.length > 1 ? `\`?${newTargetData.length < 7 ? newTargetData.length : '6'}aw ${targetMember.id}\`` : 'This is the user\'s first warning.', embeds: [adWarnEmbed.setFooter(`You received ${amountEarned} coins.`)], ephemeral: true, components: [] });
         await message.delete();
-        setTimeout(() => {interaction.deleteReply()}, 10*1000)
+        // setTimeout(() => {interaction.deleteReply()}, 10*1000)
         
         interaction.channel.send({ embeds: [logEmbed] });
     }

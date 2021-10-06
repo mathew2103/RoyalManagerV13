@@ -10,7 +10,7 @@ module.exports = {
         .setDescription('Shows the leaderboard for ad warnings.'),
     async execute(client, interaction) {
         const data = await warnCountSchema.find({})
-        const staffguild = client.guilds.cache.get(config.staffServer.id)
+        const staffguild = await client.guilds.fetch(config.staffServer.id)
 
         const filtered = await data.filter(e => {
             let staffmember = staffguild ? staffguild.members.cache.get(e.userId) : null

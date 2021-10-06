@@ -21,12 +21,7 @@ module.exports = {
 		.addChannelOption((op) => op.setName('belongs_to').setDescription('The channel that the advertisement belongs to.').setRequired(false)),
 	global: false,
 	guilds: '825958701487620107',
-	permissions:
-	{
-		id: '834680586970071121',
-		type: 'ROLE',
-		permission: true,
-	},
+	permissions: [],
 	async execute(interaction) {
 		await interaction.deferReply({ ephemeral: true });
 		const targetMember = interaction.options.getMember('member');

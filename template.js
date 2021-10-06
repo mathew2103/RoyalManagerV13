@@ -1,4 +1,3 @@
-/* eslint-disable */
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
 

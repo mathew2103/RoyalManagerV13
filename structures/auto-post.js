@@ -78,7 +78,7 @@ module.exports.run = async (client) => {
         
       }
 
-      utils.log(client, `**[AUTO-EXPIRE] Auto-ad from \`${user?.tag || "no one"}\` has expired.`, 'auto')
+      utils.log(client, `**[AUTO-EXPIRE]** Auto-ad from \`${user?.tag || "no one"}\` has expired.`, 'auto')
 
       await autoads.findOneAndUpdate({interval: 4}, {
         $pull: {

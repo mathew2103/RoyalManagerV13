@@ -11,7 +11,7 @@ const logChannels = {
  * Logs a message in a discord channel
  * @param {Client} client 
  * @param {String} message 
- * @param {logChannels} type 
+ * @param {logChannels} type
  */
 
 async function log(client, message, type) {
@@ -43,13 +43,14 @@ async function getMessage(interaction, message) {
 }
 
 /**
- * 
- * @param {*} label 
- * @param {*} style 
+ * Creates a button
+ * @param {String} label - Button Label
+ * @param {String} style - Button Style
  * @param {String} customId 
- * @param {*} emoji 
+ * @param {String} emoji
+ * @returns {MessageButton} 
  */
-function createButton(label, style, customId, emoji) {
+function createButton(label = '', style = '', customId = '', emoji = '') {
     if (!label || !style || !customId) throw new Error('You didnt provide label or style or custom id')
     const button = new MessageButton()
         .setStyle(style)
@@ -61,5 +62,5 @@ function createButton(label, style, customId, emoji) {
 }
 
 module.exports = {
-    log, getMessage
+    log, getMessage, createButton
 }
