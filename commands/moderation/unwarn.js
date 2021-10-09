@@ -12,6 +12,7 @@ module.exports = {
         .addStringOption(op => op.setName('reason').setDescription('Reason for removing this punishment').setRequired(true)),
     global: false,
     guilds: '825958701487620107',
+    roles: ['Mod'],
     async execute(interaction) {
         const punishmentId = interaction.options.get('punishment_id');
         const reason = interaction.options.get('reason');

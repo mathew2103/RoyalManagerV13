@@ -8,6 +8,7 @@ module.exports = {
         .setName('reasons')
         .setDescription('Shows the reasons available for ad moderations.')
         .addStringOption((op) => op.setName('query').setDescription('Ad moderation reason')),
+    roles: ['Mod'],
     async execute(client, interaction) {
         const reasonSearch = interaction.options.getString('query')
         let data = await settingsSchema.findOne({ guildId: interaction.guild.id })

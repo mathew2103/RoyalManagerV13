@@ -1,13 +1,15 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const warnCountSchema = require('../schemas/warnCount-schema');
+const warnCountSchema = require('../../schemas/warnCount-schema');
 const Discord = require('discord.js');
+const config = require('../../config.json');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('clearstats')
         .setDescription('Clear\'s counts of a staff team')
         .addStringOption(op => op.setName('team').setDescription('The team of which you want to reset the stats').setRequired(true).addChoice('moderators', 'mod')),
     global: false,
-    guilds: '825958701487620107',
+    guilds: ['825958701487620107', config.mainServer.id],
+    roles: ['team leader'],
     async execute(interaction) {
 
         const acceptButton = new Discord.MessageButton()

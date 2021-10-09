@@ -12,13 +12,14 @@ module.exports = {
 		.addStringOption((op) => op.setName('new_reason').setDescription('The new reason that you want to change to').setRequired(true).addChoices(reasons)),
 	global: false,
 	guilds: '825958701487620107',
+	roles: ['Mod'],
 	async execute(interaction) {
 		const punishmentId = interaction.options.getString('punishment_id')
 		const newReason = interaction.options.getString('new_reason')
 
 		const oldPunishment = await punishmentsSchema.findOne({ punishmentId });
 		if (!oldPunishment) return interaction.reply({ content: 'No punishment found with ID: ' + punishmentId, ephemeral: true });
-		if (!interaction.member.roles.cache.find(e => e.name.toLowerCase().includes('Head Moderator') || e.name.toLowerCase().includes('Admin') || e.name.toLowerCase().includes('Manager') || e.name.toLowerCase().includes('Bot Dev')) && oldPunishment.author !== interaction.user.id) return interaction.reply({ content: 'Only a head moderator or above can edit punishments made by other moderators.', ephemeral: true });
+		if (oldPunishment.author !== interaction.user.id && !interaction.member.roles.cache.find(e => e.name.toLowerCase().includes('Head Moderator') || e.name.toLowerCase().includes('Admin') || e.name.toLowerCase().includes('Manager') || e.name.toLowerCase().includes('Bot Dev'))) return interaction.reply({ content: 'Only a head moderator or above can edit punishments made by other moderators.', ephemeral: true });
 
 		const mainGuildData = await settingsSchema.findOne({ guildId: config.mainServer.id });
 		const reason = mainGuildData.reasons[parseInt(newReason)];

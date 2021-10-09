@@ -28,7 +28,7 @@ module.exports = {
 		const warningData = await punishmentSchema.find({ user: target.id });
 		const desc = warningData?.map(e => {
 			const mod = interaction.client.users.cache.get(e.author);
-			const st = `**ID:** \`${e.punishmentId}\`\n**Moderator:** ${(moderator == false) ? 'Anonymous#0001' : `${mod?.tag ?? 'Unknown'} \`${e.author}\``}\n**Reason:** ${e.reason}\n**Issued At:** <t:${(e.at / 1000).toString().split('.')[0]}> | <t:${(e.at / 1000).toString().split('.')[0]}:R>`;
+			const st = `**ID:** \`${e.punishmentId}\`\n**Moderator:** ${(moderator == false) ? 'Anonymous#0000' : `${mod?.tag ?? 'Unknown'} \`${e.author}\``}\n**Reason:** ${e.reason}\n**Issued At:** <t:${(e.at / 1000).toString().split('.')[0]}> | <t:${(e.at / 1000).toString().split('.')[0]}:R>`;
 			return st;
 		}).join('\n\n') ?? 'No Warnings found.';
 

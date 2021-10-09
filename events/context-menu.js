@@ -52,11 +52,11 @@ let reasons = [{
 module.exports = {
     name: 'interactionCreate',
     async execute(interaction) {
-        if (!interaction.isContextMenu()) return;
+        if (!interaction.isContextMenu()) return;        
+        if (!interaction.member.roles.some(role => role.name.includes('Mod') || role.name.includes('Admin') || role.name.includes('Manager') || role.name.includes('Bot Dev')))return interaction.reply({ content: 'You are not supposed to be using this.', ephemeral: true})
 
         const message = interaction.options.getMessage('message');
         
-        console.log(message)
         const targetMember = message.member;
         if(!targetMember){
             interaction.reply({ content: 'Looks like the member either left or is a webhook message.', ephemeral: true})

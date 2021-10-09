@@ -9,8 +9,7 @@ module.exports = {
 		await interaction.deferReply();
 
 		const queue = interaction.client.player.getQueue(interaction.guild);
-		console.log(queue)
-		if (!queue || !queue.playing) return interaction.followUp({ content: '❌ | No music is being played!' });
+		if (!queue || !queue.playing) return interaction.followUp({ content: '❌ | No music is being played!', ephemeral: true});
 
 		if(!interaction.member.voice?.channelId || interaction.member.voice.channelId !== interaction.guild.me.voice.channelId)return interaction.followUp({ content: 'You need to be in the same voice channel as me.', ephemeral: true });
 

@@ -1,4 +1,5 @@
-const Discord, { Client } = require("discord.js");
+const { Client } = require("discord.js");
+const Discord = require('discord.js')
 const autoads = require("../schemas/autoAd-schema");
 const config = require('../config.json');
 const utils = require('./utils')
@@ -16,7 +17,7 @@ module.exports.run = async (client) => {
 
   // We check periodically if we have auto post ads
   // and both load message data and autopost time
-  setInterval(async () => {
+  client.intervals.set('auto-post', setInterval(async () => {
     // Check mongodb for data on autoads. If none, it defaults to false
     const rdata = await autoads.findOne({ interval: 4 });
     if (!rdata) return console.log(`No data present`);
@@ -61,9 +62,9 @@ module.exports.run = async (client) => {
     utils.log(client, '**[AUTO-POST]** Posted all autoads successfully', 'auto')
     // utils.log(client, '**[AUTO-POST]** Posted all autoads successfully.', 'auto')
     // client.log('**[AUTO-POST]** Posted all autoads.')
-  }, 1000 * 60 * 60 * 4);
+  }, 1000 * 60 * 60 * 4));
 
-  setInterval(async() => {
+  client.intervals.set('aa-expire', setInterval(async() => {
     const rdata = await autoads.findOne({ interval: 4 });
     if (!rdata) return console.log(`No data present`);
 
@@ -87,5 +88,5 @@ module.exports.run = async (client) => {
       })
 
     })
-  }, 1000 * 60 * 60)
+  }, 1000 * 60 * 60));
 };

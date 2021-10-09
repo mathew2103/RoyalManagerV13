@@ -7,6 +7,7 @@ module.exports = {
 		.setDescription('Replies with pong.')
 		.addBooleanOption((op) => op.setName('ephemeral').setDescription('Should the reply be only shown to you?')),
 	global: false,
+	guilds: 'all',
 	async execute(interaction) {
 		// await interaction.deferReply({ ephemeral: true });
 		// const allData = await warnschema.find({});

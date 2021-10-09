@@ -12,7 +12,6 @@ module.exports = {
 		.addStringOption((op) => op.setName('reason').setDescription('The reason for your break.').setRequired(true)),
 	global: false,
 	guilds: ['825958701487620107'],
-	permissions: { id: '834422519871176774', type: 'ROLE', permission: false},
 	async execute(interaction) {
 		const duration = interaction.options.getString('duration');
 		const reason = interaction.options.getString('reason');

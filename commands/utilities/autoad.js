@@ -6,6 +6,7 @@ const uniqid = require('uniqid')
 const ms = require('ms')
 const autoads = require('../../schemas/autoAd-schema');
 const utils = require('../../structures/utils');
+const config = require('../../config.json');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('autoad')
@@ -20,7 +21,7 @@ module.exports = {
             .addStringOption(op => op.setName('duration').setDescription('The duration for which the autoad be posted.').setRequired(true))
             .addChannelOption(op => op.setName('channel').setDescription('The channel in which this autoad should be').setRequired(true))),
     global: false,
-    guilds: ['825958701487620107'],
+    guilds: ['825958701487620107', config.mainServer.id],
     async execute(interaction) {
 
         const rdata = await autoads.find({ interval: 4 });

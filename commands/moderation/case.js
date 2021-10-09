@@ -1,7 +1,7 @@
 /* eslint-disable */
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
-// const warnSchema = require('../../schemas/warn-schema');
+const config = require('../../config.json')
 const punishmentSchema = require('../../schemas/punishments-schema');
 module.exports = {
     data: new SlashCommandBuilder()
@@ -10,7 +10,8 @@ module.exports = {
     .addStringOption((op) => op.setName('punishment_id').setDescription('ID of the punishment you want to check.').setRequired(true))
     .addBooleanOption((op => op.setName('ephemeral').setDescription('Should the reply be shown only to you?'))),
     global: false,
-	guilds: '825958701487620107',
+	guilds: ['825958701487620107', config.mainServer.id],
+    roles: ['Mod'],
     async execute(interaction) {
         const punishmentId = interaction.options.getString('punishment_id');
         const ephemeral = interaction.options.getBoolean('ephemeral');

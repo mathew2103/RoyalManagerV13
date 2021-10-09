@@ -51,7 +51,7 @@ module.exports = (client) => {
     }))
 
 
-    setInterval(async () => {
+    client.intervals.set('votes', setInterval(async () => {
         let voteReminders = await votesSchema.find({})
         voteReminders = voteReminders.filter(e => e.reminders != false && e.nextVote && e.nextVote <= Date.now())
         const mainGuild = await client.guilds.fetch(config.mainServer.id);
@@ -87,6 +87,6 @@ module.exports = (client) => {
             await member.send({ embed: embed, components: [actionRow] })
             
         }
-    }, 5 * 60 * 1000)
+    }, 5 * 60 * 1000))
     app.listen(4002)
 }

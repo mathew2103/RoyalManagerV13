@@ -8,7 +8,7 @@ module.exports.run = async(client) => {
 
     console.log('Loaded Auto Breaks')
 
-    client.setInterval(async() => {
+    client.intervals.set('auto-break', setInterval(async() => {
         const data = await breakSchema.find({accepted: true})
         if(!data)return;
 
@@ -36,6 +36,6 @@ module.exports.run = async(client) => {
         }
         
 
-    }, 60*1000)
+    }, 60*1000))
 
 }

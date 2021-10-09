@@ -2,13 +2,14 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js')
 const settingsSchema = require('../../schemas/settings-schema')
-
+const config = require('../../config.json');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('config')
         .setDescription('Configuration for the server.')
         .addStringOption((op) => op.setName('query').setDescription('Config Settings').addChoice('Reason', 'reason').addChoice('Add', 'add').addChoice('Remove', 'remove').addChoice('Message', 'message').addChoice('Logs', 'logs'))
         .addChannelOption((op) => op.setName('logschannel').setDescription('Pick this if you choose logs in query')),
+    guilds:[config.mainServer.id],
     async execute(client, interaction) {
         const guildId = interaction.guild.id
         // const options = ['reason', 'message', 'logs']

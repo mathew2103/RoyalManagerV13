@@ -18,9 +18,9 @@ module.exports = {
     permissions: [],
     global: false,
     async execute(interaction) {
+        await interaction.deferReply();
         
         const player = interaction.client.player
-        const voiceChannel = interaction.member.voice?.channel;
         const error1 = new Discord.MessageEmbed()
 			.setDescription('⛔ You are required to be in a voice channel!')
 			.setColor('RED');
@@ -33,27 +33,32 @@ module.exports = {
 			.setDescription('⛔ You are required to be in the same voice channel as me!')
 			.setColor('RED');
 
-		if (!interaction.member.voice.channelId) return interaction.reply({ embeds: [error1], ephemeral: true });
-		if (interaction.guild.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.me.voice.channelId) return await interaction.reply({ embed: [error3], ephemeral: true });
-        if (interaction.member.voice.deaf) return interaction.reply({ embeds: [error2], ephemeral: true });
+		if (!interaction.member.voice.channelId) return interaction.followUp({ embeds: [error1], ephemeral: true });
+		if (interaction.guild.me.voice.channelId && interaction.member.voice.channelId !== interaction.guild.me.voice.channelId) return await interaction.followUp({ embed: [error3], ephemeral: true });
+        if (interaction.member.voice.deaf) return interaction.followUp({ embeds: [error2], ephemeral: true });
 
         const query = interaction.options.getString('song')
         const queue = player.createQueue(interaction.guild, {
             metadata: {
-                channel: interaction.channel
-            }
+                channel: interaction.channel,
+            },
+            buffeingTimeout: 60000,
+            leaveOnEnd: false,
+            leaveOnStop: false,
+            leaveOnEmptyCooldown: 10000,
+            initialVolume: 50
         });
 
         try {
             if (!queue.connection) await queue.connect(interaction.member.voice.channel);
         } catch {
             queue.destroy();
-            return await interaction.reply({ content: "Could not join your voice channel!", ephemeral: true });
+            return await interaction.followUp({ content: "Could not join your voice channel!", ephemeral: true });
         }
 
-        await interaction.deferReply();
+        
         const track = await player.search(query, {
-            requestedBy: interaction.user
+            requestedBy: interaction.user,
         }).then(x => x.tracks[0]);
         if (!track) return await interaction.followUp({ content: `❌ | Track **${query}** not found!` });
 

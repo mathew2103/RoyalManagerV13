@@ -1,14 +1,16 @@
 /* eslint-disable */
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js')
-
+const config = require('../../config.json')
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('banrequest')
         .setDescription('Request a ban to be executed by moderators+.')
         .addUserOption((op) => op.setName('member').setDescription('Member to request ban').setRequired(true))
         .addStringOption((op) => op.setName('reason').setDescription('Reason for ban request').addChoice('6 Ad warnings', '6aw').setRequired(true)),
-    async execute(client, interaction) {
+    guilds: [config.mainServer.id],
+    roles: ['Trial Mods'],
+    async execute(interaction) {
         const member = interaction.options.getMember('member')
 
         if (member.roles.highest.position >= interaction.member.roles.highest.position) return interaction.reply(`You cannot request a ban for a user above you.`)

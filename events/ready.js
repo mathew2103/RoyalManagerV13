@@ -1,5 +1,7 @@
 // const utils = require('../structures/utils');
 const autoBreaks = require('../structures/auto-break');
+const autoPost = require('../structures/auto-post')
+const voteWebhooks = require('../structures/vote-webhooks');
 module.exports = {
 	name: 'ready',
 	once: true,
