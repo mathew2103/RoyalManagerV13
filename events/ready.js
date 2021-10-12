@@ -1,7 +1,6 @@
-// const utils = require('../structures/utils');
-const autoBreaks = require('../structures/auto-break');
-const autoPost = require('../structures/auto-post')
-const voteWebhooks = require('../structures/vote-webhooks');
+// const autoBreaks = require('../structures/auto-break');
+// const autoPost = require('../structures/auto-post')
+// const voteWebhooks = require('../structures/vote-webhooks');
 module.exports = {
 	name: 'ready',
 	once: true,
@@ -44,8 +43,26 @@ module.exports = {
 		}, {
 			content: 'you read my status',
 			type: 'watching'
+		}, {
+			content: 'Minecraft Speedruns with Dream',
+			type: 'competing'
+		}, {
+			content: 'Menin search for Nothingness',
+			type: 'watching'
+		}, {
+			content: 'Nothingness search for Menin',
+			type: 'watching'
+		}, {
+			content: 'hide and seek with mods'
+		}, {
+			content: 'my token',
+			type: 'Streaming',
+			url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+		}, {
+			content: 'bedwars'
 		}]
 
+		console.log(`Loaded ${activities.length} activities`)
 		setInterval(() => {
 			const activity = activities[Math.floor(Math.random() * activities.length)];
 

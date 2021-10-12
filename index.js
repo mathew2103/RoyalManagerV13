@@ -2,12 +2,11 @@ const { Client, Collection, Intents } = require('discord.js');
 const dotenv = require('dotenv');
 const fs = require('fs');
 const { join } = require('path');
-const { Player, AudioFilters } = require('discord-player');
+const { Player } = require('discord-player');
 const { playerEvents } = require('./events/music');
 const mongo = require('./mongo');
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES], partials: ['MESSAGE', 'GUILD_MEMBER'] });
 const config = require('./config.json');
-
 dotenv.config();
 client
 	.commands = new Collection()
@@ -56,13 +55,11 @@ const readCommands = async (dir) => {
 
 readCommands('./commands');
 
-client.on('messageCreate', async message => {
-
-	if(!message.guild)return;
-
+client.on('messageCreate', async (message) => {
 	if (message.content.toLowerCase() === '!deploy' && (message.author.id === '378025254125305867' || message.author.id === '605061180599304212')) {
 
 		// const clientCmds = await client.commands.fetch();
+		// const { client } = message
 		let guilds = await client.guilds.fetch();
 		guilds = Array.from(guilds.values())
 		console.log(guilds)
@@ -112,21 +109,10 @@ client.on('messageCreate', async message => {
 			type: "MESSAGE"
 		}, config.mainServer.id)
 
-		message.reply('DONE')
+		message.reply('Deployed all commands!')
+		return;
 		// await client.guilds.cache.get('825958701487620107')?.commands.create(adCmdData);
 	}
-
-	if (message.content.toLowerCase().startsWith('!eval') && (message.author.id === '378025254125305867' || message.author.id === '605061180599304212')){
-		const code = message.content.split('!eval ')[1]
-		if(!code)return message.reply('Provide some code nerd.')
-
-		try{
-			eval(code)
-		}catch(e){
-			console.error(e)
-		}
-	}
-});
-
+})
 
 client.login(process.env.TOKEN);

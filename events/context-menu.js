@@ -52,18 +52,22 @@ let reasons = [{
 module.exports = {
     name: 'interactionCreate',
     async execute(interaction) {
-        if (!interaction.isContextMenu()) return;        
-        if (!interaction.member.roles.some(role => role.name.includes('Mod') || role.name.includes('Admin') || role.name.includes('Manager') || role.name.includes('Bot Dev')))return interaction.reply({ content: 'You are not supposed to be using this.', ephemeral: true})
+        if (!interaction.isContextMenu()) return;
+        const bypassRegex = /(mod|admin|manager|bot dev)/mi
+        if(!interaction.member.roles.cache.some(role => role.name.match(bypassRegex)))return interaction.reply({ content: 'You are not supposed to be using this.', ephemeral: true})
+        // if (!interaction.member.roles.cache.some(role => role.name.includes('Mod') || role.name.includes('Admin') || role.name.includes('Manager') || role.name.includes('Bot Dev')))return interaction.reply({ content: 'You are not supposed to be using this.', ephemeral: true})
 
-        const message = interaction.options.getMessage('message');
+        let message = interaction.options.getMessage('message');
+        message = await message.fetch()
+        console.log(message)
+        const targetMember = await interaction.guild.members.fetch(message.author.id).catch(e => e)
+
+        if(!targetMember)return interaction.reply({ content: 'Looks like the member either left or is a webhook message.', ephemeral: true});
         
-        const targetMember = message.member;
-        if(!targetMember){
-            interaction.reply({ content: 'Looks like the member either left or is a webhook message.', ephemeral: true})
-            return
-        }
         const adDeletedIn = message.channel;
-        // if (targetMember.roles.highest.position >= interaction.member.roles.highest.position) return await interaction.editReply('You cannot warn a member having a role higher than or equal to you.');
+        const adCats = ['649269707135909888', '880482008931905598', '594392827627044865', '594509117524017162']
+        if(!adCats.includes(adDeletedIn.parentId))return interaction.reply({ content: `You can only moderate ads in the following categories: ${adCats.map(e => `<#${e}>`).join(', ')}`, ephemeral: true })
+        if (targetMember.roles.highest.position >= interaction.member.roles.highest.position) return await interaction.editReply('You cannot warn a member having a role higher than or equal to you.');
 
         const oldWarns = await punishmentSchema.find({ user: targetMember.id, guild:interaction.guild.id });
         if (oldWarns?.length) {
@@ -95,11 +99,11 @@ module.exports = {
         await interaction.reply({ content: 'Choose a reason for this warn:', components: [row], ephemeral: true })
         // const reply = await interaction.fetchReply();
 
-        let reasonID = await interaction.channel.awaitMessageComponent({ filter, componentType: 'SELECT_MENU', time: 5*1000})
+        let reasonID = await interaction.channel.awaitMessageComponent({ filter, componentType: 'SELECT_MENU', time: 2*60*1000})
         .catch(async e => { return await interaction.editReply({ content: 'Looks like you didnt choose in time.', components: [] }) })
         // let reasonID = await reply.awaitMessageComponent({ filter, componentType: 'SELECT_MENU', time: 5 * 1000 })
             
-        // if(!reasonID?.values)return;
+        if(!reasonID?.values)return;
         reasonID = reasonID.values[0]
 
         const mainGuildData = await settingsSchema.findOne({ guildId: config.mainServer.id });
@@ -113,7 +117,7 @@ module.exports = {
         
         if (reason.includes('incorrect')) {
             
-            await staffCmds.send(interaction.member.toString());
+            await staffCmds.send(`${interaction.member.toString()}, mention the channel where the ad belongs to. (Basically the channel where the ad can go)`);
             const msgFilter = m => m.author.id == interaction.user.id && m.mentions.channels?.first()
 
             belongsto = await staffCmds.awaitMessages({ filter: msgFilter, time: 5 * 60 * 1000, max: 1 })

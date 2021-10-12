@@ -21,7 +21,7 @@ module.exports = {
 		.addChannelOption((op) => op.setName('belongs_to').setDescription('The channel that the advertisement belongs to.').setRequired(false)),
 	global: false,
 	guilds: ['825958701487620107', config.mainServer.id],
-	permissions: ['Mod'],
+	roles: ['Mod'],
 	async execute(interaction) {
 		await interaction.deferReply({ ephemeral: true });
 		const targetMember = interaction.options.getMember('member');
@@ -29,7 +29,9 @@ module.exports = {
 		const reasonString = interaction.options.getString('reason');
 		let belongstoChannel = interaction.options.getChannel('belongs_to');
 
-		//!!! if (targetMember.roles.highest.position >= interaction.member.roles.highest.position) return await interaction.editReply('You cannot warn a member having a role higher than or equal to you.');
+		const adCats = ['649269707135909888', '880482008931905598', '594392827627044865', '594509117524017162']
+        if(!adCats.includes(adDeletedIn.parentId))return interaction.reply({ content: `You can only moderate ads in the following categories: ${adCats.map(e => `<#${e}>`).join(', ')}`, ephemeral: true })
+		if(targetMember.roles.highest.position >= interaction.member.roles?.highest.position) return await interaction.editReply('You cannot warn a member having a role higher than or equal to you.');
 
 		const mainGuildData = await settingsSchema.findOne({ guildId: config.mainServer.id });
 		const reason = mainGuildData.reasons[parseInt(reasonString)];

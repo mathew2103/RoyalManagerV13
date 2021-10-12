@@ -20,7 +20,7 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
         
-        const player = interaction.client.player
+        const player = interaction.client.player;
         const error1 = new Discord.MessageEmbed()
 			.setDescription('⛔ You are required to be in a voice channel!')
 			.setColor('RED');

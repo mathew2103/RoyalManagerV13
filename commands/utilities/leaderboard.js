@@ -1,76 +1,52 @@
-/*eslint-disable*/
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const config = require('../../config.json')
 const warnCountSchema = require('../../schemas/warnCount-schema')
+const Discord = require('discord.js');
 // const punishments = require('../schemas/punishments-schema');
 // const warnschema = require('../schemas/warn-schema')
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('leaderboard')
-        .setDescription('Shows the leaderboard for ad warnings.'),
-    async execute(client, interaction) {
-        const data = await warnCountSchema.find({})
-        const staffguild = await client.guilds.fetch(config.staffServer.id)
+        .setDescription('Shows the leaderboard for ad warnings.')
+        .addStringOption((op) => op.setName('sort_by').setDescription('The method you want to sort the data').addChoices([['current', 'current'], ['total', 'total']])),
+    guilds: [config.mainServer.id],
+    async execute(interaction) {
+        await interaction.deferReply({ ephemeral: true });
+        const sortBy = interaction.options.getString('sort_by') ?? 'current'
+        const data = await warnCountSchema.find({});
+        let staffguild = await interaction.client.guilds.fetch(config.staffServer.id);
+        await staffguild.members.fetch();
 
-        const filtered = await data.filter(e => {
-            let staffmember = staffguild ? staffguild.members.cache.get(e.userId) : null
-            if (!staffmember) return false
-            if (!staffmember.roles.cache.find(r => r.name.includes('Moderation Team'))) return false
-            return true
+        const modTeamRole = await staffguild.roles.fetch(config.staffServer.modTeamRole);
+        let members = [...modTeamRole.members.values()]
+        const bannedRegex = /(admin|manager|bot dev|head mod)/mi
+        members = members.filter(e => !e.roles.cache.some(r => r.name.match(bannedRegex)));
+        let modData = []
+        members.forEach(member => {
+            let memberData = data.find(e => e.userId == member.id);
+            memberData.tag = member.user.tag;
+            if(member.id == interaction.member.id)memberData.self = true;
+            if(member.roles.cache.has(config.onBreakRole))memberData.onBreak = true;
+            if(memberData)modData.push(memberData)
         })
-        const sorted = await filtered.sort((a, b) => b.current - a.current)
 
-        const maxPages = Math.ceil(sorted.length / 10)
-        let pageno = 1
-        if (args[0] && !isNaN(args[0])) pageno = args[0]
-        if (pageno > maxPages) return interaction.reply(`Only ${maxPages} page(s) exist.`)
-        const result = await pages(sorted, 10, pageno)
+        if(sortBy == 'current')modData = modData.sort((a, b) => b.current - a.current)
+        else modData = modData.sort((a, b) => b.total - a.total);
 
-        if (!result) return interaction.reply(`Couldn't make the leaderboard. Try again.`)
         const embed = new Discord.MessageEmbed()
-            .setAuthor(`Ad Moderation Leaderboard [${pageno}/${maxPages}]`)
-            .setColor("RANDOM")
-            .setFooter(`Requested by ${interaction.author.tag}`, interaction.author.displayAvatarURL())
+            .setAuthor(`Ad Moderation Leaderboard [Sort By: ${sortBy}]`)
+            .setColor("#ffffff")
+            .setFooter(`Requested by ${interaction.user.tag}`, interaction.user.displayAvatarURL())
             .setTimestamp()
-        let desc = ''
-        let num = 1
-        for (const e of result) {
-            const member = interaction.guild.members.cache.get(e.userId)
-
-            let staffmember = staffguild ? await staffguild.members.cache.get(e.userId) : null
-            // if(staffguild) staffmember = staffguild.members.cache.get(e.user)
-            // if(!member)return console.log(`couldnt find user with id: ${e.userId}`)
-
-            if (member) {
-                if ((!member.roles.cache.find(r => r.name === '• Server Manager'
-                    || r.name === '• Administrator'
-                    || r.name === '♛ Head Moderator'))
-                    && member.roles.cache.find(r => r.name.includes('Moderation Team'))) {
-                    if (e.current >= 8) {
-                        if (e.userId == interaction.user.id) desc += `#${num}: **${member.user.tag}** - \`${e.current}\` 🟢 (Total: \`${e.total}\`) -- **YOU** \n`;
-                        else desc += `#${num}: **${member.user.tag}** - \`${e.current}\` 🟢 (Total: \`${e.total}\`)\n`;
-                    } else if (staffmember && staffmember.roles.cache.get(config.onBreakRole)) {
-                        if (e.userId == interaction.user.id) desc += `#${num}: **${member.user.tag}** - \`${e.current}\` 🟡 (Total: \`${e.total}\`) -- **YOU** \n`;
-                        else desc += `#${num}: **${member.user.tag}** - \`${e.current}\` 🟡 (Total: \`${e.total}\`) \n`;
-                    } else {
-                        if (e.userId == interaction.user.id) desc += `#${num}: **${member.user.tag}** - \`${e.current}\` 🔴 (Total: \`${e.total}\`) -- **YOU** \n`;
-                        else desc += `#${num}: **${member.user.tag}** - \`${e.current}\` 🔴 (Total: \`${e.total}\`) \n`;
-                    }
-                    num++;
-                }
-
-            }
-
-        }
-
-        await embed.setDescription(desc)
-
-        await interaction.reply({ embeds: [embed] })
-
-        function pages(arr, itemsPerPage, page = 1) {
-            const maxPages = Math.ceil(arr.length / itemsPerPage);
-            if (page < 1 || page > maxPages) return null;
-            return arr.slice((page - 1) * itemsPerPage, page * itemsPerPage);
-        }
+    
+        let num = 0
+        const desc = modData.map(e => {
+            num++
+            if(e.current >= 8)return `#${num}: **${e.tag}** - \`${e.current}\` 🟢 (Total: \`${e.total}\`) ${e.self? '-- **YOU**': ''}`
+            else if(e.onBreak)return `#${num}: **${e.tag}** - \`${e.current}\` 🟡 (Total: \`${e.total}\`) ${e.self? '-- **YOU**': ''}`
+            else return `#${num}: **${e.tag}** - \`${e.current}\` 🔴 (Total: \`${e.total}\`) ${e.self? '-- **YOU**': ''}`
+        }).join('\n')
+        embed.setDescription(desc)
+        interaction.followUp({ embeds: [embed]})
     },
 };

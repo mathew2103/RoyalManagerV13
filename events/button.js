@@ -14,7 +14,7 @@ module.exports = {
 
 		const embed = new MessageEmbed();
 		const oldEmbeds = interaction.message.embeds;
-		const webhook = await interaction.message.fetchWebhook();
+		const webhook = await interaction.message.fetchWebhook().catch(e => e);
 		const filter = m => m.author.id == interaction.user.id;
 		const buttonIdParts = interaction.customId.split('_');
 		const [label, trigger, id] = buttonIdParts;

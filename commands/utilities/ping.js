@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-// const punishments = require('../schemas/punishments-schema');
-// const warnschema = require('../schemas/warn-schema')
+// const punishments = require('../../schemas/punishments-schema');
+// const warnschema = require('../../schemas/warn-schema')
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ping')
@@ -17,7 +17,7 @@ module.exports = {
 		// 	for (const warning of data.warnings) {
 		// 		const warn = await new punishments({
 		// 			guild: data.guildId,
-		// 			user: data.userId,F
+		// 			user: data.userId,
 		// 			author: warning.author,
 		// 			at: warning.at,
 		// 			punishmentId: warning.punishmentId,
