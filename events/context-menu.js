@@ -53,21 +53,21 @@ module.exports = {
     name: 'interactionCreate',
     async execute(interaction) {
         if (!interaction.isContextMenu()) return;
+        await interaction.deferReply({ephemeral: true});
         const bypassRegex = /(mod|admin|manager|bot dev)/mi
-        if(!interaction.member.roles.cache.some(role => role.name.match(bypassRegex)))return interaction.reply({ content: 'You are not supposed to be using this.', ephemeral: true})
-        // if (!interaction.member.roles.cache.some(role => role.name.includes('Mod') || role.name.includes('Admin') || role.name.includes('Manager') || role.name.includes('Bot Dev')))return interaction.reply({ content: 'You are not supposed to be using this.', ephemeral: true})
+        if(!interaction.member.roles.cache.some(role => role.name.match(bypassRegex)))return interaction.followUp({ content: 'You are not supposed to be using this.', ephemeral: true})
+        // if (!interaction.member.roles.cache.some(role => role.name.includes('Mod') || role.name.includes('Admin') || role.name.includes('Manager') || role.name.includes('Bot Dev')))return interaction.followUp({ content: 'You are not supposed to be using this.', ephemeral: true})
 
         let message = interaction.options.getMessage('message');
         message = await message.fetch()
-        console.log(message)
         const targetMember = await interaction.guild.members.fetch(message.author.id).catch(e => e)
 
-        if(!targetMember)return interaction.reply({ content: 'Looks like the member either left or is a webhook message.', ephemeral: true});
+        if(!targetMember)return interaction.followUp({ content: 'Looks like the member either left or is a webhook message.', ephemeral: true});
         
         const adDeletedIn = message.channel;
         const adCats = ['649269707135909888', '880482008931905598', '594392827627044865', '594509117524017162']
-        if(!adCats.includes(adDeletedIn.parentId))return interaction.reply({ content: `You can only moderate ads in the following categories: ${adCats.map(e => `<#${e}>`).join(', ')}`, ephemeral: true })
-        if (targetMember.roles.highest.position >= interaction.member.roles.highest.position) return await interaction.editReply('You cannot warn a member having a role higher than or equal to you.');
+        if(!adCats.includes(adDeletedIn.parentId))return interaction.followUp({ content: `You can only moderate ads in the following categories: ${adCats.map(e => `<#${e}>`).join(', ')}`, ephemeral: true })
+        if (targetMember.roles?.highest.position >= interaction.member.roles?.highest.position) return await interaction.editReply('You cannot warn a member having a role higher than or equal to you.');
 
         const oldWarns = await punishmentSchema.find({ user: targetMember.id, guild:interaction.guild.id });
         if (oldWarns?.length) {
@@ -75,7 +75,7 @@ module.exports = {
             if (oldwarn?.at
                 && ((Date.now() - oldwarn.at) < 7.2e+6)) {
                 await message.delete();
-                await interaction.reply({ content: `This user was warned <t:${(oldwarn.at / 1000).toString().split('.')[0]}:R>, so you can't warn the user again. But I have deleted the message.`, ephemeral: true });
+                await interaction.followUp({ content: `This user was warned <t:${(oldwarn.at / 1000).toString().split('.')[0]}:R>, so you can't warn the user again. But I have deleted the message.`, ephemeral: true });
                 return;
             }
         }
@@ -96,7 +96,7 @@ module.exports = {
             return i.user.id === interaction.user.id;
         };
 
-        await interaction.reply({ content: 'Choose a reason for this warn:', components: [row], ephemeral: true })
+        await interaction.followUp({ content: 'Choose a reason for this warn:', components: [row], ephemeral: true })
         // const reply = await interaction.fetchReply();
 
         let reasonID = await interaction.channel.awaitMessageComponent({ filter, componentType: 'SELECT_MENU', time: 2*60*1000})
@@ -117,11 +117,13 @@ module.exports = {
         
         if (reason.includes('incorrect')) {
             
-            await staffCmds.send(`${interaction.member.toString()}, mention the channel where the ad belongs to. (Basically the channel where the ad can go)`);
+            const qI = await staffCmds.send(`${interaction.member.toString()}, mention the channel where the ad belongs to. (Basically the channel where the ad can go)`);
             const msgFilter = m => m.author.id == interaction.user.id && m.mentions.channels?.first()
 
             belongsto = await staffCmds.awaitMessages({ filter: msgFilter, time: 5 * 60 * 1000, max: 1 })
                 .catch(e => { return staffCmds.send('You didn\'t respond in time.') })
+            await qI.delete()
+            await belongsto.first().delete()
             belongsto = belongsto.first().mentions.channels.first();
         }
 
@@ -146,20 +148,38 @@ module.exports = {
                 current: 1,
                 total: 1,
             },
-        });
+        }, {upsert: true});
 
         const newTargetData = await punishmentSchema.find({ user: targetMember.id, guild: interaction.guild.id });
 
         const randomBetween = (min, max) => {
             return Math.round(Math.random() * (max - min) + min);
         };
-        const amountEarned = randomBetween(50, 75);
-        await coinsSchema.findOneAndUpdate({ userID: interaction.member.id }, {
-            userID: interaction.member.id,
-            $inc: {
-                balance: amountEarned,
-            },
-        });
+        // const amountEarned = randomBetween(50, 75);
+        let amountOfCoins = randomBetween(50, 75)
+        if(oldData && oldData.cooldownTill && oldData.cooldownTill >= Date.now())amountOfCoins = 0
+        if(amountOfCoins > 0){
+            await coinsSchema.findOneAndUpdate({ userID: msg.author.id }, {
+                userID: msg.author.id,
+                $inc: {
+                    balance: amountOfCoins,
+                    last24hrs: amountOfCoins
+                }
+            }, { upsert: true })
+
+            if((oldData?.last24hrs + amountOfCoins) >= 500){
+                await coinsSchema.findOneAndUpdate({ userID: msg.author.id }, {
+                    cooldownTill: Date.now() + 8.64e+7,
+                    last24hrs: 0
+                }, { upsert: true })
+            }
+        }
+        // await coinsSchema.findOneAndUpdate({ userID: interaction.member.id }, {
+        //     userID: interaction.member.id,
+        //     $inc: {
+        //         balance: amountEarned,
+        //     },
+        // });
 
         const adWarnEmbed = new Discord.MessageEmbed()
             .setAuthor('Ad Warning')

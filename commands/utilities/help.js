@@ -8,11 +8,11 @@ module.exports = {
         .setDescription('Shows the help menu')
         .addStringOption((op) => op.setName('ephemeral').setDescription('Should the reply be only shown to you?')),
     permissions: [],
-    global: false,
+    guilds: 'all',
     async execute(interaction) {
-
+return interaction.reply('still under work.')
         let cmds = interaction.client.commands
-        if (!interaction.member.permissions.has('ADMINISTRATOR') && (message.author.id === '378025254125305867' || message.author.id === '605061180599304212')) cmds = cmds.filter(cmd => {
+        if (!interaction.member.permissions.has('ADMINISTRATOR') && (interaction.user.id === '378025254125305867' || interaction.user.id === '605061180599304212')) cmds = cmds.filter(cmd => {
 
             if (!cmd.global && cmd.guilds.toLowerCase() != 'all' && (cmd.guilds.length ? cmd.guilds.includes(interaction.guild.id) : cmd.guilds == interaction.guild.id)) return false;
             if (cmd.permissions?.length && !interaction.member.permissions.has(cmd.permissions)) return false;

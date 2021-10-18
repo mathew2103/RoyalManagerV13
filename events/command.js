@@ -7,7 +7,7 @@ module.exports = {
 		const cmd = interaction.client.commands.get(interaction.commandName)
 		// const bypassRoles = ['bot dev', 'server manager', 'administrator'] //bypassRoles.includes(role.name.toLowerCase())
 		const bypassRegex = /(admin|manager|bot dev)/mi
-		if(!interaction.member.roles.cache.some(role => role.name.match(bypassRegex))){
+		if(interaction.guild && !interaction.member.roles.cache.some(role => role.name.match(bypassRegex))){
 			if (cmd.permissions) {			
 				if (!Array.isArray(cmd.permissions)) cmd.permissions = [cmd.permissions]
 				if (!interaction.member.permissions.has(cmd.permissions))return interaction.reply({ content: `You need ${interaction.member.permissions.missing(cmd.permissions).map(e => `\`${e.replace('_', ' ')}\``).join(', ')} to use this command.`, ephemeral: false})

@@ -98,12 +98,24 @@ module.exports = {
 			return Math.round(Math.random() * (max - min) + min);
 		};
 		const amountEarned = randomBetween(50, 75);
-		await coinsSchema.findOneAndUpdate({ userID: interaction.member.id }, {
-			userID: interaction.member.id,
-			$inc: {
-				balance: amountEarned,
-			},
-		});
+		let amountOfCoins = randomBetween(50, 75)
+        if(oldData && oldData.cooldownTill && oldData.cooldownTill >= Date.now())amountOfCoins = 0
+        if(amountOfCoins > 0){
+            await coinsSchema.findOneAndUpdate({ userID: msg.author.id }, {
+                userID: msg.author.id,
+                $inc: {
+                    balance: amountOfCoins,
+                    last24hrs: amountOfCoins
+                }
+            }, { upsert: true })
+
+            if((oldData?.last24hrs + amountOfCoins) >= 500){
+                await coinsSchema.findOneAndUpdate({ userID: msg.author.id }, {
+                    cooldownTill: Date.now() + 8.64e+7,
+                    last24hrs: 0
+                }, { upsert: true })
+            }
+        }
 
 		const adWarnEmbed = new Discord.MessageEmbed()
 			.setAuthor('Ad Warning')

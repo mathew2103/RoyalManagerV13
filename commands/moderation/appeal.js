@@ -27,13 +27,13 @@ module.exports = {
         console.log(dmChannel)
         if (interaction.channelId !== dmChannel.id) {
             interaction.reply({ content: 'Check dms.', ephemeral: true })
-            dmChannel.send('Send your advertisement for the appeal.')
+            dmChannel.send('Send your advertisement for the appeal.').catch(e => {return interaction.editReply('Open your dms to appeal')})
         } else interaction.reply('Send your advertisement for the appeal.');
         
 
         const filter = m => m.author.id == interaction.user.id;
 
-        const collector = dmChannel.createMessageCollector({ filter, time: 120000 })
+        const collector = dmChannel.createMessageCollector({ filter, time: 120000, max: 1 })
 
         const yesButton = new Discord.MessageButton()
             .setLabel('Accept')
@@ -45,6 +45,7 @@ module.exports = {
             .setCustomId(`appeal_deny_${warning.punishmentId}`)
         const row = new Discord.MessageActionRow()
             .addComponents([yesButton, noButton])
+            console.log(row)
 
 
         collector.on('collect', async msg => {
@@ -86,9 +87,8 @@ module.exports = {
                 })
             }
 
-            webhook.send({ embeds: [embed], username: interaction.user.username, avatarURL: interaction.user.displayAvatarURL(), components: [row] })
+            await webhook.send({ content: '@', embeds: [embed], components: [row] , username: interaction.user.username, avatarURL: interaction.user.displayAvatarURL()})
             dmChannel.send('Your appeal has been submitted. Please wait for us to review your appeal.')
-
             // interaction.followUp('Appeal Submitted, Please wait for us to review your appeal')
         })
     }

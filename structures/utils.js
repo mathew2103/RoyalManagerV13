@@ -61,6 +61,16 @@ function createButton(label = '', style = '', customId = '', emoji = '') {
     return button;
 }
 
+/**
+ * Gives a number between 2 numbers
+ * @param {Number} min 
+ * @param {Number} max 
+ * @returns {Number} Random Number
+ */
+function randomBetween(min, max) {
+    return Math.round(Math.random() * (max - min) + min);
+}
+
 module.exports = {
-    log, getMessage, createButton
+    log, getMessage, createButton, randomBetween
 }

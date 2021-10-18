@@ -13,19 +13,19 @@ module.exports = {
 	global: false,
 	guilds: ['825958701487620107'],
 	async execute(interaction) {
+		await interaction.deferReply({})
 		const duration = interaction.options.getString('duration');
 		const reason = interaction.options.getString('reason');
 
-		if (interaction.member.roles.cache.get(config.onBreakRole)) return interaction.reply({ content: 'You are already on break.', ephemeral: true })
+		if (interaction.member.roles.cache.get(config.onBreakRole)) return interaction.followUp({ content: 'You are already on break.', ephemeral: true })
 
-
-		if (await breakSchema.findOne({ user: interaction.user.id })) return interaction.reply({ content: 'You have already requested a break.', ephemeral: true })
+		if (await breakSchema.findOne({ user: interaction.user.id })) return interaction.followUp({ content: 'You have already requested a break.', ephemeral: true })
 
 		const time = ms(duration); //matter of fact, im gonna remove the unknown option
     
-		if (!time) return interaction.reply({ content: 'You can only specify a duration such as `3d` for 3 days or use `unknown`.', ephemeral:true})
+		if (!time) return interaction.followUp({ content: 'You can only specify a duration such as `3d` for 3 days or use `unknown`.', ephemeral:true})
 
-        if(time <= ms('2d')) return interaction.reply({content: 'You dont need to request a break for less than 2 days.', ephemeral: true}) //COPY PASTA LOL
+        if(time <= ms('2d')) return interaction.followUp({content: 'You dont need to request a break for less than 2 days.', ephemeral: true}) //COPY PASTA LOL
 
 		const embed = new Discord.MessageEmbed()
 			 .setAuthor(interaction.user.tag, interaction.user.displayAvatarURL())
@@ -51,7 +51,7 @@ module.exports = {
             //     user: msg.author.id,
             //     accepted: false
             // }, { upsert: true, new: true })
-        } catch (e) { return interaction.reply(`Failed to update database.`) }
+        } catch (e) { return interaction.followUp(`Failed to update database.`) }
 
         const yesButton = new Discord.MessageButton()
         .setCustomId(`break_yes_${interaction.user.id}`)
@@ -70,14 +70,14 @@ module.exports = {
 		const webhooks = await breakChannel.fetchWebhooks()
 		let webhook = webhooks.first()
 		if (!webhook) {
-			webhook = await breakChannel.createWebhook(msg.guild.name, {
-				avatar: msg.guild.iconURL()
+			webhook = await breakChannel.createWebhook(interaction.guild.name, {
+				avatar: interaction.guild.iconURL()
 			})
 		}
 		
-		await webhook.send({ content: '@here', embeds: [embed], components: [row] })
+		await webhook.send({ content: '@here', embeds: [embed], components: [row], username: interaction.user.username, avatarURL: interaction.user.displayAvatarURL() })
         // await breakChannel.send({ content: '@here', embeds: [embed], components: [row] })
 
-        interaction.reply({ content: 'Your break has been requested. You will receive a DM soon about the status of your break request.', ephemeral: true})
+        interaction.followUp({ content: 'Your break has been requested. You will receive a DM soon about the status of your break request.', ephemeral: true})
 	},
 };

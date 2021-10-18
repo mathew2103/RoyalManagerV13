@@ -5,7 +5,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('')
 		.setDescription(''),
-		// .addStringOption((op) => op.setName('ephemeral').setDescription('Should the reply be only shown to you?')),
+		// .addBooleanOption((op) => op.setName('ephemeral').setDescription('Should the reply be only shown to you?')),
 	permissions: [],
 	global: false,
 	async execute(interaction) {

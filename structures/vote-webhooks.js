@@ -13,7 +13,7 @@ const utils = require('./utils');
  * @param {Client} client 
  */
 
-module.exports = (client) => {
+module.exports.run = (client) => {
     const wh = new Webhook(process.env.TOPGG_PASS)
     const app = express()
 

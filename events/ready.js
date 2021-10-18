@@ -1,74 +1,77 @@
-// const autoBreaks = require('../structures/auto-break');
-// const autoPost = require('../structures/auto-post')
-// const voteWebhooks = require('../structures/vote-webhooks');
+const autoBreaks = require('../structures/auto-break');
+const autoPost = require('../structures/auto-post')
+const voteWebhooks = require('../structures/vote-webhooks');
 module.exports = {
 	name: 'ready',
 	once: true,
 	execute(client) {
 		console.log(`Ready! Logged in as ${client.user.tag}`);
-		// autoBreaks.run(client);
+		autoBreaks.run(client);
+		autoPost.run(client)
+		voteWebhooks.run(client)
 
 		const activities = [{
-			content: 'Menin and Nothingness struggle',
-			type: 'Watching'
+			name: 'Menin and Nothingness struggle',
+			type: 'WATCHING'
 		}, {
-			content: 'Slash Commands',
-			type: 'Listening'
+			name: 'Slash Commands',
+			type: 'LISTENING'
 		}, {
-			content: 'hip hop moosic',
-			type: 'Listening'
+			name: 'hip hop moosic',
+			type: 'LISTENING'
 		}, {
-			content: 'Minecraft',
+			name: 'Minecraft',
 		}, {
-			content: 'my code',
-			type: 'Streaming',
+			name: 'my code',
+			type: 'STREAMING',
 			url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
 		}, {
-			content: 'appeals',
-			type: 'watching'
+			name: 'appeals',
+			type: 'WATCHING'
 		}, {
-			content: 'people advertise',
-			type: 'watching'
+			name: 'people advertise',
+			type: 'WATCHING'
 		}, {
-			content: 'moderators',
-			type: 'listening'
+			name: 'moderators',
+			type: 'LISTENING'
 		}, {
-			content: 'CustomName\'s videos',
-			type: 'watching'
+			name: 'CustomName\'s videos',
+			type: 'WATCHING'
 		}, {
-			content: 'with my life',
+			name: 'with my life',
 		}, {
-			content: 'typeracer',
+			name: 'typeracer',
 			type: 'competing'
 		}, {
-			content: 'you read my status',
-			type: 'watching'
+			name: 'you read my status',
+			type: 'WATCHING'
 		}, {
-			content: 'Minecraft Speedruns with Dream',
+			name: 'Minecraft Speedruns with Dream',
 			type: 'competing'
 		}, {
-			content: 'Menin search for Nothingness',
-			type: 'watching'
+			name: 'Menin search for Nothingness',
+			type: 'WATCHING'
 		}, {
-			content: 'Nothingness search for Menin',
-			type: 'watching'
+			name: 'Nothingness search for Menin',
+			type: 'WATCHING'
 		}, {
-			content: 'hide and seek with mods'
+			name: 'hide and seek with mods'
 		}, {
-			content: 'my token',
-			type: 'Streaming',
+			name: 'my token',
+			type: 'STREAMING',
 			url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
 		}, {
-			content: 'bedwars'
+			name: 'bedwars'
 		}]
 
 		console.log(`Loaded ${activities.length} activities`)
+		// client.user.setPresence({ activities: activities, status: 'dnd'})
 		setInterval(() => {
 			const activity = activities[Math.floor(Math.random() * activities.length)];
-
-			client.user.setActivity(activity.content, { type: activity.type?.toUpperCase(), url: activity.url });
+			client.user.setStatus('dnd')
+			client.user.setActivity(activity.name, { type: activity.type, url: activity.url });
 			
-		}, 5 * 1000)
+		}, 10 * 1000)
 
 	},
 };
