@@ -1,6 +1,5 @@
 /* eslint-disable */
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { Interaction } = require('discord.js')
 const Discord = require('discord.js')
 const uniqid = require('uniqid')
 const ms = require('ms')
