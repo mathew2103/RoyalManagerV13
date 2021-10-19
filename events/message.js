@@ -1,4 +1,4 @@
-const Canvas = require('canvas');
+// const Canvas = require('canvas');
 // const fs = require('fs')
 // const { join } = require('path');
 const { codeBlock } = require('@discordjs/builders');
@@ -54,7 +54,7 @@ module.exports = {
             return;
         }
 
-        if (config.automod.scams && new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?([^ ])+").test(message.content) && message.channel.id == '834377508307730462') {
+        if (config.automod.scams && new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?([^ ])+").test(message.content)) {
             const fetched = await fetch("https://anti-fish.bitflow.dev/check", {
                 method: 'POST',
                 headers: {
