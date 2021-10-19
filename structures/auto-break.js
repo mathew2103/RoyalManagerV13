@@ -15,10 +15,10 @@ module.exports.run = async(client) => {
         for(const e of data){
             if(isNaN(e.expires))continue;
             
-            const member = staffg.members.cache.get(e.user)
+            const member = await staffg.members.fetch(e.user).catch(e => e)
             if(!member){ await breakSchema.findOneAndDelete({user: e.user})
                 console.log(`No member found for auto break removal. Member ID: ${e.user}`)
-            continue}
+            continue;}
             if(Date.now() < (e.at+Number(e.expires)))continue;
 
             await member.roles.remove(config.onBreakRole);

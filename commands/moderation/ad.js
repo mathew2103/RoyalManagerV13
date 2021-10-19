@@ -7,6 +7,7 @@ const coinsSchema = require('../../schemas/coins-schema');
 const Discord = require('discord.js');
 const config = require('../../config.json');
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const utils = require('../../structures/utils');
 
 const reasons = [['Sending an advertisement without a description in the server advertising channels', '0'], ['Sending an advertisement which server revolves around invite rewards', '1'], ['Sending an advertisement containing a ping', '2'], ['Sending an advertisement back to back', '3'], ['Sending an advertisement in an incorrect channel', '4'], ['Sending an advertisement which description is vague and/or contains less than 20 characters', '5'], ['Advertising an NSFW server and/or advertising a server that isn\'t suitable for children', '6'], ['Sending an advertisement containing an invalid invite', '7'], ['Sending an advertisement that is not in English language', '8'], ['Sending an advertisement without a link', '9']];
 
@@ -24,10 +25,11 @@ module.exports = {
 	roles: ['Mod'],
 	async execute(interaction) {
 		await interaction.deferReply({ ephemeral: true });
-		const targetMember = interaction.options.getMember('member');
+		const targetMember = await interaction.options.getMember('member');
 		const adDeletedIn = interaction.options.getChannel('channel');
 		const reasonString = interaction.options.getString('reason');
 		let belongstoChannel = interaction.options.getChannel('belongs_to');
+		console.log(targetMember)
 
 		const adCats = ['649269707135909888', '880482008931905598', '594392827627044865', '594509117524017162']
         if(!adCats.includes(adDeletedIn.parentId))return interaction.reply({ content: `You can only moderate ads in the following categories: ${adCats.map(e => `<#${e}>`).join(', ')}`, ephemeral: true })
@@ -99,10 +101,11 @@ module.exports = {
 		};
 		const amountEarned = randomBetween(50, 75);
 		let amountOfCoins = randomBetween(50, 75)
+		const oldData = await coinsSchema.findOne({ userID: interaction.user.id })
         if(oldData && oldData.cooldownTill && oldData.cooldownTill >= Date.now())amountOfCoins = 0
         if(amountOfCoins > 0){
-            await coinsSchema.findOneAndUpdate({ userID: msg.author.id }, {
-                userID: msg.author.id,
+            await coinsSchema.findOneAndUpdate({ userID: interaction.user.id }, {
+                userID: interaction.user.id,
                 $inc: {
                     balance: amountOfCoins,
                     last24hrs: amountOfCoins
@@ -110,7 +113,7 @@ module.exports = {
             }, { upsert: true })
 
             if((oldData?.last24hrs + amountOfCoins) >= 500){
-                await coinsSchema.findOneAndUpdate({ userID: msg.author.id }, {
+                await coinsSchema.findOneAndUpdate({ userID: interaction.user.id }, {
                     cooldownTill: Date.now() + 8.64e+7,
                     last24hrs: 0
                 }, { upsert: true })
@@ -169,7 +172,7 @@ module.exports = {
 				cmd.delete();
 			}, 10 * 1000);
 		}
-
-		interaction.channel.send({ embeds: [logEmbed] });
+		await utils.log(client, logEmbed, 'STAFF')
+		// interaction.channel.send({ embeds: [logEmbed] });
 	},
 };

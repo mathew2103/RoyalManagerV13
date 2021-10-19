@@ -22,5 +22,8 @@
     "banRequestChannel": "830401537020526593",
     "onBreakRole": "754303021659324476",
     "breakRequestChannel": "832182767382691921",
-    "modTeamUpdatesChannel": "781173056625836042"
+    "modTeamUpdatesChannel": "781173056625836042",
+    "automod": {
+        "scams": true
+    }
 }

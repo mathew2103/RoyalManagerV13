@@ -157,10 +157,11 @@ module.exports = {
         };
         // const amountEarned = randomBetween(50, 75);
         let amountOfCoins = randomBetween(50, 75)
+        const oldData = await coinsSchema.findOne({ userID: interaction.user.id })
         if(oldData && oldData.cooldownTill && oldData.cooldownTill >= Date.now())amountOfCoins = 0
         if(amountOfCoins > 0){
-            await coinsSchema.findOneAndUpdate({ userID: msg.author.id }, {
-                userID: msg.author.id,
+            await coinsSchema.findOneAndUpdate({ userID: interaction.user.id }, {
+                userID: interaction.user.id,
                 $inc: {
                     balance: amountOfCoins,
                     last24hrs: amountOfCoins
@@ -168,7 +169,7 @@ module.exports = {
             }, { upsert: true })
 
             if((oldData?.last24hrs + amountOfCoins) >= 500){
-                await coinsSchema.findOneAndUpdate({ userID: msg.author.id }, {
+                await coinsSchema.findOneAndUpdate({ userID: interaction.user.id }, {
                     cooldownTill: Date.now() + 8.64e+7,
                     last24hrs: 0
                 }, { upsert: true })

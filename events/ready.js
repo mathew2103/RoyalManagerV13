@@ -1,6 +1,7 @@
 const autoBreaks = require('../structures/auto-break');
 const autoPost = require('../structures/auto-post')
 const voteWebhooks = require('../structures/vote-webhooks');
+const utils = require('../structures/utils')
 module.exports = {
 	name: 'ready',
 	once: true,
@@ -67,7 +68,7 @@ module.exports = {
 		console.log(`Loaded ${activities.length} activities`)
 		// client.user.setPresence({ activities: activities, status: 'dnd'})
 		setInterval(() => {
-			const activity = activities[Math.floor(Math.random() * activities.length)];
+			const activity = activities[utils.randomBetween(0, activities.length-1)];
 			client.user.setStatus('dnd')
 			client.user.setActivity(activity.name, { type: activity.type, url: activity.url });
 			

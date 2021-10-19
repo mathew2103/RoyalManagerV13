@@ -7,10 +7,10 @@ const { playerEvents } = require('./events/music');
 const mongo = require('./mongo');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES], partials: ['MESSAGE', 'GUILD_MEMBER'] });
 const config = require('./config.json');
+
 dotenv.config();
-client
-	.commands = new Collection()
-	.intervals = new Map();
+client.commands = new Collection();
+client.intervals = new Map();
 
 client.player = new Player(client)
 	
@@ -45,7 +45,8 @@ const readCommands = async (dir) => {
 		}
 		else {
 			const option = require(join(__dirname, dir, file));
-			if(dir !== './commands')option.category = dir.split('\\')[1];
+			console.log(dir)
+			if(dir !== './commands')option.category = dir.split('/')[1];
 			
 			client.commands.set(option.data.name.toLowerCase(), option)
 		}
