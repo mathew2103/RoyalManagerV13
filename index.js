@@ -21,7 +21,7 @@ const connectToMongoDB = async () => {
 		console.log('Connected to mongodb!');
 	});
 };
-connectToMongoDB();
+// connectToMongoDB();
 
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
@@ -45,13 +45,12 @@ const readCommands = async (dir) => {
 		}
 		else {
 			const option = require(join(__dirname, dir, file));
-			console.log(dir)
 			if(dir !== './commands')option.category = dir.split('/')[1];
 			
 			client.commands.set(option.data.name.toLowerCase(), option)
 		}
 	}
-	// console.log(client.commands);
+
 };
 
 readCommands('./commands');
@@ -63,7 +62,6 @@ client.on('messageCreate', async (message) => {
 		// const { client } = message
 		let guilds = await client.guilds.fetch();
 		guilds = Array.from(guilds.values())
-		console.log(guilds)
 		let allCmds = []
 		
 
@@ -94,18 +92,18 @@ client.on('messageCreate', async (message) => {
 		};
 		registerCmd('./commands');
 
+		await client.application.fetch();
 		const globalCmdsData = allCmds.filter(e => e.global)
-
-		await client.application.commands.set(globalCmdsData.map(e => e.data))
+		await client.application.commands.set(...globalCmdsData.map(e => e.data))
 		for(let guild of guilds){
-			if(!guild.commands)guild = await guild.fetch()
+			// if(!guild.commands)guild = await guild.fetch()
 			const guildCmdsData = allCmds.filter(e => e.guilds?.includes(guild.id) || e.guilds?.includes('all') || e.global)			
 			const cmds = guildCmdsData.map(e => e.data)
-			await guild.commands.set(cmds).catch(e => message.channel.send(e.message));
+			client.application.commands.set(cmds, guild)
+			// await guild.commands.set(cmds).catch(e => message.channel.send(e.message));
 		}
 
-		await client.application.fetch();
-		if(message.guild.id == '559271990456745996')await client.application.commands.create({
+		await client.application.commands.create({
 			name: 'AD WARN',
 			type: "MESSAGE"
 		}, config.mainServer.id)
@@ -116,4 +114,5 @@ client.on('messageCreate', async (message) => {
 	}
 })
 
-client.login(process.env.TOKEN);
+connectToMongoDB().then(() => client.login(process.env.TOKEN))
+

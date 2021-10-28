@@ -15,11 +15,11 @@ module.exports = {
     async execute(interaction) {
         const punishmentId = interaction.options.getString('punishment_id');
         const ephemeral = interaction.options.getBoolean('ephemeral');
-        await interaction.deferReply({ ephemeral: ephemeral });
+        await interaction.deferReply();
         const showMod = interaction.member.permissions.has("MANAGE_MESSAGES") ? true : false
 
         const warn = await punishmentSchema.findOne({ punishmentId })
-        if(!warn)return interaction.editReply('No warn found with ID:' + punishmentId);
+        if(!warn)return interaction.followUp({content: 'No warn found with ID:' + punishmentId, ephemeral: true});
         // const guildId = process.env.MAIN_GUILD ?? interaction.guild.id
         // let arr = await warnSchema.find({
         //     guildId
@@ -42,6 +42,6 @@ module.exports = {
         embed.addField('Appealed', (warn.appealed == true) ? 'Yes' : 'No', true)
         embed.addField('Reason', `${warn.reason}`)
         embed.setFooter(`Punishment ID: ${punishmentId}`)
-        interaction.editReply({ embeds: [embed] })
+        interaction.followUp({ embeds: [embed] })
     },
 };

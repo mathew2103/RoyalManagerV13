@@ -13,7 +13,7 @@ module.exports = {
 	global: false,
 	guilds: ['825958701487620107'],
 	async execute(interaction) {
-		await interaction.deferReply({})
+		await interaction.deferReply()
 		const duration = interaction.options.getString('duration');
 		const reason = interaction.options.getString('reason');
 
@@ -21,21 +21,20 @@ module.exports = {
 
 		if (await breakSchema.findOne({ user: interaction.user.id })) return interaction.followUp({ content: 'You have already requested a break.', ephemeral: true })
 
-		const time = ms(duration); //matter of fact, im gonna remove the unknown option
-    
-		if (!time) return interaction.followUp({ content: 'You can only specify a duration such as `3d` for 3 days or use `unknown`.', ephemeral:true})
+		const time = ms(duration);
+		if (!time) return interaction.followUp({ content: 'You can only specify a duration such as `3d` for 3 days', ephemeral: true })
 
-        if(time <= ms('2d')) return interaction.followUp({content: 'You dont need to request a break for less than 2 days.', ephemeral: true}) //COPY PASTA LOL
+		if (time < ms('2d')) return interaction.followUp({ content: 'You dont need to request a break for less than 2 days.', ephemeral: true })
 
 		const embed = new Discord.MessageEmbed()
-			 .setAuthor(interaction.user.tag, interaction.user.displayAvatarURL())
-			 .addField(`Duration`, duration, true)
-			 .addField(`User ID`, `\`${interaction.user.id}\``, true)
-			 .addField(`Reason`, reason, true)
-			 .setTimestamp()
-			 .setColor("YELLOW")
+			.setAuthor(interaction.user.tag, interaction.user.displayAvatarURL())
+			.addField(`Duration`, duration, true)
+			.addField(`User ID`, `\`${interaction.user.id}\``, true)
+			.addField(`Reason`, reason, true)
+			.setTimestamp()
+			.setColor("YELLOW")
 
-        try {
+		try {
 			const breakData = await new breakSchema({
 				user: interaction.user.id,
 				reason,
@@ -43,28 +42,21 @@ module.exports = {
 				at: Date.now(),
 				accepted: false
 			})
-			breakData.save()
-            // await breakSchema.findOneAndUpdate({ user: interaction.user.id }, {
-            //     reason,
-            //     expires: time,
-            //     at: Date.now(),
-            //     user: msg.author.id,
-            //     accepted: false
-            // }, { upsert: true, new: true })
-        } catch (e) { return interaction.followUp(`Failed to update database.`) }
+			breakData.save()			
+		} catch (e) { return interaction.followUp(`Failed to update database.`) }
 
-        const yesButton = new Discord.MessageButton()
-        .setCustomId(`break_yes_${interaction.user.id}`)
-        .setLabel('Accept')
-        .setStyle('SUCCESS')
-        
-        const noButton = new Discord.MessageButton()
-        .setCustomId(`break_no_${interaction.user.id}`)
-        .setLabel('Deny')
-        .setStyle('DANGER')
+		const yesButton = new Discord.MessageButton()
+			.setCustomId(`break_yes_${interaction.user.id}`)
+			.setLabel('Accept')
+			.setStyle('SUCCESS')
 
-        const row = new Discord.MessageActionRow()
-        .addComponents([yesButton, noButton])
+		const noButton = new Discord.MessageButton()
+			.setCustomId(`break_no_${interaction.user.id}`)
+			.setLabel('Deny')
+			.setStyle('DANGER')
+
+		const row = new Discord.MessageActionRow()
+			.addComponents([yesButton, noButton])
 
 		const breakChannel = await interaction.guild.channels.cache.get(config.breakRequestChannel) || interaction.channel
 		const webhooks = await breakChannel.fetchWebhooks()
@@ -74,10 +66,10 @@ module.exports = {
 				avatar: interaction.guild.iconURL()
 			})
 		}
-		
-		await webhook.send({ content: '@here', embeds: [embed], components: [row], username: interaction.user.username, avatarURL: interaction.user.displayAvatarURL() })
-        // await breakChannel.send({ content: '@here', embeds: [embed], components: [row] })
 
-        interaction.followUp({ content: 'Your break has been requested. You will receive a DM soon about the status of your break request.', ephemeral: true})
+		await webhook.send({ content: '@here', embeds: [embed], components: [row], username: interaction.user.username, avatarURL: interaction.user.displayAvatarURL() })
+		// await breakChannel.send({ content: '@here', embeds: [embed], components: [row] })
+
+		interaction.followUp({ content: 'Your break has been requested. You will receive a DM soon about the status of your break request.', ephemeral: true })
 	},
 };

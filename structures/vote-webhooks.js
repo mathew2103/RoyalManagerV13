@@ -18,8 +18,12 @@ module.exports.run = (client) => {
     const app = express()
 
     app.post('/webhook', wh.listener(async (vote) => {
-        console.log(vote)
-        const amountOfCoins = vote.isWeekend == true ? 4 : 2;
+        const guild = await client.guilds.fetch(vote.guild);
+        const member = await guild.members.fetch(vote.user);
+        if (member) await member.roles.add(config.voterRole)
+        if(vote.type == 'test')return member.send('Test went through.')
+        
+        const amountOfCoins = vote.isWeekend ? 4 : 2;
         await coinsSchema.findOneAndUpdate({ userID: vote.user }, {
             userID: vote.user,
             $inc: {
@@ -35,16 +39,14 @@ module.exports.run = (client) => {
             }
         }, { upsert: true })
 
-        const guild = await client.guilds.fetch(vote.guild);
-        const member = await guild.members.fetch(vote.user);
-        if (member) await member.roles.add(config.voterRole)
+        
 
         const embed = new MessageEmbed()
             .setAuthor(`Vote Rewards`)
             .setDescription(`Thank you for voting for ${guild.name}.\nYou have received ${amountOfCoins} coins for voting for the server and also the Server Voter Role.`)
             .setColor('#ed80e0');
 
-        await member.user.send(embed).catch(e => e)
+        await member.user.send({embeds: [embed]}).catch(e => e)
 
         utils.log(client, `**${member.user.tag}** voted for ${guild.name}`, 'votes')
         // client.log(`**[VOTE]** **${member.user.tag}** voted for Royal Advertising.`)
@@ -87,6 +89,6 @@ module.exports.run = (client) => {
             await member.send({ embeds: [embed], components: [actionRow] })
             
         }
-    }, 5 * 60 * 1000))
-    app.listen(4002)
+    }, 60 * 60 * 1000))
+    app.listen(4051)
 }

@@ -27,11 +27,11 @@ module.exports = {
 		
 
 		try {
-			cmd.execute(interaction);
+			await cmd.execute(interaction);
 		}
 		catch (error) {
 			console.error(error);
-			interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+			interaction.channel.send({ content: `Error while executing the command.. \n\`${error.message}\`\n\n${cmd.errorMsg || "Please report this to Menin#4642 as soon as possible"}` });
 		}
 	},
 };

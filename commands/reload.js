@@ -18,12 +18,11 @@ module.exports = {
             const command = interaction.client.commands.get(commandName)
 
             if (!command) return interaction.reply(`There is no command with name \`${commandName}\`!`);
-            console.log(command)
             delete require.cache[require.resolve(`./${command.category ? `${command.category}/` : ''}${command.data.name.toLowerCase()}.js`)];
 
             try {
                 const props = require(`./${command.category ? `${command.category}/` : ''}${command.data.name.toLowerCase()}.js`);
-                console.log(`Reloaded ${props.name}`)
+                console.log(`Reloaded ${props.data.name.toLowerCase()}`)
                 if (command.category) props.category = command.category;
 
                 interaction.client.commands.set(props.data.name.toLowerCase(), props);

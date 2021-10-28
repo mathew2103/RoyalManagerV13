@@ -10,6 +10,7 @@ module.exports = {
         .setDescription('Shows the leaderboard for ad warnings.')
         .addStringOption((op) => op.setName('sort_by').setDescription('The method you want to sort the data').addChoices([['current', 'current'], ['total', 'total']])),
     guilds: [config.mainServer.id],
+    errorMsg: `**Known Issue:** \`Cannot read property 'current' of undefined\`\nIf this error shown is not this, please notify Menin about this.`,
     async execute(interaction) {
         await interaction.deferReply({ ephemeral: true });
         const sortBy = interaction.options.getString('sort_by') ?? 'current'
@@ -18,19 +19,29 @@ module.exports = {
         await staffguild.members.fetch();
 
         const modTeamRole = await staffguild.roles.fetch(config.staffServer.modTeamRole);
+        
         let members = [...modTeamRole.members.values()]
-        const bannedRegex = /(admin|manager|bot dev|head mod)/mi
-        members = members.filter(e => !e.roles.cache.some(r => r.name.match(bannedRegex)));
-        let modData = []
-        members.forEach(member => {
-            let memberData = data.find(e => e.userId == member.id);
-            memberData.tag = member.user.tag;
-            if(member.id == interaction.member.id)memberData.self = true;
-            if(member.roles.cache.has(config.onBreakRole))memberData.onBreak = true;
-            if(memberData)modData.push(memberData)
-        })
+        const bannedRegex = /(management team|bot dev|head mod)/mi
+        members = members.filter(e => !e.roles.cache.some(r => bannedRegex.test(r.name)));//r.name.match(bannedRegex)
+        // console.log(modTeamRole.members.filter(e => !members.includes(e)))
 
-        if(sortBy == 'current')modData = modData.sort((a, b) => b.current - a.current)
+        let modData = await members.map(member => {
+            console.log(member.user.username)
+            let memberData = data.find(e => e.userId == member.id);
+            if (memberData) {
+                memberData.tag = member.user.tag;
+                if (member.id == interaction.member.id) memberData.self = true;
+                if (member.roles.cache.has(config.onBreakRole)) memberData.onBreak = true;
+                return memberData;
+            }
+            // if(!memberData)return;
+
+            // if(memberData)odData.push(memberData)
+        })
+        console.log(modData);
+        modData = modData.filter(e => e !== undefined);
+
+        if (sortBy == 'current') modData = modData.sort((a, b) => b.current - a.current)
         else modData = modData.sort((a, b) => b.total - a.total);
 
         const embed = new Discord.MessageEmbed()
@@ -38,15 +49,15 @@ module.exports = {
             .setColor("#ffffff")
             .setFooter(`Requested by ${interaction.user.tag}`, interaction.user.displayAvatarURL())
             .setTimestamp()
-    
-        let num = 0
+
+        let num = 0;
         const desc = modData.map(e => {
             num++
-            if(e.current >= 8)return `#${num}: **${e.tag}** - \`${e.current}\` 🟢 (Total: \`${e.total}\`) ${e.self? '-- **YOU**': ''}`
-            else if(e.onBreak)return `#${num}: **${e.tag}** - \`${e.current}\` 🟡 (Total: \`${e.total}\`) ${e.self? '-- **YOU**': ''}`
-            else return `#${num}: **${e.tag}** - \`${e.current}\` 🔴 (Total: \`${e.total}\`) ${e.self? '-- **YOU**': ''}`
+            if (e.current >= 8) return `#${num}: **${e.tag}** - \`${e.current}\` 🟢 (Total: \`${e.total}\`) ${e.self ? '-- **YOU**' : ''}`
+            else if (e.onBreak) return `#${num}: **${e.tag}** - \`${e.current}\` 🟡 (Total: \`${e.total}\`) ${e.self ? '-- **YOU**' : ''}`
+            else return `#${num}: **${e.tag}** - \`${e.current}\` 🔴 (Total: \`${e.total}\`) ${e.self ? '-- **YOU**' : ''}`
         }).join('\n')
         embed.setDescription(desc)
-        interaction.followUp({ embeds: [embed]})
+        interaction.followUp({ embeds: [embed] })
     },
 };

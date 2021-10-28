@@ -15,10 +15,8 @@ module.exports = {
 		const ephemeral = interaction.options.get('ephemeral');
 		await interaction.deferReply({ ephemeral: ephemeral });
 		let target = interaction.options.getUser('user') ?? interaction.member.user;
-		const moderator = interaction.member?.permissions.has('MANAGE_MESSAGES');
+		const moderator = true //interaction.member?.permissions.has('MANAGE_MESSAGES');
 		if (moderator == false) target = interaction.member.user;
-
-		console.log(target.username);
 
 		const embed = new Discord.MessageEmbed()
 			.setAuthor(target.username, target.displayAvatarURL())

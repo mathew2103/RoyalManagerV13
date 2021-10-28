@@ -32,7 +32,7 @@ module.exports = {
 		console.log(targetMember)
 
 		const adCats = ['649269707135909888', '880482008931905598', '594392827627044865', '594509117524017162']
-        if(!adCats.includes(adDeletedIn.parentId))return interaction.reply({ content: `You can only moderate ads in the following categories: ${adCats.map(e => `<#${e}>`).join(', ')}`, ephemeral: true })
+        if(!adCats.includes(adDeletedIn.parentId) || adDeletedIn.type !== 'GUILD_TEXT')return interaction.editReply({ content: `You can only moderate ads in text channels of the following categories: ${adCats.map(e => `<#${e}>`).join(', ')}`, ephemeral: true })
 		if(targetMember.roles.highest.position >= interaction.member.roles?.highest.position) return await interaction.editReply('You cannot warn a member having a role higher than or equal to you.');
 
 		const mainGuildData = await settingsSchema.findOne({ guildId: config.mainServer.id });
@@ -95,12 +95,8 @@ module.exports = {
 
 		const newTargetData = await punishmentSchema.find({ user: targetMember.id });
 		// const newTargetData = await warnSchema.findOne({ guildId: interaction.guild.id, userId: targetMember.id });
-
-		const randomBetween = (min, max) => {
-			return Math.round(Math.random() * (max - min) + min);
-		};
-		const amountEarned = randomBetween(50, 75);
-		let amountOfCoins = randomBetween(50, 75)
+	
+		let amountOfCoins = utils.randomBetween(50,75); //randomBetween(50, 75)
 		const oldData = await coinsSchema.findOne({ userID: interaction.user.id })
         if(oldData && oldData.cooldownTill && oldData.cooldownTill >= Date.now())amountOfCoins = 0
         if(amountOfCoins > 0){
@@ -125,7 +121,8 @@ module.exports = {
 			.setDescription(adWarnTemplate.replace('{member}', targetMember).replace('{reason}', reason).replace('{wc}', newTargetData.length).replace('{channel}', adDeletedIn))
 			.setFooter(`Warning ID: ${punishmentId}`)
 			.setTimestamp();
-		if (belongstoChannel?.id) adWarnEmbed.addField('Your advertisment belongs to', belongstoChannel);
+		if (belongstoChannel) adWarnEmbed.addField('Your advertisment belongs to', belongstoChannel.toString());
+		await utils.log(interaction.client, `**[AD-WARN]** ${interaction.user.tag} earned ${amountOfCoins}`, 'EARN')
 
 		try {
 			const webhooks = await adWarnChannel.fetchWebhooks();
@@ -157,6 +154,7 @@ module.exports = {
 			.setAuthor('Warning Issued', targetMember.user.displayAvatarURL())
 			.setColor('RED')
 			.setTimestamp()
+			.setThumbnail(targetMember.user.displayAvatarURL())
 			.setFooter(`Moderator Tag: ${interaction.member.user.tag}`, interaction.member.user.displayAvatarURL())
 			.addFields(
 				{ name: 'User', value: `${targetMember}\n\`${targetMember.id}\``, inline: true },
@@ -165,14 +163,14 @@ module.exports = {
 				{ name: 'Reason', value: reason, inline: true },
 			);
 
-		await interaction.editReply({ embeds: [adWarnEmbed.setFooter(`You received ${amountEarned} coins.	`)] });
+		await interaction.editReply({ embeds: [adWarnEmbed.setFooter(`Balance: ${oldData.balance+amountOfCoins} (+${amountOfCoins})`)] });
 		if (newTargetData.length > 1) {
 			const cmd = await interaction.channel.send(`\`?${newTargetData.length < 7 ? newTargetData.length : '6'}aw ${targetMember.id}\``);
 			setTimeout(() => {
 				cmd.delete();
 			}, 10 * 1000);
 		}
-		await utils.log(client, logEmbed, 'STAFF')
+		await utils.log(interaction.client, logEmbed, 'STAFF')
 		// interaction.channel.send({ embeds: [logEmbed] });
 	},
 };

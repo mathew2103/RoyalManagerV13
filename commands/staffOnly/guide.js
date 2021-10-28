@@ -16,11 +16,11 @@ module.exports = {
         let pages = [
             {
                 label: 'Basic Info',
-                description: `Hi. I am Royal Manager, a moderation, utility and music bot made only for Royal Advertising.\n**Prefix:** \`/\`\n**Developer:** <@378025254125305867> \`Menin#4642\`\n**Commands:** ${client.commands.size}\n**Users Cached:** ${client.users.cache.size}`,
+                description: `Hi. I am Royal Manager, a moderation, utility and music bot made only for Royal Advertising.\n**Prefix:** \`/\`\n**Developer:** <@378025254125305867> \`Menin#4642\`\n<@605061180599304212> \`605061180599304212\`\n**Commands:** ${client.commands.size}\n**Users Cached:** ${client.users.cache.size}`,
                 value: 'basics'
             }, {
                 label: 'How to warn',
-                description: '**Command:** `r!ad`\n**Usage:** `r!ad <user> <ad-deleted-channel> <reason> (belongs-to)`\n\n**Examples:**\n• `r!ad 814845014009053214 #┇📋・anime-servers description`\n• `r!ad 814845014009053214 649270895830892554 rewards`\n• `r!ad 814845014009053214 anime ping`\n\n**Notes:**\n• The reason can only be one word.\n• You can use \`r!reasons <word>\` to check which word triggers which reason.\n• You can use the user\'s mention too instead of the user id in the command, but the user id is easier to use.\n• Check the `How to warn for incorrect channel?` guide for info about the `belongs-to` part.',
+                description: '**Command:** \n `r!ad`\n**Usage:** `r!ad <user> <ad-deleted-channel> <reason> (belongs-to)`\n\n**Examples:**\n• `r!ad 814845014009053214 #┇📋・anime-servers description`\n• `r!ad 814845014009053214 649270895830892554 rewards`\n• `r!ad 814845014009053214 anime ping`\n\n**Notes:**\n• The reason can only be one word.\n• You can use \`r!reasons <word>\` to check which word triggers which reason.\n• You can use the user\'s mention too instead of the user id in the command, but the user id is easier to use.\n• Check the `How to warn for incorrect channel?` guide for info about the `belongs-to` part.',
                 value: 'warn'
             }, {
                 label: 'How to request a ban',
