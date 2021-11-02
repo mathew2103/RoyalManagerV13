@@ -26,7 +26,7 @@ module.exports = {
         // console.log(modTeamRole.members.filter(e => !members.includes(e)))
 
         let modData = await members.map(member => {
-            console.log(member.user.username)
+            
             let memberData = data.find(e => e.userId == member.id);
             if (memberData) {
                 memberData.tag = member.user.tag;
@@ -38,7 +38,7 @@ module.exports = {
 
             // if(memberData)odData.push(memberData)
         })
-        console.log(modData);
+        
         modData = modData.filter(e => e !== undefined);
 
         if (sortBy == 'current') modData = modData.sort((a, b) => b.current - a.current)

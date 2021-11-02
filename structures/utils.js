@@ -19,10 +19,14 @@ async function log(client, message, type) {
     if (!logChannels[type]) throw new Error(`Type ``${type}`` is not an option.`);
     const channel = client.channels.cache.get(logChannels[type]);
     const webhooks = await channel.fetchWebhooks()
-    let webhook = webhooks?.first() || channel
+    let webhook = webhooks?.find(e => e.token) || channel
 
+    
+
+    try{
     if (typeof message == 'string') webhook.send(message);
     else webhook.send({ embeds: [message] });
+    }catch(e){console.error(e)}
 }
 
 /**

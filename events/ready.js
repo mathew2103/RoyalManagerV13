@@ -73,6 +73,6 @@ module.exports = {
 			client.user.setActivity(activity.name, { type: activity.type, url: activity.url });
 			
 		}, 10 * 1000)
-
+		client.channels.cache.get("749618873552207872").send(':green_circle: Im ready to be used.')
 	},
 };

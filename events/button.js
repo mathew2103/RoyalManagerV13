@@ -80,7 +80,7 @@ module.exports = {
 				const breakData = await breakSchema.findOne({ user: id })
 				console.log(breakData);
 				if (!member) return interaction.update({ content: 'User left the server.', embeds: [oldEmbed], components: [] })
-
+				if(member.id == interaction.user.id)return interaction.reply({ content: 'You cannot accept/deny your own break request', ephemeral: true})
 				await interaction.reply({ content: `Provide a reason for this ${trigger == 'yes' ? 'approval. You can also provide `none`' : 'denial'}`, ephemeral: true })
 
 				let breakReason = await interaction.channel.awaitMessages({ filter, max: 1, time: 2 * 60 * 1000, errors: ['time'] }).catch(e => { return interaction.editReply('You didn\'t answer in time. Use the button again.') })

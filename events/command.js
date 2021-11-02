@@ -1,3 +1,5 @@
+const { MessageEmbed } = require("discord.js");
+
 module.exports = {
 	name: 'interactionCreate',
 	async execute(interaction) {
@@ -6,7 +8,7 @@ module.exports = {
 
 		const cmd = interaction.client.commands.get(interaction.commandName)
 		// const bypassRoles = ['bot dev', 'server manager', 'administrator'] //bypassRoles.includes(role.name.toLowerCase())
-		const bypassRegex = /(admin|manager|bot dev)/mi
+		const bypassRegex = /(admin|server manager|bot dev)/mi
 		if(interaction.guild && !interaction.member.roles.cache.some(role => role.name.match(bypassRegex))){
 			if (cmd.permissions) {			
 				if (!Array.isArray(cmd.permissions)) cmd.permissions = [cmd.permissions]
@@ -31,6 +33,12 @@ module.exports = {
 		}
 		catch (error) {
 			console.error(error);
+			const emb = new MessageEmbed()
+			.setAuthor(`Error while using command ${interaction.commandName}`)
+			.addField('Error', error)
+			.setTimestamp()
+			.setFooter(interaction.user.tag, interaction.user.displayAvatarURL())
+			client.channels.cache.get('871290638631600128')?.send()
 			interaction.channel.send({ content: `Error while executing the command.. \n\`${error.message}\`\n\n${cmd.errorMsg || "Please report this to Menin#4642 as soon as possible"}` });
 		}
 	},

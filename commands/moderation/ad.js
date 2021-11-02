@@ -120,6 +120,7 @@ module.exports = {
 			.setAuthor('Ad Warning')
 			.setDescription(adWarnTemplate.replace('{member}', targetMember).replace('{reason}', reason).replace('{wc}', newTargetData.length).replace('{channel}', adDeletedIn))
 			.setFooter(`Warning ID: ${punishmentId}`)
+			.setColor(colorFromNum(newTargetData.length))
 			.setTimestamp();
 		if (belongstoChannel) adWarnEmbed.addField('Your advertisment belongs to', belongstoChannel.toString());
 		await utils.log(interaction.client, `**[AD-WARN]** ${interaction.user.tag} earned ${amountOfCoins}`, 'EARN')
@@ -146,6 +147,7 @@ module.exports = {
 		const dmEmbed = new Discord.MessageEmbed()
 			.setAuthor('Ad Warning')
 			.setDescription(`Your ad has been deleted in ${adDeletedIn}.\n**Reason:** ${reason}\nNow you have ${newTargetData.length} ad warning${(newTargetData.length > 1) ? 's' : ''}\nIf you think that this is a mistake or if you want to appeal this punishment, use \`r!appeal ${punishmentId}\` in <#678181401157304321> or in this DM to appeal.`)
+			.setColor(colorFromNum(newTargetData.length))
 			.setFooter('Warning ID:' + punishmentId);
 
 		await targetMember.send(dmEmbed).catch(e => e);
@@ -172,5 +174,11 @@ module.exports = {
 		}
 		await utils.log(interaction.client, logEmbed, 'STAFF')
 		// interaction.channel.send({ embeds: [logEmbed] });
+
+		function colorFromNum(num) {
+            if(num <= 2)return 'GREEN';
+            else if(num <= 4)return 'YELLOW';
+            else return "RED";
+        }
 	},
 };

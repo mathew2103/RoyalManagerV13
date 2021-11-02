@@ -54,7 +54,7 @@ module.exports = {
     async execute(interaction) {
         if (!interaction.isContextMenu()) return;
         await interaction.deferReply({ephemeral: true});
-        const bypassRegex = /(mod|admin|manager|bot dev)/mi
+        const bypassRegex = /(mod|admin|server manager|bot dev)/mi
         if(!interaction.member.roles.cache.some(role => role.name.match(bypassRegex)))return interaction.followUp({ content: 'You are not supposed to be using this.', ephemeral: true})
         // if (!interaction.member.roles.cache.some(role => role.name.includes('Mod') || role.name.includes('Admin') || role.name.includes('Manager') || role.name.includes('Bot Dev')))return interaction.followUp({ content: 'You are not supposed to be using this.', ephemeral: true})
 
@@ -65,8 +65,11 @@ module.exports = {
         if(!targetMember)return interaction.followUp({ content: 'Looks like the member either left or is a webhook message.', ephemeral: true});
         
         const adDeletedIn = message.channel;
+        
         const adCats = ['649269707135909888', '880482008931905598', '594392827627044865', '594509117524017162']
+        
         if(!adCats.includes(adDeletedIn.parentId))return interaction.followUp({ content: `You can only moderate ads in the following categories: ${adCats.map(e => `<#${e}>`).join(', ')}`, ephemeral: true })
+        
         if (targetMember.roles?.highest.position >= interaction.member.roles?.highest.position) return await interaction.editReply('You cannot warn a member having a role higher than or equal to you.');
 
         const oldWarns = await punishmentSchema.find({ user: targetMember.id, guild:interaction.guild.id });
@@ -158,7 +161,7 @@ module.exports = {
         // const amountEarned = randomBetween(50, 75);
         let amountOfCoins = randomBetween(50, 75)
         const oldData = await coinsSchema.findOne({ userID: interaction.user.id })
-        if(oldData && oldData.cooldownTill && oldData.cooldownTill >= Date.now())amountOfCoins = 0
+        if(oldData && oldData.cooldownTill && oldData.cooldownTill >= Date.now())amountOfCoins = 0;
         if(amountOfCoins > 0){
             await coinsSchema.findOneAndUpdate({ userID: interaction.user.id }, {
                 userID: interaction.user.id,
@@ -186,7 +189,8 @@ module.exports = {
             .setAuthor('Ad Warning')
             .setDescription(adWarnTemplate.replace('{member}', targetMember.toString()).replace('{reason}', reason).replace('{wc}', newTargetData.length).replace('{channel}', adDeletedIn.toString()))
             .setFooter(`Warning ID: ${punishmentId}`)
-            .setTimestamp();
+            .setTimestamp()
+            .setColor(colorFromNum(newTargetData.length));
         if (belongsto?.id) adWarnEmbed.addField('Your advertisment belongs to', belongsto.toString());
 
         try {
@@ -210,8 +214,10 @@ module.exports = {
 
         const dmEmbed = new Discord.MessageEmbed()
             .setAuthor('Ad Warning')
-            .setDescription(`Your ad has been deleted in ${adDeletedIn}.\n**Reason:** ${reason}\nNow you have ${newTargetData.length} ad warning${(newTargetData.length > 1) ? 's' : ''}\nIf you think that this is a mistake or if you want to appeal this punishment, use \`r!appeal ${punishmentId}\` in <#678181401157304321> or in this DM to appeal.`)
-            .setFooter('Warning ID:' + punishmentId);
+            .setDescription(`Your ad has been deleted in ${adDeletedIn}.\n**Reason:** ${reason}\nNow you have ${newTargetData.length} ad warning${(newTargetData.length > 1) ? 's' : ''}\nIf you think that this is a mistake or if you want to appeal this punishment, use \`/appeal ${punishmentId}\` in <#678181401157304321> or in this DM to appeal.`)
+            .setFooter('Warning ID:' + punishmentId)
+            .setColor(colorFromNum(newTargetData.length))
+            
 
         await targetMember.send(dmEmbed).catch(e => e);
 
@@ -233,5 +239,11 @@ module.exports = {
         // setTimeout(() => {interaction.deleteReply()}, 10*1000)
         
         interaction.channel.send({ embeds: [logEmbed] });
+
+        function colorFromNum(num) {
+            if(num <= 2)return 'GREEN';
+            else if(num <= 4)return 'YELLOW';
+            else return "RED";
+        }
     }
 }
