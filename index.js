@@ -114,5 +114,6 @@ client.on('messageCreate', async (message) => {
 	}
 })
 
-connectToMongoDB().then(() => client.login(process.env.TOKEN))
+connectToMongoDB()
+client.login(process.env.TOKEN)
 
