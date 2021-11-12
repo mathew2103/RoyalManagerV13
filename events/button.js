@@ -144,7 +144,7 @@ module.exports = {
 				const reason = oldEmbeds[0].fields.find(e => e.name == 'Reason');
 				const targetBan = await interaction.guild.members.fetch(id).catch(e => e);
 				const evidence = oldEmbeds[0].fields.find(e => e.name == 'Evidence');
-				let moderatorId = oldEmbeds[0].filends.find(e => e.name == 'Moderator')
+				let moderatorId = oldEmbeds[0].fields.find(e => e.name == 'Moderator')
 				moderatorId = moderatorId.value.split('\`')[1]
 				const banModerator = await interaction.guilds.members.fetch(id).catch(e => e);
 

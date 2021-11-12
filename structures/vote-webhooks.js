@@ -85,8 +85,8 @@ module.exports.run = (client) => {
                 nextVote: Date.now() + ms('12h')
             }, {upsert: true})
 
-            await member.roles.remove(config.voterRole);
-            await member.send({ embeds: [embed], components: [actionRow] })
+            await member.roles.remove(config.voterRole).catch(e => e);
+            await member.send({ embeds: [embed], components: [actionRow] }).catch(e => e);
             
         }
     }, 60 * 60 * 1000))

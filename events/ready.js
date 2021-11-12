@@ -74,5 +74,6 @@ module.exports = {
 			
 		}, 10 * 1000)
 		client.channels.cache.get("749618873552207872").send(':green_circle: Im ready to be used.')
+		
 	},
 };

@@ -4,29 +4,32 @@ const logChannels = {
     STAFF: "757957484802605060",
     EARN: "879976554413846538",
     AUTO: "879976688245674044",
-    VOTES: "879976455608602624"
+    VOTES: "879976455608602624",
+    ERRORS: "871290638631600128",
 }
 
 /**
  * Logs a message in a discord channel
  * @param {Client} client 
- * @param {String} message 
- * @param {logChannels} type
+ * @param {String|MessageEmbed} message 
+ * @param {logChannels} channelType
  */
 
-async function log(client, message, type) {
-    type = type.toUpperCase();
-    if (!logChannels[type]) throw new Error(`Type ``${type}`` is not an option.`);
-    const channel = client.channels.cache.get(logChannels[type]);
-    const webhooks = await channel.fetchWebhooks()
+async function log(client, message, channelType) {
+    
+    try
+    {channelType = channelType.toUpperCase();
+    if (!logChannels[channelType]) return console.log(`Type ``${channelType}`` is not an option.`);
+    const channel = client.channels.cache.get(logChannels[channelType]);
+    const webhooks = await channel?.fetchWebhooks();
     let webhook = webhooks?.find(e => e.token) || channel
 
-    
 
-    try{
+    
     if (typeof message == 'string') webhook.send(message);
     else webhook.send({ embeds: [message] });
-    }catch(e){console.error(e)}
+    
+    }catch(e){console.log(e)}
 }
 
 /**

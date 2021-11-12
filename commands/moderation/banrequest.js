@@ -9,44 +9,46 @@ module.exports = {
         .addUserOption((op) => op.setName('member').setDescription('Member to request ban').setRequired(true))
         .addStringOption((op) => op.setName('reason').setDescription('Reason for ban request (NOT EVIDENCE)').setRequired(true)),
     guilds: [config.mainServer.id],
-    roles: ['Trial Mods'],
+    roles: ['Trial Mod'],
     async execute(interaction) {
+        await interaction.deferReply({ ephemeral: true });
         const member = interaction.options.getMember('member')
 
-        if (member.roles.highest.position >= interaction.member.roles.highest.position) return interaction.reply(`You cannot request a ban for a user above you.`)
+        if (member.roles.highest.position >= interaction.member.roles.highest.position) return interaction.editReply({ content: `You cannot request a ban for a user above you.`, ephemeral: true })
         let reason = interaction.options.getString('reason')
 
-        if (reason.includes('-')) return interaction.reply(`Dont use \`-\` in the reason.`)
-
         const banreqchannel = await interaction.guild.channels.cache.get(config.banRequestChannel);
-        if (!banreqchannel) return interaction.reply({ content: 'No ban request channel found.', ephemeral: true })
+        if (!banreqchannel) return interaction.editReply({ content: 'No ban request channel found.', ephemeral: true })
 
         if (reason.toLowerCase() == '6aw') {
             reason = `Accumulating six total ad warnings`
         }
         const filter = m => m.author.id === interaction.user.id
-        await interaction.reply(`Please send the evidence for this ban. You may include a link or an attachment. Say \`cancel\` to cancel this.`)
+        await interaction.editReply(`Please send the evidence for this ban. You may include a link or an attachment. Say \`cancel\` to cancel this.`)
 
-        const response = await interaction.channel.awaitMessages(filter, {
+        const response = await interaction.channel.awaitMessages({
+            filter,
             max: 1,
-            time: 60 * 1000,
+            time: 2 * 60 * 1000,
             errors: ['time']
         })
-
+        if(!response)return interaction.editReply('You didnt respond in time..');
+        
         let evidence = response.first().attachments.first() ? response.first().attachments.first().url : response.first().content
+        if (evidence && evidence.toLowerCase() === 'cancel') return interaction.editReply(`Cancelled.`)
         if (evidence.toLowerCase() === '6aw') {
             // const guildId = interaction.guild.id, userId = member.id
             const result = await warnSchema.findOne({
                 // guildId,
                 userId
             })
-            if (!result) return interaction.reply(`User doesnt has enough warnings.`)
+            if (!result) return interaction.editReply(`User doesnt has enough warnings.`)
             const sorted = result.warnings.sort((a, b) => b.at - a.at)
 
             evidence = sorted.map(e => `\`${e.punishmentId}\` - ${moment.utc(e.at).format("MMM Do YYYY, h:mm:ss a")}`).join('\n')
         }
 
-        if (evidence && evidence.toLowerCase() === 'cancel') return interaction.reply(`Cancelled.`)
+        
         const embed = new Discord.MessageEmbed()
             .setTitle('New Ban Request')
             .setColor('YELLOW')
@@ -84,7 +86,16 @@ module.exports = {
         const row = new Discord.MessageActionRow()
             .addComponents(button1, button2)
 
-        await banreqchannel.send('@here', { embeds: [embed], components: [row] })
-        await interaction.reply(`Ban successfully requested.`)
+        const webhooks = await banreqchannel.fetchWebhooks()
+        let webhook = webhooks?.find(e => e.token)
+        if (!webhook) {
+            webhook = await banreqchannel.createWebhook('Ban Requests', {
+                avatar: interaction.client.user.displayAvatarURL()
+            })
+        }
+
+        // await banreqchannel.send('@here', { embeds: [embed], components: [row] })
+        await webhook.send({ content: '@h', embeds: [embed], components: [row], avatar: interaction.user.displayAvatarURL(), username: interaction.member.displayName })
+        await interaction.editReply(`Ban successfully requested.`)
     },
 };

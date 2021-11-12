@@ -29,8 +29,8 @@ module.exports = {
 		const adDeletedIn = interaction.options.getChannel('channel');
 		const reasonString = interaction.options.getString('reason');
 		let belongstoChannel = interaction.options.getChannel('belongs_to');
-		console.log(targetMember)
-
+		
+		if(!targetMember)return interaction.editReply('Couldnt find a target member..')
 		const adCats = ['649269707135909888', '880482008931905598', '594392827627044865', '594509117524017162']
         if(!adCats.includes(adDeletedIn.parentId) || adDeletedIn.type !== 'GUILD_TEXT')return interaction.editReply({ content: `You can only moderate ads in text channels of the following categories: ${adCats.map(e => `<#${e}>`).join(', ')}`, ephemeral: true })
 		if(targetMember.roles.highest.position >= interaction.member.roles?.highest.position) return await interaction.editReply('You cannot warn a member having a role higher than or equal to you.');

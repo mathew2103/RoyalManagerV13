@@ -38,7 +38,8 @@ module.exports = {
 			.addField('Error', error)
 			.setTimestamp()
 			.setFooter(interaction.user.tag, interaction.user.displayAvatarURL())
-			client.channels.cache.get('871290638631600128')?.send()
+			utils.log(client, emb, 'ERRORS')
+			// client.channels.cache.get('871290638631600128')?.send()
 			interaction.channel.send({ content: `Error while executing the command.. \n\`${error.message}\`\n\n${cmd.errorMsg || "Please report this to Menin#4642 as soon as possible"}` });
 		}
 	},
