@@ -4,7 +4,7 @@ const coinsSchema = require('../schemas/coins-schema');
 const utils = require('../structures/utils')
 const fetch = require('node-fetch');
 const fs = require('fs');
-
+const config = require('../config.json');
 module.exports = {
     name: 'messageCreate',
     async execute(message, client) {
@@ -25,7 +25,7 @@ module.exports = {
                 const data = await fetched.json()
 
                 if (data.match) {
-                    
+
                     const replyEmbed = new MessageEmbed()
                         .addFields([
                             {
@@ -45,7 +45,7 @@ module.exports = {
                         .setColor('RED')
                         .setAuthor(client.user.tag, client.user.displayAvatarURL())
                     message.reply({ embeds: [replyEmbed] })
-                    
+
                 } else message.reply('This link doesnt seem phishy to me..')
                 return;
             } catch (e) { console.error(e) }
@@ -66,10 +66,19 @@ module.exports = {
                 const data = await fetched.json()
 
                 if (data.match) {
-                    await message.send({ embeds: [new MessageEmbed().setDescription(`You have been banned in ${message.guild.name} for sending ${data.matches[0]?.type?.toLowerCase() || 'scam'} links`)] }).catch(e => e);
+                    if (message.guild.id == config.mainServer.id) {
+                        await message.send({ embeds: [new MessageEmbed().setDescription(`You have been banned in ${message.guild.name} for sending ${data.matches[0]?.type?.toLowerCase() || 'scam'} links`)] }).catch(e => e);
+                        
+                        await message.member.ban({ days: 2, reason: `Sending ${data.matches[0]?.type?.toLowerCase() || 'scam'} links` }).catch(e => e);
 
-                    message.member.ban({ days: 2, reason: `Sending ${data.matches[0]?.type?.toLowerCase() || 'scam'} links` }).catch(e => e);
-                    await client.channels.cache.get('749618873552207872')?.send({ embeds: [new MessageEmbed().setDescription(`Banned ${message.author.tag} for sending ${data.matches[0]?.type.toLowerCase || 'scam'} link in ${message.channel.toString()}`).addFields([{name:'Link', value: data.matches[0]?.domain, inline: true}, {name: 'Trust Rating (0-1)', value: data.matches[0]?.trust_rating.toString()}])]})
+                        await client.channels.cache.get('749618873552207872')?.send({ embeds: [new MessageEmbed().setDescription(`Banned ${message.author.tag} for sending ${data.matches[0]?.type.toLowerCase || 'scam'} link in ${message.channel.toString()}`).addFields([{ name: 'Link', value: data.matches[0]?.domain, inline: true }, { name: 'Trust Rating (0-1)', value: data.matches[0]?.trust_rating.toString() }])] })
+                    } else if (message.guild.id == config.staffServer.id){
+                        await message.delete();
+                        
+                        await message.member.roles.set('882622655545614386');
+                        
+                        await message.guild.channels.cache.get(config.modTeamUpdatesChannel)?.send(`${message.member.toString()} just posted a scam link in ${message.channel.toString()}. Please do not click on any links sent by them.`)
+                    }
                     return;
                 }
             } catch (e) { console.error(e) }
@@ -125,6 +134,6 @@ module.exports = {
             return;
         }
 
-       
+
     }
 }
