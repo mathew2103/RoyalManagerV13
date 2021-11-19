@@ -14,9 +14,10 @@ module.exports = {
     guilds: '825958701487620107',
     roles: ['Mod'],
     async execute(interaction) {
-        const punishmentId = interaction.options.get('punishment_id');
-        const reason = interaction.options.get('reason');
+        const punishmentId = interaction.options.getString('punishment_id');
+        const reason = interaction.options.getString('reason');
         const warning = await punishmentSchema.findOne({ punishmentId, guild: interaction.guild.id })
+        if(!warning)return interaction.reply({content: `No punishment found with ID: ${punishmentId}`, ephemeral: true});
 
         if (warning.author !== interaction.user.id
             && !interaction.member.roles.cache.some(e => e.name.includes('Head Moderator') || e.name.includes('Administrator') || e.name.includes('Server Manager')))
@@ -50,12 +51,11 @@ module.exports = {
             moderator.user.send(`A warning issued by you has been removed. You currently have \`${moddata.current}\` ad moderations.`).catch(e => e)
         }
 
-
         const dm = new Discord.MessageEmbed()
             .setAuthor(`Punishment Removed`)
-            .setDescription(`Your ad warning with ID: \`${args[0]}\` has been removed.`)
+            .setDescription(`Your ad warning with ID: \`${punishmentId}\` has been removed.`)
             .setColor("GREEN")
-        if (member) member.send(dm).catch(e => interaction.followUp({ content: `Couldn't DM the user. \nError:\n\`\`\`${e.message}\`\`\``, ephemeral: true }))
+        if (member) member.send({embeds: [dm]}).catch(e => interaction.followUp({ content: `Couldn't DM the user. \nError:\n\`\`\`${e.message}\`\`\``, ephemeral: true }))
 
         const logem = new Discord.MessageEmbed()
             .setAuthor(`Punishment Removed`)
@@ -65,8 +65,9 @@ module.exports = {
             .setTimestamp()
             .setFooter(`Warning ID: ${warning.punishmentId} | Warning was issued by: ${warning.author}`)
             .setColor("YELLOW")
+            .setThumbnail(member.user.displayAvatarURL())
 
-        utils.log(client, logem, 'staff')
+        utils.log(interaction.client, logem, 'staff')
         // const logs = interaction.guild.channels.cache.get(data.logs)
         // if (logs) try { logs.send(logem) } catch (e) { }
         // else console.log(`brr`)

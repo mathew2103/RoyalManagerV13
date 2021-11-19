@@ -36,6 +36,6 @@ module.exports.run = async(client) => {
         }
         
 
-    }, 60*1000))
+    }, 60*60*1000))
 
 }

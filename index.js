@@ -1,19 +1,23 @@
-const { Client, Collection, Intents } = require('discord.js');
+const { Client, Collection, Intents, MessageEmbed } = require('discord.js');
 const dotenv = require('dotenv');
 const fs = require('fs');
 const { join } = require('path');
 const { Player } = require('discord-player');
 const { playerEvents } = require('./events/music');
 const mongo = require('./mongo');
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES], partials: ['MESSAGE', 'GUILD_MEMBER'] });
 const config = require('./config.json');
+const utils = require('./structures/utils');
+const { codeBlock } = require('@discordjs/builders');
+
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES], partials: ['MESSAGE', 'GUILD_MEMBER'] });
 
 dotenv.config();
 client.commands = new Collection();
 client.intervals = new Map();
+client.player = new Player(client);
 
-client.player = new Player(client)
-	
+globalThis.utils = utils
+
 playerEvents(client.player);
 
 const connectToMongoDB = async () => {
@@ -21,7 +25,7 @@ const connectToMongoDB = async () => {
 		console.log('Connected to mongodb!');
 	});
 };
-connectToMongoDB();
+// connectToMongoDB();
 
 
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
@@ -29,10 +33,12 @@ const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'
 for (const file of eventFiles) {
 	const event = require(`./events/${file}`);
 	if (event.once) {
-		client.once(event.name, (...args) => event.execute(...args));
+		client.prependOnceListener(event.name, (...args) => event.execute(...args))
+		// client.once(event.name, (...args) => event.execute(...args));
 	}
 	else {
-		client.on(event.name, (...args) => event.execute(...args, client));
+		// client.on(event.name, (...args) => event.execute(...args, client))
+		client.addListener(event.name, (...args) => event.execute(...args, client));
 	}
 }
 
@@ -45,13 +51,12 @@ const readCommands = async (dir) => {
 		}
 		else {
 			const option = require(join(__dirname, dir, file));
-			console.log(dir)
-			if(dir !== './commands')option.category = dir.split('/')[1];
-			
+			if (dir !== './commands') option.category = dir.split('/')[1];
+
 			client.commands.set(option.data.name.toLowerCase(), option)
 		}
 	}
-	// console.log(client.commands);
+
 };
 
 readCommands('./commands');
@@ -63,9 +68,8 @@ client.on('messageCreate', async (message) => {
 		// const { client } = message
 		let guilds = await client.guilds.fetch();
 		guilds = Array.from(guilds.values())
-		console.log(guilds)
 		let allCmds = []
-		
+
 
 		const registerCmd = async (dir) => {
 			const files = fs.readdirSync(join(__dirname, dir));
@@ -76,17 +80,24 @@ client.on('messageCreate', async (message) => {
 				}
 				else {
 					const option = require(join(__dirname, dir, file));
-					
-					if(option.data.options[0]?.options)option.data.options[0].type = 1
-					if(option.data.options[1]?.options)option.data.options[1].type = 1
 
-					if(option.guilds && !Array.isArray(option.guilds))option.guilds = [option.guilds]
 
-					if(!option.guilds?.length)option.guilds = []
-					if(dir.includes('moderation'))option.guilds.push(config.mainServer.id)
-					else if(dir.includes('staffOnly'))option.guilds.push(config.staffServer.id)
-					else if(dir.includes('music'))option.guilds.push('all')
-					
+					// if(option.data.options?.length){
+					// 	for(let i = 0; i < option.data.options.length; i++){
+					// 		options.data.options[i].type = 1
+					// 	}
+					// }
+					if (option.data.options[0]?.options) option.data.options[0].type = 1
+					if (option.data.options[1]?.options) option.data.options[1].type = 1
+					if (option.data.options[2]?.options) option.data.options[2].type = 1
+
+					if (option.guilds && !Array.isArray(option.guilds)) option.guilds = [option.guilds]
+
+					if (!option.guilds?.length) option.guilds = []
+					if (dir.includes('moderation')) option.guilds.push(config.mainServer.id)
+					else if (dir.includes('staffOnly')) option.guilds.push(config.staffServer.id)
+					else if (dir.includes('music')) option.guilds.push('all')
+
 					allCmds.push(option)
 				}
 			}
@@ -94,18 +105,19 @@ client.on('messageCreate', async (message) => {
 		};
 		registerCmd('./commands');
 
-		const globalCmdsData = allCmds.filter(e => e.global)
-
-		await client.application.commands.set(globalCmdsData.map(e => e.data))
-		for(let guild of guilds){
-			if(!guild.commands)guild = await guild.fetch()
-			const guildCmdsData = allCmds.filter(e => e.guilds?.includes(guild.id) || e.guilds?.includes('all') || e.global)			
+		await client.application.fetch();
+		const globalCmdsData = allCmds.filter(e => e.global);
+		console.log(...globalCmdsData?.map(e => e.data))
+		// await client.application.commands.set(...globalCmdsData?.map(e => e.data))
+		for (let guild of guilds) {
+			// if(!guild.commands)guild = await guild.fetch()
+			const guildCmdsData = allCmds.filter(e => e.guilds?.includes(guild.id) || e.guilds?.includes('all') || e.global)
 			const cmds = guildCmdsData.map(e => e.data)
-			await guild.commands.set(cmds).catch(e => message.channel.send(e.message));
+			client.application.commands.set(cmds, guild.id)
+			// await guild.commands.set(cmds).catch(e => message.channel.send(e.message));
 		}
 
-		await client.application.fetch();
-		if(message.guild.id == '559271990456745996')await client.application.commands.create({
+		await client.application.commands.create({
 			name: 'AD WARN',
 			type: "MESSAGE"
 		}, config.mainServer.id)
@@ -116,4 +128,14 @@ client.on('messageCreate', async (message) => {
 	}
 })
 
-client.login(process.env.TOKEN);
+process.on("uncaughtException", (err) => {
+	console.error(err.stack);
+	const embed = new MessageEmbed()
+		.setDescription(`${err.message}\n\n${codeBlock('cmd', err.stack)}`)
+	utils.log(client, embed, 'errors');
+});
+
+connectToMongoDB()
+client.login(process.env.TOKEN)
+module.exports = client 
+
