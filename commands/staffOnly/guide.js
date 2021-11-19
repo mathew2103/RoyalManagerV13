@@ -69,8 +69,8 @@ module.exports = {
             collector.resetTimer();
         })
         collector.on('end', collected => {
-            const newRow = new Discord.MessageActionRow()
-            .addComponents(menu.setDisabled())
+            menu.setDisabled(true);
+            newRow = [menu]
             interaction.editReply({ embeds: [embed], components: [newRow] })
         })
     },
