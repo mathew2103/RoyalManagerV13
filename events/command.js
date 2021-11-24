@@ -1,8 +1,16 @@
-const { MessageEmbed } = require("discord.js");
-
+const { MessageEmbed, Interaction } = require("discord.js");
+const buttonCreate = require('./subEvents/button');
+const menuCreate = require('./subEvents/context-menu');
 module.exports = {
 	name: 'interactionCreate',
+	/**
+	 * 
+	 * @param {Interaction} interaction 
+	 * @returns 
+	 */
 	async execute(interaction) {
+		if (interaction.isButton()) return buttonCreate.execute(interaction);
+		if (interaction.isContextMenu())return menuCreate.execute(interaction);
 		if (!interaction.isCommand()) return;
 		if (!interaction.client.commands.has(interaction.commandName)) return interaction.reply('No such cmd found.. *weird*');
 

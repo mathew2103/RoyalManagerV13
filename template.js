@@ -1,15 +1,18 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
-
+const { CommandInteraction } = require('discord.js');
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('')
-		.setDescription(''),
-		// .addBooleanOption((op) => op.setName('ephemeral').setDescription('Should the reply be only shown to you?')),
+		.setName('steco')
+		.setDescription('Staff economy'),
 	permissions: [],
 	global: false,
+    /**
+     * 
+     * @param {CommandInteraction} interaction 
+     */
 	async execute(interaction) {
-		
+        
 
 	},
 };

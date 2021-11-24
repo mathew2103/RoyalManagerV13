@@ -25,7 +25,18 @@
     "onBreakRole": "754303021659324476",
     "breakRequestChannel": "832182767382691921",
     "modTeamUpdatesChannel": "781173056625836042",
-    "automod": {
-        "scams": true
+    "shopItems": {
+        "auto1": {
+            "name": "Autoad for 5 days",
+            "duration": "5d",
+            "type": "autoad",
+            "price": "1200"
+        },
+        "auto2": {
+            "name":"Autoad for 7 days",
+            "duration": "7d",
+            "type": "autoad",
+            "price": "1700"
+        }
     }
 }

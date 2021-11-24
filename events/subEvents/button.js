@@ -1,13 +1,18 @@
 /* eslint-disable no-case-declarations */
-const { MessageEmbed } = require('discord.js');
-const punishmentsSchema = require('../schemas/punishments-schema');
-const warnCountSchema = require('../schemas/warnCount-schema');
-const breakSchema = require('../schemas/break-schema');
-const votesSchema = require('../schemas/votes-schema');
-const config = require('../config.json');
+const { MessageEmbed, ButtonInteraction } = require('discord.js');
+const punishmentsSchema = require('../../schemas/punishments-schema');
+const warnCountSchema = require('../../schemas/warnCount-schema');
+const breakSchema = require('../../schemas/break-schema');
+const votesSchema = require('../../schemas/votes-schema');
+const config = require('../../config.json');
 const { time } = require('@discordjs/builders');
 module.exports = {
 	name: 'interactionCreate',
+	/**
+	 * 
+	 * @param {ButtonInteraction} interaction 
+	 * @returns 
+	 */
 	async execute(interaction) {
 		if (!interaction.isButton()) return;
 		if (!interaction.customId.includes('_')) return;

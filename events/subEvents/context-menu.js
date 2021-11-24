@@ -1,10 +1,10 @@
-const { MessageActionRow, MessageSelectMenu } = require('discord.js');
+const { MessageActionRow, MessageSelectMenu, ContextMenuInteraction } = require('discord.js');
 const Discord = require('discord.js')
-const punishmentSchema = require('../schemas/punishments-schema');
-const settingsSchema = require('../schemas/settings-schema');
-const warnCountSchema = require('../schemas/warnCount-schema');
-const coinsSchema = require('../schemas/coins-schema');
-const config = require('../config.json');
+const punishmentSchema = require('../../schemas/punishments-schema');
+const settingsSchema = require('../../schemas/settings-schema');
+const warnCountSchema = require('../../schemas/warnCount-schema');
+const coinsSchema = require('../../schemas/coins-schema');
+const config = require('../../config.json');
 const uniqid = require('uniqid');
 
 let reasons = [{
@@ -51,6 +51,11 @@ let reasons = [{
 
 module.exports = {
     name: 'interactionCreate',
+    /**
+     * 
+     * @param {ContextMenuInteraction} interaction 
+     * @returns 
+     */
     async execute(interaction) {
         if (!interaction.isContextMenu()) return;
         await interaction.deferReply({ephemeral: true});

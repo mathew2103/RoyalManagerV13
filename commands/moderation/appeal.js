@@ -47,7 +47,7 @@ module.exports = {
             .addComponents([yesButton, noButton])
             console.log(row)
 
-
+        client.mails.set(interaction.user.id, 'appeal')
         collector.on('collect', async msg => {
             collector.stop();
 
@@ -89,6 +89,7 @@ module.exports = {
 
             await webhook.send({ content: '@', embeds: [embed], components: [row] , username: interaction.user.username, avatarURL: interaction.user.displayAvatarURL()})
             dmChannel.send('Your appeal has been submitted. Please wait for us to review your appeal.')
+            client.mails.set(interaction.user.id, undefined)
             // interaction.followUp('Appeal Submitted, Please wait for us to review your appeal')
         })
     }

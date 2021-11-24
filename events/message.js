@@ -5,11 +5,13 @@ const utils = require('../structures/utils')
 const fetch = require('node-fetch');
 const fs = require('fs');
 const config = require('../config.json');
+const modmail = require('../structures/modmail');
 module.exports = {
     name: 'messageCreate',
     async execute(message, client) {
-        if (message.author.bot || !message.guild) return;
-        const config = JSON.parse(fs.readFileSync('config.json', 'utf-8'));
+        if (message.author.bot) return;
+        if(!message.guild)return modmail.run(message, client);
+        
 
         if (message.content.toLowerCase().startsWith('!check') && (message.guild.id == '746635811243556925' || message.channel.id == '749618873552207872' || message.member.roles.cache.some(e => e.name.toLowerCase() == 'bot developer'))) {
             try {
@@ -63,7 +65,7 @@ module.exports = {
                         message: message.content
                     })
                 })
-                const data = await fetched.json()
+                const data = await fetched.json();
 
                 if (data.match) {
                     if (message.guild.id == config.mainServer.id) {

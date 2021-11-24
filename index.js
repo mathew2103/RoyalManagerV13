@@ -9,12 +9,13 @@ const config = require('./config.json');
 const utils = require('./structures/utils');
 const { codeBlock } = require('@discordjs/builders');
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES], partials: ['MESSAGE', 'GUILD_MEMBER'] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES], partials: ['MESSAGE', 'GUILD_MEMBER', 'CHANNEL'] });
 
 dotenv.config();
 client.commands = new Collection();
 client.intervals = new Map();
 client.player = new Player(client);
+client.mails = new Map();
 
 globalThis.utils = utils
 
@@ -134,6 +135,10 @@ process.on("uncaughtException", (err) => {
 		.setDescription(`${err.message}\n\n${codeBlock('cmd', err.stack)}`)
 	utils.log(client, embed, 'errors');
 });
+
+process.on('exit', () => {
+	console.log('ok')
+})
 
 connectToMongoDB()
 client.login(process.env.TOKEN)
