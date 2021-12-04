@@ -21,8 +21,8 @@ module.exports.run = (client) => {
         const guild = await client.guilds.fetch(vote.guild);
         const member = await guild.members.fetch(vote.user);
         if (member) await member.roles.add(config.voterRole)
-        if(vote.type == 'test')return member.send('Test went through.')
-        
+        if (vote.type == 'test') return member.send('Test went through.')
+
         const amountOfCoins = vote.isWeekend ? 4 : 2;
         await coinsSchema.findOneAndUpdate({ userID: vote.user }, {
             userID: vote.user,
@@ -39,14 +39,14 @@ module.exports.run = (client) => {
             }
         }, { upsert: true })
 
-        
+
 
         const embed = new MessageEmbed()
             .setAuthor(`Vote Rewards`)
             .setDescription(`Thank you for voting for ${guild.name}.\nYou have received ${amountOfCoins} coins for voting for the server and also the Server Voter Role.`)
             .setColor('#ed80e0');
 
-        await member.user.send({embeds: [embed]}).catch(e => e)
+        await member.user.send({ embeds: [embed] }).catch(e => e)
 
         utils.log(client, `**${member.user.tag}** voted for ${guild.name}`, 'votes')
         // client.log(`**[VOTE]** **${member.user.tag}** voted for Royal Advertising.`)
@@ -59,8 +59,14 @@ module.exports.run = (client) => {
         const mainGuild = await client.guilds.fetch(config.mainServer.id);
 
         for (const reminder of voteReminders) {
+
             const member = await mainGuild.members.fetch(reminder.userID).catch(e => e);
-            if (!member) return;
+            if (!member || !member.roles) {
+                await votesSchema.findOneAndUpdate({ userID: reminder.userID }, {
+                    nextVote: null
+                }, { upsert: true })
+                continue;
+            }
 
             const embed = new MessageEmbed()
                 .setAuthor('Vote Reminder')
@@ -73,21 +79,21 @@ module.exports.run = (client) => {
                 .setURL('https://top.gg/servers/559271990456745996/vote')
 
             const toggleButton = new MessageButton()
-            .setLabel('Toggle Reminders')
-            .setCustomId(`votes_${reminder.userID}`)
-            .setStyle('PRIMARY')
-            .setEmoji('⏹️')
-                
+                .setLabel('Toggle Reminders')
+                .setCustomId(`votes_${reminder.userID}`)
+                .setStyle('PRIMARY')
+                .setEmoji('⏹️')
+
             const actionRow = new MessageActionRow()
                 .addComponents([voteButton, toggleButton])
 
             await votesSchema.findOneAndUpdate({ userID: reminder.userID }, {
                 nextVote: Date.now() + ms('12h')
-            }, {upsert: true})
+            }, { upsert: true })
 
             await member.roles.remove(config.voterRole).catch(e => e);
             await member.send({ embeds: [embed], components: [actionRow] }).catch(e => e);
-            
+
         }
     }, 60 * 60 * 1000))
     app.listen(4051)

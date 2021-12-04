@@ -2,28 +2,49 @@ const { codeBlock } = require('@discordjs/builders');
 const { MessageEmbed, MessageAttachment } = require('discord.js');
 const coinsSchema = require('../schemas/coins-schema');
 const utils = require('../structures/utils')
-const fetch = require('node-fetch');
+const fetch2 = require('node-fetch');
 const fs = require('fs');
 const config = require('../config.json');
+const fetch = require('petitio');
 const modmail = require('../structures/modmail');
 module.exports = {
     name: 'messageCreate',
     async execute(message, client) {
         if (message.author.bot) return;
-        if(!message.guild)return modmail.run(message, client);
-        
+        if (!message.guild) return modmail.run(message, client);
+
+        const fetched = await fetch2("https://anti-fish.bitflow.dev/check", {
+            method:'POST', 
+            headers: {
+                'Content-Type': "application/json",
+                'User-Agent': "menin"
+            },
+            body: JSON.stringify({
+                message: message.content
+            })
+        }) 
+        // const resp = await fetch("https://anti-fish.bitflow.dev/check", "POST")
+        // .header('Application-Name','Menin')
+        // .header('Content-Type', 'application/json')
+        // .body({message: message.content}, "stream");
+
+        // return console.log(
+        //     fetched
+        // )
+
 
         if (message.content.toLowerCase().startsWith('!check') && (message.guild.id == '746635811243556925' || message.channel.id == '749618873552207872' || message.member.roles.cache.some(e => e.name.toLowerCase() == 'bot developer'))) {
             try {
-                const fetched = await fetch("https://anti-fish.bitflow.dev/check", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': "application/json"
-                    },
-                    body: JSON.stringify({
-                        message: message.content
-                    })
-                })
+                const fetched = await fetch("https://anti-fish.bitflow.dev/check", "POST").header('Content-Type', "application/json").body('message', message.content);
+                // const fetched = await fetch("https://anti-fish.bitflow.dev/check", {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': "application/json"
+                //     },
+                //     body: JSON.stringify({
+                //         message: message.content
+                //     })
+                // })
                 const data = await fetched.json()
 
                 if (data.match) {
@@ -70,15 +91,15 @@ module.exports = {
                 if (data.match) {
                     if (message.guild.id == config.mainServer.id) {
                         await message.send({ embeds: [new MessageEmbed().setDescription(`You have been banned in ${message.guild.name} for sending ${data.matches[0]?.type?.toLowerCase() || 'scam'} links`)] }).catch(e => e);
-                        
+
                         await message.member.ban({ days: 2, reason: `Sending ${data.matches[0]?.type?.toLowerCase() || 'scam'} links` }).catch(e => e);
 
                         await client.channels.cache.get('749618873552207872')?.send({ embeds: [new MessageEmbed().setDescription(`Banned ${message.author.tag} for sending ${data.matches[0]?.type.toLowerCase || 'scam'} link in ${message.channel.toString()}`).addFields([{ name: 'Link', value: data.matches[0]?.domain, inline: true }, { name: 'Trust Rating (0-1)', value: data.matches[0]?.trust_rating.toString() }])] })
-                    } else if (message.guild.id == config.staffServer.id){
+                    } else if (message.guild.id == config.staffServer.id) {
                         await message.delete();
-                        
-                        await message.member.roles.set('882622655545614386');
-                        
+
+                        // await message.member.roles.set('882622655545614386');
+
                         await message.guild.channels.cache.get(config.modTeamUpdatesChannel)?.send(`${message.member.toString()} just posted a scam link in ${message.channel.toString()}. Please do not click on any links sent by them.`)
                     }
                     return;

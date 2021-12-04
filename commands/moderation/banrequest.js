@@ -95,7 +95,7 @@ module.exports = {
         }
 
         // await banreqchannel.send('@here', { embeds: [embed], components: [row] })
-        await webhook.send({ content: '@h', embeds: [embed], components: [row], avatar: interaction.user.displayAvatarURL(), username: interaction.member.displayName })
+        await webhook.send({ content: '@here', embeds: [embed], components: [row], avatar: interaction.user.displayAvatarURL(), username: interaction.member.displayName })
         await interaction.editReply(`Ban successfully requested.`)
     },
 };
