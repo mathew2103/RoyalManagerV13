@@ -46,7 +46,7 @@ module.exports.run = (client) => {
             .setDescription(`Thank you for voting for ${guild.name}.\nYou have received ${amountOfCoins} coins for voting for the server and also the Server Voter Role.`)
             .setColor('#ed80e0');
 
-        await member.user.send({ embeds: [embed] }).catch(e => e)
+        await member.user.send({ embeds: [embed] }).catch(() => {});
 
         utils.log(client, `**${member.user.tag}** voted for ${guild.name}`, 'votes')
         // client.log(`**[VOTE]** **${member.user.tag}** voted for Royal Advertising.`)
@@ -60,7 +60,7 @@ module.exports.run = (client) => {
 
         for (const reminder of voteReminders) {
 
-            const member = await mainGuild.members.fetch(reminder.userID).catch(e => e);
+            const member = await mainGuild.members.fetch(reminder.userID).catch(() => {});;
             if (!member || !member.roles) {
                 await votesSchema.findOneAndUpdate({ userID: reminder.userID }, {
                     nextVote: null
@@ -91,8 +91,8 @@ module.exports.run = (client) => {
                 nextVote: Date.now() + ms('12h')
             }, { upsert: true })
 
-            await member.roles.remove(config.voterRole).catch(e => e);
-            await member.send({ embeds: [embed], components: [actionRow] }).catch(e => e);
+            await member.roles.remove(config.voterRole).catch(() => {});;
+            await member.send({ embeds: [embed], components: [actionRow] }).catch(() => {});;
 
         }
     }, 60 * 60 * 1000))

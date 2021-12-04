@@ -10,19 +10,20 @@ const modmail = require('../structures/modmail');
 module.exports = {
     name: 'messageCreate',
     async execute(message, client) {
+        return;
         if (message.author.bot) return;
         if (!message.guild) return modmail.run(message, client);
 
-        const fetched = await fetch2("https://anti-fish.bitflow.dev/check", {
-            method:'POST', 
-            headers: {
-                'Content-Type': "application/json",
-                'User-Agent': "menin"
-            },
-            body: JSON.stringify({
-                message: message.content
-            })
-        }) 
+        // const fetched = await fetch2("https://anti-fish.bitflow.dev/check", {
+        //     method:'POST', 
+        //     headers: {
+        //         'Content-Type': "application/json",
+        //         'User-Agent': "menin"
+        //     },
+        //     body: JSON.stringify({
+        //         message: message.content
+        //     })
+        // }) 
         // const resp = await fetch("https://anti-fish.bitflow.dev/check", "POST")
         // .header('Application-Name','Menin')
         // .header('Content-Type', 'application/json')
@@ -90,9 +91,9 @@ module.exports = {
 
                 if (data.match) {
                     if (message.guild.id == config.mainServer.id) {
-                        await message.send({ embeds: [new MessageEmbed().setDescription(`You have been banned in ${message.guild.name} for sending ${data.matches[0]?.type?.toLowerCase() || 'scam'} links`)] }).catch(e => e);
+                        await message.send({ embeds: [new MessageEmbed().setDescription(`You have been banned in ${message.guild.name} for sending ${data.matches[0]?.type?.toLowerCase() || 'scam'} links`)] }).catch(() => {});;
 
-                        await message.member.ban({ days: 2, reason: `Sending ${data.matches[0]?.type?.toLowerCase() || 'scam'} links` }).catch(e => e);
+                        await message.member.ban({ days: 2, reason: `Sending ${data.matches[0]?.type?.toLowerCase() || 'scam'} links` }).catch(() => {});;
 
                         await client.channels.cache.get('749618873552207872')?.send({ embeds: [new MessageEmbed().setDescription(`Banned ${message.author.tag} for sending ${data.matches[0]?.type.toLowerCase || 'scam'} link in ${message.channel.toString()}`).addFields([{ name: 'Link', value: data.matches[0]?.domain, inline: true }, { name: 'Trust Rating (0-1)', value: data.matches[0]?.trust_rating.toString() }])] })
                     } else if (message.guild.id == config.staffServer.id) {

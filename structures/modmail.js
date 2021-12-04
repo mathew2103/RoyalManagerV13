@@ -4,7 +4,7 @@ const config = require('../config.json');
 module.exports.run = async (message, client) => {
     console.log('modmail')
     const guild = client.guilds.cache.get(config.mainServer.id);
-    const member = await guild?.members.fetch(message.author.id).catch(e => e);
+    const member = await guild?.members.fetch(message.author.id).catch(() => {});;
 
     if (client.mails.get(message.author.id) == 'appeal') return;
     if (!member) return;

@@ -65,7 +65,7 @@ module.exports = {
 
         let message = interaction.options.getMessage('message');
         message = await message.fetch()
-        const targetMember = await interaction.guild.members.fetch(message.author.id).catch(e => e)
+        const targetMember = await interaction.guild.members.fetch(message.author.id).catch(() => {});
 
         if(!targetMember)return interaction.followUp({ content: 'Looks like the member either left or is a webhook message.', ephemeral: true});
         
@@ -224,7 +224,7 @@ module.exports = {
             .setColor(colorFromNum(newTargetData.length))
             
 
-        await targetMember.send(dmEmbed).catch(e => e);
+        await targetMember.send(dmEmbed).catch(() => {});;
 
         const logEmbed = new Discord.MessageEmbed()
             .setAuthor('Warning Issued', targetMember.user.displayAvatarURL())

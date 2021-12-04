@@ -150,7 +150,7 @@ module.exports = {
 			.setColor(colorFromNum(newTargetData.length))
 			.setFooter('Warning ID:' + punishmentId);
 
-		await targetMember.send(dmEmbed).catch(e => e);
+		await targetMember.send(dmEmbed).catch(() => {});;
 
 		const logEmbed = new Discord.MessageEmbed()
 			.setAuthor('Warning Issued', targetMember.user.displayAvatarURL())

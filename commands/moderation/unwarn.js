@@ -41,14 +41,14 @@ module.exports = {
             })
         } catch (e) { console.error(e) }
 
-        const moderator = await interaction.guild.members.fetch(warning.author).catch(e => e)
-        const member = await interaction.guild.members.fetch(warning.user).catch(e => e)
+        const moderator = await interaction.guild.members.fetch(warning.author).catch(() => {});
+        const member = await interaction.guild.members.fetch(warning.user).catch(() => {});
         if (member) interaction.reply(`Removed ${member.user.tag}'s (\`${warning.user}\`) warning with ID: \`${punishmentId}\``);
         else interaction.reply(`Removed the warning with ID: \`${punishmentId}\``);
 
         if (moderator) {
             const moddata = await warnCountSchema.findOne({ userId: warning.author })
-            moderator.user.send(`A warning issued by you has been removed. You currently have \`${moddata.current}\` ad moderations.`).catch(e => e)
+            moderator.user.send(`A warning issued by you has been removed. You currently have \`${moddata.current}\` ad moderations.`).catch(() => {});
         }
 
         const dm = new Discord.MessageEmbed()

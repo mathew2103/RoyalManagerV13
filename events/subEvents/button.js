@@ -19,7 +19,7 @@ module.exports = {
 
 		const embed = new MessageEmbed();
 		const oldEmbeds = interaction.message.embeds;
-		const webhook = await interaction.message.fetchWebhook().catch(e => e);
+		const webhook = await interaction.message.fetchWebhook().catch(() => {});;
 		const filter = m => m.author.id == interaction.user.id;
 		const buttonIdParts = interaction.customId.split('_');
 		const [label, trigger, id] = buttonIdParts;
@@ -34,8 +34,8 @@ module.exports = {
 				let appealReason = await interaction.channel.awaitMessages({ filter, time: 2 * 60 * 1000, max: 1 }).catch(e => { return interaction.editReply('You didn\'t answer in time. Use the button again.') })
 				appealReason = appealReason.first();
 
-				const moderator = await interaction.guild.members.fetch(punishment.author).catch(e => e);
-				const punishedUser = await interaction.guild.members.fetch(punishment.user).catch(e => e);
+				const moderator = await interaction.guild.members.fetch(punishment.author).catch(() => {});;
+				const punishedUser = await interaction.guild.members.fetch(punishment.user).catch(() => {});;
 
 				await webhook.editMessage(interaction.message, { content: `${trigger == 'yes' ? 'Accepted' : 'Denied'} by ${interaction.user.tag}. Reason: ${appealReason}`, embeds: oldEmbeds, components: [] });
 
@@ -54,7 +54,7 @@ module.exports = {
 					if (punishedUser) {
 						embed.setDescription(`Your appeal for punishment with ID: \`${id}\` has been accepted\n**Reason:** ${appealReason.content}`).setColor('GREEN');
 						punishedUser.send({ embeds: [embed] })
-							.catch(e => e);
+							.catch(() => {});;
 						await interaction.editReply('Done!');
 					}
 
@@ -69,7 +69,7 @@ module.exports = {
 						embed.setDescription(`Your appeal for punishment with ID: \`${id}\` has been denied.\n**Reason:** ${appealReason}`)
 							.setColor('RED');
 						punishedUser.send({ embeds: [embed] })
-							.catch(e => e);
+							.catch(() => {});;
 						await interaction.editReply('Done!');
 					}
 					else {
@@ -81,7 +81,7 @@ module.exports = {
 				break;
 
 			case 'break':
-				const member = await interaction.guild.members.fetch(id).catch(e => e);
+				const member = await interaction.guild.members.fetch(id).catch(() => {});;
 				const breakData = await breakSchema.findOne({ user: id })
 				console.log(breakData);
 				if (!member) return interaction.update({ content: 'User left the server.', embeds: [oldEmbed], components: [] })
@@ -147,11 +147,11 @@ module.exports = {
 			
 			case 'banrequest':
 				const reason = oldEmbeds[0].fields.find(e => e.name == 'Reason');
-				const targetBan = await interaction.guild.members.fetch(id).catch(e => e);
+				const targetBan = await interaction.guild.members.fetch(id).catch(() => {});;
 				const evidence = oldEmbeds[0].fields.find(e => e.name == 'Evidence');
 				let moderatorId = oldEmbeds[0].fields.find(e => e.name == 'Moderator')
 				moderatorId = moderatorId.value.split('\`')[1]
-				const banModerator = await interaction.guilds.members.fetch(id).catch(e => e);
+				const banModerator = await interaction.guild.members.fetch(id).catch(() => {});;
 
 				if(!targetBan)return await interaction.update({ content: 'User left the server', components: []});
 
@@ -161,10 +161,10 @@ module.exports = {
 					
 					await evidenceChannel.send(`**User:** \`${targetBan.id}\`\n**Moderator:** \`${interaction.user.id}\`\n**Reason:** ${reason.value}\n**Evidence:**${evidence.value}`)
 					await interaction.update({ content: `Accepted by ${interaction.user.tag}`, components: []})
-					await banModerator?.send(`A ban requested by you for ${targetBan.id} has been accepted.`)
+					await banModerator?.send(`A ban requested by you for ${targetBan.id} has been accepted.`).catch(() => {});
 				} else {
 					await interaction.update({ content: `Denied by ${interaction.user.tag}`, components: []})
-					await banModerator?.send(`A ban requested by you for ${targetBan.id} has been denied.`)
+					await banModerator?.send(`A ban requested by you for ${targetBan.id} has been denied.`).catch(() => {});
 				}	
 			break;
 			}

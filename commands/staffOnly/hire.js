@@ -16,7 +16,7 @@ module.exports = {
         const maing = await client.guilds.cache.get(config.mainServer.id)
         if (!maing) return interaction.editReply(`No main server found.`);
 
-        const member = await maing.members.fetch(smember.user.id).catch(e => e)
+        const member = await maing.members.fetch(smember.user.id).catch(() => {});
         if(!member)return interaction.editReply('Member doesnt seem to be in the main server..');
 
         const updates = await interaction.guild.channels.cache.get("748190196239040606")

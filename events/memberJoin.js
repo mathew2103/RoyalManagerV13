@@ -50,7 +50,7 @@ module.exports = {
             console.log('1')
             sent.edit({ embeds: [embed2.setDescription('You have been removed from the server, since you failed the test.').setAuthor('FAILED').setColor('RED')], components: [] })
                 await client.channels.cache.get('749618873552207872')?.send(`Removed ${member.user.tag} | Reason: Failed Captcha Test`)
-            await member.kick('Failed Captcha Test').catch(e => e);
+            await member.kick('Failed Captcha Test').catch(() => {});;
         } else {
             console.log('2')
             sent.edit({ embeds: [embed2.setDescription('You have been verified!').setAuthor('SUCCESS').setColor("GREEN")] })
@@ -63,9 +63,9 @@ module.exports = {
 
         // if (resp?.content === captcha.currentString) return await member.send({ embeds: [embed2.setDescription('You have been verified!').setAuthor('SUCCESS').setColor("GREEN")] })
         // else {
-        //     await member.send({ emebds: [embed2.setDescription('You have been removed from the server, since you failed the test.').setAuthor('FAILED').setColor('RED')] }).catch(e => e)
+        //     await member.send({ emebds: [embed2.setDescription('You have been removed from the server, since you failed the test.').setAuthor('FAILED').setColor('RED')] }).catch(() => {});
         //     await client.channels.cache.get('749618873552207872')?.send(`Removed ${member.user.tag} | Reason: Failed Captcha Test`)
-        //     // await member.kick('Failed Captcha Test').catch(e => e);
+        //     // await member.kick('Failed Captcha Test').catch(() => {});;
         // }
 
     }

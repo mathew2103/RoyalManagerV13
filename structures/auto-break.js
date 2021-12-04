@@ -15,7 +15,7 @@ module.exports.run = async(client) => {
         for(const e of data){
             if(isNaN(e.expires))continue;
             
-            const member = await staffg.members.fetch(e.user).catch(e => e)
+            const member = await staffg.members.fetch(e.user).catch(() => {});
             if(!member){ await breakSchema.findOneAndDelete({user: e.user})
                 console.log(`No member found for auto break removal. Member ID: ${e.user}`)
             continue;}
@@ -31,7 +31,7 @@ module.exports.run = async(client) => {
                 .setDescription('Your break in Royal Advertising has ended. You will need to continue doing the weekly quota from now on.')
                 .setColor('YELLOW')
                 .setFooter('Auto Break Expiration', client.user.displayAvatarURL())
-            await member.send(embed).catch(e => e);
+            await member.send(embed).catch(() => {});;
             utils.log(client, `**[AUTO-BREAK]** ${member.user.tag}'s break expired.`, 'auto')
         }
         
