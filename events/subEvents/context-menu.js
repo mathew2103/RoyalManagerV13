@@ -239,7 +239,7 @@ module.exports = {
             );
 
         // await interaction.deleteReply();
-        await interaction.editReply({ content: newTargetData.length > 1 ? `\`?${newTargetData.length < 7 ? newTargetData.length : '6'}aw ${targetMember.id}\`` : 'This is the user\'s first warning.', embeds: [adWarnEmbed.setFooter(`You received ${amountEarned} coins.`)], ephemeral: true, components: [] });
+        await interaction.editReply({ content: newTargetData.length > 1 ? `\`?${newTargetData.length < 7 ? newTargetData.length : '6'}aw ${targetMember.id}\`` : 'This is the user\'s first warning.', embeds: [adWarnEmbed.setFooter(`You received ${amountOfCoins} coins.`)], ephemeral: true, components: [] });
         await message.delete();
         // setTimeout(() => {interaction.deleteReply()}, 10*1000)
         
