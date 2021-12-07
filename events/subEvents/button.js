@@ -152,7 +152,7 @@ module.exports = {
 				let moderatorId = oldEmbeds[0].fields.find(e => e.name == 'Moderator')
 				moderatorId = moderatorId.value.split('\`')[1]
 				const banModerator = await interaction.guild.members.fetch(id).catch(() => {});;
-
+	
 				if(!targetBan)return await interaction.update({ content: 'User left the server', components: []});
 
 				if(trigger == 'yes'){

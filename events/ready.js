@@ -2,9 +2,15 @@ const autoBreaks = require('../structures/auto-break');
 const autoPost = require('../structures/auto-post')
 const voteWebhooks = require('../structures/vote-webhooks');
 const utils = require('../structures/utils')
+const {Client, ActivityOptions} = require('discord.js');
 module.exports = {
 	name: 'ready',
 	once: true,
+	/**
+	 * 
+	 * @param {Client} client 
+	 * @returns 
+	 */
 	execute(client) {
 		console.log(`Ready! Logged in as ${client.user.tag}`);
 		autoBreaks.run(client);
@@ -61,19 +67,16 @@ module.exports = {
 			name: 'my token',
 			type: 'STREAMING',
 			url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-		}, {
-			name: 'bedwars'
 		}]
 
 		console.log(`Loaded ${activities.length} activities`)
 		// client.user.setPresence({ activities: activities, status: 'dnd'})
 		setInterval(() => {
 			const activity = activities[utils.randomBetween(0, activities.length-1)];
-			client.user.setStatus('dnd')
-			client.user.setActivity(activity.name, { type: activity.type, url: activity.url });
-			
-		}, 10 * 1000)
-		client.channels.cache.get("749618873552207872").send(':green_circle: Im ready to be used.')
+			client.user.setPresence({ activities: [{name: activities.name, type: activity.type, url: activity.url}], status: 'dnd'});
+			// client.user.setActivity(activity.name, { type: activity.type, url: activity.url });
+		}, 30 * 1000)
+		client.channels.cache.get("749618873552207872")?.send(':green_circle: Im ready to be used.')
 		
 	},
 };

@@ -23,6 +23,10 @@ module.exports = {
 	global: false,
 	guilds: ['825958701487620107', config.mainServer.id],
 	roles: ['Mod'],
+	/**
+	 * 
+	 * @param {Discord.CommandInteraction} interaction 
+	 */
 	async execute(interaction) {
 		await interaction.deferReply({ ephemeral: true });
 		const targetMember = await interaction.options.getMember('member');
@@ -55,32 +59,43 @@ module.exports = {
 		if (!reason.includes('incorrect') && belongstoChannel) belongstoChannel = undefined;
 
 		const punishmentId = uniqid();
-		let warningData = new Object();
-		if (belongstoChannel) {
-			warningData = {
-				guild: interaction.guild.id,
-				user: targetMember.id,
-				author: interaction.member.id,
-				at: Date.now(),
-				punishmentId,
-				channel: adDeletedIn.id,
-				appealed: false,
-				belongsto: belongstoChannel.id,
-				reason,
-			};
-		}
-		else {
-			warningData = {
-				guild: interaction.guild.id,
-				user: targetMember.id,
-				author: interaction.member.id,
-				at: Date.now(),
-				punishmentId,
-				channel: adDeletedIn.id,
-				appealed: false,
-				reason,
-			};
-		}
+		let warningData = {
+			guild: interaction.guild.id,
+			user: targetMember.id,
+			author: interaction.member.id,
+			at: Date.now(),
+			punishmentId,
+			channel: adDeletedIn.id,
+			appealed: false,
+			reason,
+		};
+		if(belongstoChannel) warningData.belongsto = belongstoChannel.id;
+
+		// if (belongstoChannel) {
+		// 	warningData = {
+		// 		guild: interaction.guild.id,
+		// 		user: targetMember.id,
+		// 		author: interaction.member.id,
+		// 		at: Date.now(),
+		// 		punishmentId,
+		// 		channel: adDeletedIn.id,
+		// 		appealed: false,
+		// 		belongsto: belongstoChannel.id,
+		// 		reason,
+		// 	};
+		// }
+		// else {
+		// 	warningData = {
+		// 		guild: interaction.guild.id,
+		// 		user: targetMember.id,
+		// 		author: interaction.member.id,
+		// 		at: Date.now(),
+		// 		punishmentId,
+		// 		channel: adDeletedIn.id,
+		// 		appealed: false,
+		// 		reason,
+		// 	};
+		// }
 
 		const warning = await new punishmentSchema(warningData);
 		await warning.save();
