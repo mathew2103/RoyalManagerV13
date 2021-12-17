@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
-const { CommandInteraction } = require('discord.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('steco')
@@ -9,7 +8,7 @@ module.exports = {
 	global: false,
     /**
      * 
-     * @param {CommandInteraction} interaction 
+     * @param {Discord.CommandInteraction} interaction 
      */
 	async execute(interaction) {
         

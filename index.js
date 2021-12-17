@@ -16,7 +16,7 @@ client.commands = new Collection();
 client.intervals = new Map();
 client.player = new Player(client);
 client.mails = new Map();
-
+globalThis.config = config;
 globalThis.utils = utils
 
 playerEvents(client.player);
@@ -53,6 +53,7 @@ const readCommands = async (dir) => {
 		else {
 			const option = require(join(__dirname, dir, file));
 			if (dir !== './commands') option.category = dir.split('/')[1];
+			if (option.category == 'context-menus') continue;
 
 			client.commands.set(option.data.name.toLowerCase(), option)
 		}
@@ -118,10 +119,10 @@ client.on('messageCreate', async (message) => {
 			// await guild.commands.set(cmds).catch(e => message.channel.send(e.message));
 		}
 
-		await client.application.commands.create({
-			name: 'AD WARN',
-			type: "MESSAGE"
-		}, config.mainServer.id)
+		// await client.application.commands.create({
+		// 	name: 'AD WARN',
+		// 	type: "MESSAGE"
+		// }, config.mainServer.id)
 
 		message.reply('Deployed all commands!')
 		return;
@@ -142,5 +143,5 @@ process.on('exit', () => {
 
 connectToMongoDB()
 client.login(process.env.TOKEN)
-module.exports = client 
+module.exports = client
 

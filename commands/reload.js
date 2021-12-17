@@ -66,7 +66,7 @@ module.exports = {
                         client.addListener(event.name, (...args) => event.execute(...args, client));
                     }
                 }
-                interaction.reply('done')
+                interaction.reply(`Loaded \`${eventFiles.length}\` events.`);
             }catch (e) { console.error(e) }
         }
     },

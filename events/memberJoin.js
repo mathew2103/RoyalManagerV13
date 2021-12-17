@@ -5,10 +5,14 @@ const math = require('mathjs');
 
 module.exports = {
     name: 'guildMemberAdd',
+    /**
+     * @param {Discord.GuildMember} member
+     * @param {Discord.Client} client
+     */
     async execute(member, client) {
         // if (member.id !== '378025254125305867') return;
         if (member.guild.id !== '559271990456745996') return;
-        
+
         const no1 = utils.randomBetween(50, 100);
         const no2 = utils.randomBetween(0, 50);
         const operator = ['+', '-'][utils.randomBetween(0, 1)]
@@ -43,18 +47,17 @@ module.exports = {
             i.deferUpdate();
             return true;
         }
-        let resp = await member.user.dmChannel.awaitMessageComponent({ filter, time: 5 * 60 * 1000 });
-        console.log(resp.customId, ran)
+
         const embed2 = new Discord.MessageEmbed()
-        if (resp.customId != ran) {
-            console.log('1')
-            sent.edit({ embeds: [embed2.setDescription('You have been removed from the server, since you failed the test.').setAuthor('FAILED').setColor('RED')], components: [] })
-                await client.channels.cache.get('749618873552207872')?.send(`Removed ${member.user.tag} | Reason: Failed Captcha Test`)
-            await member.kick('Failed Captcha Test').catch(() => {});;
-        } else {
-            console.log('2')
-            sent.edit({ embeds: [embed2.setDescription('You have been verified!').setAuthor('SUCCESS').setColor("GREEN")] })
-        }
+        let resp = await member.user.dmChannel.awaitMessageComponent({ filter, time: 5 * 60 * 1000 }).catch(async () => {
+            await fail('didnt respond', 'No Response')
+        });
+
+        if (!resp) return await fail('didnt respond', 'FAILED');
+
+        if (resp.customId != ran) return await fail('failed the test', 'FAILED')
+
+        else sent.edit({ embeds: [embed2.setDescription('You have been verified!').setAuthor('SUCCESS').setColor("GREEN")], components: [] })
         // await member.send({ files: [await captcha.image(captcha.currentString)] }).catch(e => console.error(e));
         // const filter = m => m.author.id == member.id;
         // let resp = await member.user.dmChannel.awaitMessages({ filter, time: 5 * 60 * 1000, max: 1 });
@@ -68,5 +71,20 @@ module.exports = {
         //     // await member.kick('Failed Captcha Test').catch(() => {});;
         // }
 
+        /**
+         * 
+         * @param {String} reason 
+         * @param {String} author 
+         */
+        async function fail(reason, author) {
+            if (!reason || !author) throw new Error('Provide a reason and a title')
+
+            const invButton = new Discord.MessageButton()
+                .setStyle("LINK").setLabel("Join Back").setURL("https://discord.gg/vAaxA2Qu89")
+
+            await sent.edit({ embeds: [embed2.setDescription(`You have been removed from the server, since you ${reason}.\n You can use the button below to join back.`).setAuthor(author).setColor('RED')], components: [new Discord.MessageActionRow().addComponents([invButton])] })
+            await client.channels.cache.get('749618873552207872')?.send(`Removed ${member.user.tag} | Reason: Failed Captcha Test`)
+            // await member.kick('Failed Captcha Test').catch(() => { });;
+        }
     }
 }
