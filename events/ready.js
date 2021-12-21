@@ -2,7 +2,7 @@ const autoBreaks = require('../structures/auto-break');
 const autoPost = require('../structures/auto-post')
 const voteWebhooks = require('../structures/vote-webhooks');
 const utils = require('../structures/utils')
-const {Client, ActivityOptions} = require('discord.js');
+const { Client, ActivityOptions } = require('discord.js');
 module.exports = {
 	name: 'ready',
 	once: true,
@@ -72,11 +72,11 @@ module.exports = {
 		console.log(`Loaded ${activities.length} activities`)
 		// client.user.setPresence({ activities: activities, status: 'dnd'})
 		setInterval(() => {
-			const activity = activities[utils.randomBetween(0, activities.length-1)];
-			client.user.setPresence({ activities: [{name: activities.name, type: activity.type, url: activity.url}], status: 'dnd'});
+			const activity = activities[utils.randomBetween(0, activities.length - 1)];
+			client.user.setPresence({ activities: [{ name: activity.name, type: activity.type, url: activity.url }], status: 'dnd' });
 			// client.user.setActivity(activity.name, { type: activity.type, url: activity.url });
-		}, 30 * 1000)
+		}, 5 * 60 * 1000)
 		client.channels.cache.get("749618873552207872")?.send(':green_circle: Im ready to be used.')
-		
+
 	},
 };

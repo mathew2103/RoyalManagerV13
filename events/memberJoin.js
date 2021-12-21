@@ -24,15 +24,8 @@ module.exports = {
             .setLabel(utils.randomBetween(0, 150).toString()).setCustomId('2').setStyle('SECONDARY'),
         new Discord.MessageButton()
             .setLabel(utils.randomBetween(0, 150).toString()).setCustomId('3').setStyle('SECONDARY')]
-        // const b1 = new Discord.MessageButton()
-        //     .setLabel(utils.randomBetween(0, 150).toString()).setCustomId('0').setStyle('SECONDARY'),
-        //     b2 = new Discord.MessageButton()
-        //         .setLabel(utils.randomBetween(0, 150).toString()).setCustomId('1').setStyle('SECONDARY'),
-        //     b3 = new Discord.MessageButton()
-        //         .setLabel(utils.randomBetween(0, 150).toString()).setCustomId('2').setStyle('SECONDARY'),
-        //     b4 = new Discord.MessageButton()
-        //         .setLabel(utils.randomBetween(0, 150).toString()).setCustomId('3').setStyle('SECONDARY')
-        // let arrB = [b1, b2, b3, b4]
+
+
         const ran = utils.randomBetween(0, 3)
         arrB[ran] = arrB[ran].setLabel(math.evaluate(`${no1} ${operator} ${no2}`).toString())
         const row = new Discord.MessageActionRow().addComponents(arrB)
@@ -84,7 +77,7 @@ module.exports = {
 
             await sent.edit({ embeds: [embed2.setDescription(`You have been removed from the server, since you ${reason}.\n You can use the button below to join back.`).setAuthor(author).setColor('RED')], components: [new Discord.MessageActionRow().addComponents([invButton])] })
             await client.channels.cache.get('749618873552207872')?.send(`Removed ${member.user.tag} | Reason: Failed Captcha Test`)
-            // await member.kick('Failed Captcha Test').catch(() => { });;
+            await member.kick('Failed Captcha Test').catch(() => { });;
         }
     }
 }

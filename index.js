@@ -63,72 +63,72 @@ const readCommands = async (dir) => {
 
 readCommands('./commands');
 
-client.on('messageCreate', async (message) => {
-	if (message.content.toLowerCase() === '!deploy' && (message.author.id === '378025254125305867' || message.author.id === '605061180599304212')) {
+// client.on('messageCreate', async (message) => {
+// 	if (message.content.toLowerCase() === '!deploy' && (message.author.id === '378025254125305867' || message.author.id === '605061180599304212')) {
 
-		// const clientCmds = await client.commands.fetch();
-		// const { client } = message
-		let guilds = await client.guilds.fetch();
-		guilds = Array.from(guilds.values())
-		let allCmds = []
-
-
-		const registerCmd = async (dir) => {
-			const files = fs.readdirSync(join(__dirname, dir));
-			for (const file of files) {
-				const stat = fs.lstatSync(join(__dirname, dir, file));
-				if (stat.isDirectory()) {
-					registerCmd(join(dir, file));
-				}
-				else {
-					const option = require(join(__dirname, dir, file));
+// 		// const clientCmds = await client.commands.fetch();
+// 		// const { client } = message
+// 		let guilds = await client.guilds.fetch();
+// 		guilds = Array.from(guilds.values())
+// 		let allCmds = []
 
 
-					// if(option.data.options?.length){
-					// 	for(let i = 0; i < option.data.options.length; i++){
-					// 		options.data.options[i].type = 1
-					// 	}
-					// }
-					if (option.data.options[0]?.options) option.data.options[0].type = 1
-					if (option.data.options[1]?.options) option.data.options[1].type = 1
-					if (option.data.options[2]?.options) option.data.options[2].type = 1
+// 		const registerCmd = async (dir) => {
+// 			const files = fs.readdirSync(join(__dirname, dir));
+// 			for (const file of files) {
+// 				const stat = fs.lstatSync(join(__dirname, dir, file));
+// 				if (stat.isDirectory()) {
+// 					registerCmd(join(dir, file));
+// 				}
+// 				else {
+// 					const option = require(join(__dirname, dir, file));
 
-					if (option.guilds && !Array.isArray(option.guilds)) option.guilds = [option.guilds]
 
-					if (!option.guilds?.length) option.guilds = []
-					if (dir.includes('moderation')) option.guilds.push(config.mainServer.id)
-					else if (dir.includes('staffOnly')) option.guilds.push(config.staffServer.id)
-					else if (dir.includes('music')) option.guilds.push('all')
+// 					// if(option.data.options?.length){
+// 					// 	for(let i = 0; i < option.data.options.length; i++){
+// 					// 		options.data.options[i].type = 1
+// 					// 	}
+// 					// }
+// 					if (option.data.options[0]?.options) option.data.options[0].type = 1
+// 					if (option.data.options[1]?.options) option.data.options[1].type = 1
+// 					if (option.data.options[2]?.options) option.data.options[2].type = 1
 
-					allCmds.push(option)
-				}
-			}
+// 					if (option.guilds && !Array.isArray(option.guilds)) option.guilds = [option.guilds]
 
-		};
-		registerCmd('./commands');
+// 					if (!option.guilds?.length) option.guilds = []
+// 					if (dir.includes('moderation')) option.guilds.push(config.mainServer.id)
+// 					else if (dir.includes('staffOnly')) option.guilds.push(config.staffServer.id)
+// 					else if (dir.includes('music')) option.guilds.push('all')
 
-		await client.application.fetch();
-		const globalCmdsData = allCmds.filter(e => e.global);
-		console.log(...globalCmdsData?.map(e => e.data))
-		// await client.application.commands.set(...globalCmdsData?.map(e => e.data))
-		for (let guild of guilds) {
-			// if(!guild.commands)guild = await guild.fetch()
-			const guildCmdsData = allCmds.filter(e => e.guilds?.includes(guild.id) || e.guilds?.includes('all') || e.global)
-			const cmds = guildCmdsData.map(e => e.data)
-			client.application.commands.set(cmds, guild.id)
-			// await guild.commands.set(cmds).catch(e => message.channel.send(e.message));
-		}
+// 					allCmds.push(option)
+// 				}
+// 			}
 
-		// await client.application.commands.create({
-		// 	name: 'AD WARN',
-		// 	type: "MESSAGE"
-		// }, config.mainServer.id)
+// 		};
+// 		registerCmd('./commands');
 
-		message.reply('Deployed all commands!')
-		return;
-		// await client.guilds.cache.get('825958701487620107')?.commands.create(adCmdData);
-	}
-})
+// 		await client.application.fetch();
+// 		const globalCmdsData = allCmds.filter(e => e.global);
+// 		console.log(...globalCmdsData?.map(e => e.data))
+// 		// await client.application.commands.set(...globalCmdsData?.map(e => e.data))
+// 		for (let guild of guilds) {
+// 			// if(!guild.commands)guild = await guild.fetch()
+// 			const guildCmdsData = allCmds.filter(e => e.guilds?.includes(guild.id) || e.guilds?.includes('all') || e.global)
+// 			const cmds = guildCmdsData.map(e => e.data)
+// 			client.application.commands.set(cmds, guild.id)
+// 			// await guild.commands.set(cmds).catch(e => message.channel.send(e.message));
+// 		}
+
+// 		// await client.application.commands.create({
+// 		// 	name: 'AD WARN',
+// 		// 	type: "MESSAGE"
+// 		// }, config.mainServer.id)
+
+// 		message.reply('Deployed all commands!')
+// 		return;
+// 		// await client.guilds.cache.get('825958701487620107')?.commands.create(adCmdData);
+// 	}
+// })
 
 process.on("uncaughtException", (err) => {
 	console.error(err.stack);
