@@ -54,30 +54,30 @@ module.exports = {
     /**
      * 
      * @param {ContextMenuInteraction} interaction 
-     * @returns 
      */
     async execute(interaction) {
         if (!interaction.isContextMenu()) return;
-        await interaction.deferReply({ephemeral: true});
+        await interaction.deferReply({ ephemeral: true });
+
         const bypassRegex = /(mod|admin|server manager|bot dev)/mi
-        if(!interaction.member.roles.cache.some(role => role.name.match(bypassRegex)))return interaction.followUp({ content: 'You are not supposed to be using this.', ephemeral: true})
+        if (!interaction.member.roles.cache.some(role => role.name.match(bypassRegex))) return interaction.followUp({ content: 'You are not supposed to be using this.', ephemeral: true })
         // if (!interaction.member.roles.cache.some(role => role.name.includes('Mod') || role.name.includes('Admin') || role.name.includes('Manager') || role.name.includes('Bot Dev')))return interaction.followUp({ content: 'You are not supposed to be using this.', ephemeral: true})
 
         let message = interaction.options.getMessage('message');
         message = await message.fetch()
-        const targetMember = await interaction.guild.members.fetch(message.author.id).catch(() => {});
+        const targetMember = await interaction.guild.members.fetch(message.author.id).catch(() => { });
 
-        if(!targetMember)return interaction.followUp({ content: 'Looks like the member either left or is a webhook message.', ephemeral: true});
-        
+        if (!targetMember) return interaction.followUp({ content: 'Looks like the member either left or is a webhook message.', ephemeral: true });
+
         const adDeletedIn = message.channel;
-        
+
         const adCats = ['649269707135909888', '880482008931905598', '594392827627044865', '594509117524017162']
-        
-        if(!adCats.includes(adDeletedIn.parentId))return interaction.followUp({ content: `You can only moderate ads in the following categories: ${adCats.map(e => `<#${e}>`).join(', ')}`, ephemeral: true })
-        
+
+        if (!adCats.includes(adDeletedIn.parentId)) return interaction.followUp({ content: `You can only moderate ads in the following categories: ${adCats.map(e => `<#${e}>`).join(', ')}`, ephemeral: true })
+
         if (targetMember.roles?.highest.position >= interaction.member.roles?.highest.position) return await interaction.editReply('You cannot warn a member having a role higher than or equal to you.');
 
-        const oldWarns = await punishmentSchema.find({ user: targetMember.id, guild:interaction.guild.id });
+        const oldWarns = await punishmentSchema.find({ user: targetMember.id, guild: interaction.guild.id });
         if (oldWarns?.length) {
             const oldwarn = oldWarns[oldWarns.length - 1];
             if (oldwarn?.at
@@ -107,11 +107,11 @@ module.exports = {
         await interaction.followUp({ content: 'Choose a reason for this warn:', components: [row], ephemeral: true })
         // const reply = await interaction.fetchReply();
 
-        let reasonID = await interaction.channel.awaitMessageComponent({ filter, componentType: 'SELECT_MENU', time: 2*60*1000})
-        .catch(async e => { return await interaction.editReply({ content: 'Looks like you didnt choose in time.', components: [] }) })
+        let reasonID = await interaction.channel.awaitMessageComponent({ filter, componentType: 'SELECT_MENU', time: 2 * 60 * 1000 })
+            .catch(async e => { return await interaction.editReply({ content: 'Looks like you didnt choose in time.', components: [] }) })
         // let reasonID = await reply.awaitMessageComponent({ filter, componentType: 'SELECT_MENU', time: 5 * 1000 })
-            
-        if(!reasonID?.values)return;
+
+        if (!reasonID?.values) return;
         reasonID = reasonID.values[0]
 
         const mainGuildData = await settingsSchema.findOne({ guildId: config.mainServer.id });
@@ -122,9 +122,9 @@ module.exports = {
         const punishmentId = uniqid();
         let belongsto = null;
         const staffCmds = interaction.guild.channels.cache.get('749618873552207872') || interaction.channel
-        
+
         if (reason.includes('incorrect')) {
-            
+
             const qI = await staffCmds.send(`${interaction.member.toString()}, mention the channel where the ad belongs to. (Basically the channel where the ad can go)`);
             const msgFilter = m => m.author.id == interaction.user.id && m.mentions.channels?.first()
 
@@ -156,7 +156,7 @@ module.exports = {
                 current: 1,
                 total: 1,
             },
-        }, {upsert: true});
+        }, { upsert: true });
 
         const newTargetData = await punishmentSchema.find({ user: targetMember.id, guild: interaction.guild.id });
 
@@ -166,8 +166,8 @@ module.exports = {
         // const amountEarned = randomBetween(50, 75);
         let amountOfCoins = randomBetween(50, 75)
         const oldData = await coinsSchema.findOne({ userID: interaction.user.id })
-        if(oldData && oldData.cooldownTill && oldData.cooldownTill >= Date.now())amountOfCoins = 0;
-        if(amountOfCoins > 0){
+        if (oldData && oldData.cooldownTill && oldData.cooldownTill >= Date.now()) amountOfCoins = 0;
+        if (amountOfCoins > 0) {
             await coinsSchema.findOneAndUpdate({ userID: interaction.user.id }, {
                 userID: interaction.user.id,
                 $inc: {
@@ -176,7 +176,7 @@ module.exports = {
                 }
             }, { upsert: true })
 
-            if((oldData?.last24hrs + amountOfCoins) >= 500){
+            if ((oldData?.last24hrs + amountOfCoins) >= 500) {
                 await coinsSchema.findOneAndUpdate({ userID: interaction.user.id }, {
                     cooldownTill: Date.now() + 8.64e+7,
                     last24hrs: 0
@@ -222,9 +222,9 @@ module.exports = {
             .setDescription(`Your ad has been deleted in ${adDeletedIn}.\n**Reason:** ${reason}\nNow you have ${newTargetData.length} ad warning${(newTargetData.length > 1) ? 's' : ''}\nIf you think that this is a mistake or if you want to appeal this punishment, use \`/appeal ${punishmentId}\` in <#678181401157304321> or in this DM to appeal.`)
             .setFooter('Warning ID:' + punishmentId)
             .setColor(colorFromNum(newTargetData.length))
-            
 
-        await targetMember.send(dmEmbed).catch(() => {});;
+
+        await targetMember.send(dmEmbed).catch(() => { });;
 
         const logEmbed = new Discord.MessageEmbed()
             .setAuthor('Warning Issued', targetMember.user.displayAvatarURL())
@@ -242,12 +242,12 @@ module.exports = {
         await interaction.editReply({ content: newTargetData.length > 1 ? `\`?${newTargetData.length < 7 ? newTargetData.length : '6'}aw ${targetMember.id}\`` : 'This is the user\'s first warning.', embeds: [adWarnEmbed.setFooter(`You received ${amountOfCoins} coins.`)], ephemeral: true, components: [] });
         await message.delete();
         // setTimeout(() => {interaction.deleteReply()}, 10*1000)
-        
+
         interaction.channel.send({ embeds: [logEmbed] });
 
         function colorFromNum(num) {
-            if(num <= 2)return 'GREEN';
-            else if(num <= 4)return 'YELLOW';
+            if (num <= 2) return 'GREEN';
+            else if (num <= 4) return 'YELLOW';
             else return "RED";
         }
     }

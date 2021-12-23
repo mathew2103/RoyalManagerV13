@@ -11,7 +11,7 @@ module.exports = {
     roles: ['mod'],
     async execute(interaction) {
         const ephemeral = interaction.options.getBoolean('ephemeral')
-        const { client } = interaction
+        const { client } = interaction;
         await interaction.deferReply({ ephemeral })
         let pages = [
             {
@@ -42,11 +42,11 @@ module.exports = {
             value: 'br'
         }]
         const menu = new Discord.MessageSelectMenu()
-        .setMaxValues(1)
-        .setMinValues(1)
-        .setCustomId('select')
-        .setPlaceholder('Choose a guide to view')
-        .addOptions(options)
+            .setMaxValues(1)
+            .setMinValues(1)
+            .setCustomId('select')
+            .setPlaceholder('Choose a guide to view')
+            .addOptions(options)
         const row = new Discord.MessageActionRow()
             .addComponents([menu])
 
@@ -61,7 +61,7 @@ module.exports = {
             return i.user.id === interaction.user.id;
         };
         await interaction.editReply({ embeds: [embed], components: [row], ephemeral })
-        const collector = await interaction.channel.createMessageComponentCollector({ filter, componentType: "SELECT_MENU", time: 2*60*1000 })
+        const collector = await interaction.channel.createMessageComponentCollector({ filter, componentType: "SELECT_MENU", time: 2 * 60 * 1000 })
         collector.on('collect', async (i) => {
             const data = pages.find(e => e.value == i.values[0])
             embed.setTitle(data.label).setDescription(data.description)

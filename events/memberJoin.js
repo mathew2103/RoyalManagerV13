@@ -27,6 +27,7 @@ module.exports = {
 
 
         const ran = utils.randomBetween(0, 3)
+        const answer = math.evaluate(`${no1} ${operator} ${no2}`).toString();
         arrB[ran] = arrB[ran].setLabel(math.evaluate(`${no1} ${operator} ${no2}`).toString())
         const row = new Discord.MessageActionRow().addComponents(arrB)
 
@@ -42,15 +43,16 @@ module.exports = {
         }
 
         const embed2 = new Discord.MessageEmbed()
-        let resp = await member.user.dmChannel.awaitMessageComponent({ filter, time: 5 * 60 * 1000 }).catch(async () => {
+        let resp = await member.user.dmChannel.awaitMessageComponent({ filter, time: 5 * 60 * 1000, componentType: 'BUTTON' }).catch(async () => {
             await fail('didnt respond', 'No Response')
         });
 
         if (!resp) return await fail('didnt respond', 'FAILED');
 
-        if (resp.customId != ran) return await fail('failed the test', 'FAILED')
+        if (resp.customId != ran) return await fail('selected the incorrect answer', 'FAILED');
 
-        else sent.edit({ embeds: [embed2.setDescription('You have been verified!').setAuthor('SUCCESS').setColor("GREEN")], components: [] })
+        await sent.edit({ embeds: [embed2.setDescription('You have been verified!').setAuthor('SUCCESS').setColor("GREEN")], components: [] })
+        await client.channels.cache.get('923541236189655071')?.send({ embeds: [embed.setAuthor(`${member.user.tag} Passed`, member.user.displayAvatarURL()).setDescription(codeBlock('js', `${no1} ${operator} ${no2}`)).addField('Answer Selected', arrB[Number(resp.customId)].label, true).addField('Correct Answer', answer, true).setColor('GREEN')] })
         // await member.send({ files: [await captcha.image(captcha.currentString)] }).catch(e => console.error(e));
         // const filter = m => m.author.id == member.id;
         // let resp = await member.user.dmChannel.awaitMessages({ filter, time: 5 * 60 * 1000, max: 1 });
@@ -65,9 +67,8 @@ module.exports = {
         // }
 
         /**
-         * 
-         * @param {String} reason 
-         * @param {String} author 
+         * @param {Option} reason 
+         * @param {String} author
          */
         async function fail(reason, author) {
             if (!reason || !author) throw new Error('Provide a reason and a title')
@@ -76,8 +77,10 @@ module.exports = {
                 .setStyle("LINK").setLabel("Join Back").setURL("https://discord.gg/vAaxA2Qu89")
 
             await sent.edit({ embeds: [embed2.setDescription(`You have been removed from the server, since you ${reason}.\n You can use the button below to join back.`).setAuthor(author).setColor('RED')], components: [new Discord.MessageActionRow().addComponents([invButton])] })
-            await client.channels.cache.get('749618873552207872')?.send(`Removed ${member.user.tag} | Reason: Failed Captcha Test`)
-            await member.kick('Failed Captcha Test').catch(() => { });;
+
+            await client.channels.cache.get('923541236189655071')?.send({ embeds: [embed.setAuthor(`${member.user.tag} Failed`, member.user.displayAvatarURL()).setDescription(codeBlock('js', `${no1} ${operator} ${no2}`)).addField('Answer Selected', arrB[Number(resp.customId)].label, true).addField('Correct Answer', answer, true).setColor('RED')] }) //`Removed ${member.user.tag} | Reason: Failed Captcha Test`
+
+            // await member.kick('Failed Captcha Test').catch(() => { });;
         }
     }
 }

@@ -170,7 +170,7 @@ module.exports = {
                     }
 
                 };
-                registerCmd('../commands');
+                registerCmd('commands');
 
                 await client.application.fetch();
                 const globalCmdsData = allCmds.filter(e => e.global);

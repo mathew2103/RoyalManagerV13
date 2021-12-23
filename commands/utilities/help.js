@@ -11,7 +11,6 @@ module.exports = {
     guilds: 'all',
     roles: ['Royal Staff'],
     /**
-     * 
      * @param {Discord.CommandInteraction} interaction
      */
     async execute(interaction) {
@@ -35,15 +34,15 @@ module.exports = {
 
             if (cmd.permissions) {
                 if (!Array.isArray(cmd.permissions)) cmd.permissions = [cmd.permissions]
-                if (interaction.member.permissions.has(cmd.permissions)) return true;
+                if (!interaction.member.permissions.has(cmd.permissions)) return false;
             }
-            if (cmd.roles.length) {
+            if (cmd.roles?.length) {
                 const rolesMapped = cmd.roles.join('|')
                 const requiredRegex = new RegExp(`(admin|manager|bot dev|${rolesMapped})`, 'mi')
 
-                if (interaction.member.roles.cache.some(role => role.name.match(requiredRegex))) return true;
+                if (!interaction.member.roles.cache.some(role => role.name.match(requiredRegex))) return false;
             }
-            return false;
+            return true;
         })
 
 

@@ -19,7 +19,7 @@ module.exports = {
 
 		const embed = new MessageEmbed();
 		const oldEmbeds = interaction.message.embeds;
-		const webhook = await interaction.message.fetchWebhook().catch(() => {});;
+		const webhook = await interaction.message.fetchWebhook().catch(() => { });;
 		const filter = m => m.author.id == interaction.user.id;
 		const buttonIdParts = interaction.customId.split('_');
 		const [label, trigger, id] = buttonIdParts;
@@ -34,8 +34,8 @@ module.exports = {
 				let appealReason = await interaction.channel.awaitMessages({ filter, time: 2 * 60 * 1000, max: 1 }).catch(e => { return interaction.editReply('You didn\'t answer in time. Use the button again.') })
 				appealReason = appealReason.first();
 
-				const moderator = await interaction.guild.members.fetch(punishment.author).catch(() => {});;
-				const punishedUser = await interaction.guild.members.fetch(punishment.user).catch(() => {});;
+				const moderator = await interaction.guild.members.fetch(punishment.author).catch(() => { });;
+				const punishedUser = await interaction.guild.members.fetch(punishment.user).catch(() => { });;
 
 				await webhook.editMessage(interaction.message, { content: `${trigger == 'yes' ? 'Accepted' : 'Denied'} by ${interaction.user.tag}. Reason: ${appealReason}`, embeds: oldEmbeds, components: [] });
 
@@ -54,7 +54,7 @@ module.exports = {
 					if (punishedUser) {
 						embed.setDescription(`Your appeal for punishment with ID: \`${id}\` has been accepted\n**Reason:** ${appealReason.content}`).setColor('GREEN');
 						punishedUser.send({ embeds: [embed] })
-							.catch(() => {});;
+							.catch(() => { });;
 						await interaction.editReply('Done!');
 					}
 
@@ -69,7 +69,7 @@ module.exports = {
 						embed.setDescription(`Your appeal for punishment with ID: \`${id}\` has been denied.\n**Reason:** ${appealReason}`)
 							.setColor('RED');
 						punishedUser.send({ embeds: [embed] })
-							.catch(() => {});;
+							.catch(() => { });;
 						await interaction.editReply('Done!');
 					}
 					else {
@@ -81,11 +81,11 @@ module.exports = {
 				break;
 
 			case 'break':
-				const member = await interaction.guild.members.fetch(id).catch(() => {});;
+				const member = await interaction.guild.members.fetch(id).catch(() => { });;
 				const breakData = await breakSchema.findOne({ user: id })
 				console.log(breakData);
 				if (!member) return interaction.update({ content: 'User left the server.', embeds: [oldEmbed], components: [] })
-				if(member.id == interaction.user.id)return interaction.reply({ content: 'You cannot accept/deny your own break request', ephemeral: true})
+				if (member.id == interaction.user.id) return interaction.reply({ content: 'You cannot accept/deny your own break request', ephemeral: true })
 				await interaction.reply({ content: `Provide a reason for this ${trigger == 'yes' ? 'approval. You can also provide `none`' : 'denial'}`, ephemeral: true })
 
 				let breakReason = await interaction.channel.awaitMessages({ filter, max: 1, time: 2 * 60 * 1000, errors: ['time'] }).catch(e => { return interaction.editReply('You didn\'t answer in time. Use the button again.') })
@@ -96,7 +96,7 @@ module.exports = {
 						await breakSchema.findOneAndUpdate({ user: member.id }, {
 							accepted: true,
 							at: Date.now()
-						})
+						}, { upsert: true })
 					} catch (e) { return await interaction.editReply('Failed to update database. Try again.') }
 
 					await member.roles.add(config.onBreakRole).catch(console.error)
@@ -109,6 +109,7 @@ module.exports = {
 						.setTimestamp()
 						.setColor("GREEN")
 					member.send({ embeds: [embed] }).catch(e => interaction.editReply('Seems the user has closed their dms.'));
+					return;
 				} else {
 
 					try {
@@ -130,43 +131,43 @@ module.exports = {
 				await breakReason.delete()
 				// await interaction.editReply()
 				break;
-		
+
 			case 'votes':
 
 				const oldUserData = await votesSchema.findOne({ userID: id })
 				if (!oldUserData) return await interaction.reply(`No data found for you.`);
-		
+
 				const newToggle = (oldUserData.reminders == true) ? false : true
 				await votesSchema.findOneAndUpdate({ userID: userID }, {
 					reminders: newToggle
 				}, { upsert: true })
 
 				await interaction.reply(`Turned ${newToggle == true ? 'on' : 'off'} vote reminders.`)
-				
-			break;
-			
+
+				break;
+
 			case 'banrequest':
 				const reason = oldEmbeds[0].fields.find(e => e.name == 'Reason');
-				const targetBan = await interaction.guild.members.fetch(id).catch(() => {});;
+				const targetBan = await interaction.guild.members.fetch(id).catch(() => { });;
 				const evidence = oldEmbeds[0].fields.find(e => e.name == 'Evidence');
 				let moderatorId = oldEmbeds[0].fields.find(e => e.name == 'Moderator')
 				moderatorId = moderatorId.value.split('\`')[1]
-				const banModerator = await interaction.guild.members.fetch(id).catch(() => {});;
-	
-				if(!targetBan)return await interaction.update({ content: 'User left the server', components: []});
+				const banModerator = await interaction.guild.members.fetch(id).catch(() => { });;
 
-				if(trigger == 'yes'){
-					await targetBan.ban({ reason: `${reason} | Banned by ${interaction.user.tag}`})
+				if (!targetBan) return await interaction.update({ content: 'User left the server', components: [] });
+
+				if (trigger == 'yes') {
+					await targetBan.ban({ reason: `${reason} | Banned by ${interaction.user.tag}` })
 					const evidenceChannel = await client.channels.cache.get(config.evidenceChannel);
-					
+
 					await evidenceChannel.send(`**User:** \`${targetBan.id}\`\n**Moderator:** \`${interaction.user.id}\`\n**Reason:** ${reason.value}\n**Evidence:**${evidence.value}`)
-					await interaction.update({ content: `Accepted by ${interaction.user.tag}`, components: []})
-					await banModerator?.send(`A ban requested by you for ${targetBan.id} has been accepted.`).catch(() => {});
+					await interaction.update({ content: `Accepted by ${interaction.user.tag}`, components: [] })
+					await banModerator?.send(`A ban requested by you for ${targetBan.id} has been accepted.`).catch(() => { });
 				} else {
-					await interaction.update({ content: `Denied by ${interaction.user.tag}`, components: []})
-					await banModerator?.send(`A ban requested by you for ${targetBan.id} has been denied.`).catch(() => {});
-				}	
-			break;
-			}
+					await interaction.update({ content: `Denied by ${interaction.user.tag}`, components: [] })
+					await banModerator?.send(`A ban requested by you for ${targetBan.id} has been denied.`).catch(() => { });
+				}
+				break;
+		}
 	},
 };

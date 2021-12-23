@@ -16,36 +16,36 @@ const logChannels = {
  */
 
 async function log(client, message, channelType) {
-    
-    try
-    {channelType = channelType.toUpperCase();
-    if (!logChannels[channelType]) return console.log(`Type ``${channelType}`` is not an option.`);
-    const channel = client.channels.cache.get(logChannels[channelType]);
-    const webhooks = await channel?.fetchWebhooks();
-    let webhook = webhooks?.find(e => e.token) || channel
+
+    try {
+        channelType = channelType.toUpperCase();
+        if (!logChannels[channelType]) return console.log(`Type ``${channelType}`` is not an option.`);
+        const channel = client.channels.cache.get(logChannels[channelType]);
+        const webhooks = await channel?.fetchWebhooks();
+        let webhook = webhooks?.find(e => e.token) || channel
 
 
-    
-    if (typeof message == 'string') webhook.send(message);
-    else webhook.send({ embeds: [message] });
-    
-    }catch(e){console.log(e)}
+
+        if (typeof message == 'string') webhook.send(message);
+        else webhook.send({ embeds: [message] });
+
+    } catch (e) { console.log(e) }
 }
 
 /**
  * Awaits a message and returns the resposnse
  * @param {Interaction} interaction 
  * @param {String} message 
- * @returns {Message | Null}
+ * @returns {Message|null} The message response
  */
 async function getMessage(interaction, message) {
     const sent = interaction.replied ? await interaction.editReply(message) : interaction.reply(message)
 
     const filter = m => m.author.id == interaction.user.id
     const reply = await interaction.channel.awaitMessages({ filter, time: 3 * 60 * 1000, max: 1 })
-        .catch(e => { return interaction.channel.send('You didnt reply in time..') })
+        .catch(() => { return interaction.channel.send('You didnt reply in time..') })
 
-    
+
     return reply.first();
 }
 
@@ -53,9 +53,9 @@ async function getMessage(interaction, message) {
  * Creates a button
  * @param {String} label - Button Label
  * @param {String} style - Button Style
- * @param {String} customId 
- * @param {String} emoji
- * @returns {MessageButton} 
+ * @param {String} customId - Button's Custom ID
+ * @param {String} emoji - Emoji for the button
+ * @returns {MessageButton}
  */
 function createButton(label = '', style = '', customId = '', emoji = '') {
     if (!label || !style || !customId) throw new Error('You didnt provide label or style or custom id')
@@ -70,8 +70,8 @@ function createButton(label = '', style = '', customId = '', emoji = '') {
 
 /**
  * Gives a number between 2 numbers
- * @param {Number} min 
- * @param {Number} max 
+ * @param {Number} min The minimum number
+ * @param {Number} max The maximum number
  * @returns {Number} Random Number
  */
 function randomBetween(min, max) {
