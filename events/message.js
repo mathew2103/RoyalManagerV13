@@ -143,7 +143,7 @@ module.exports = {
                     for (const file of files) {
                         const stat = fs.lstatSync(`/home/container/${dir}/${file}`);
                         if (stat.isDirectory()) {
-                            registerCmd(join(dir, file));
+                            registerCmd(`${dir}/${file}`);
                         }
                         else {
                             const option = require(`/home/container/${dir}/${file}`);
@@ -184,10 +184,10 @@ module.exports = {
                     // await guild.commands.set(cmds).catch(e => message.channel.send(e.message));
                 }
 
-                // await client.application.commands.create({
-                //     name: 'AD WARN',
-                //     type: "MESSAGE"
-                // }, config.mainServer.id)
+                await client.application.commands.create({
+                    name: 'AD WARN',
+                    type: "MESSAGE"
+                }, config.mainServer.id)
 
                 message.reply('Deployed all commands!')
                 return;

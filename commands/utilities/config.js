@@ -9,8 +9,8 @@ module.exports = {
         .setDescription('Configuration for the server.')
         .addStringOption((op) => op.setName('query').setDescription('Config Settings').addChoice('Reason', 'reason').addChoice('Add', 'add').addChoice('Remove', 'remove').addChoice('Message', 'message').addChoice('Logs', 'logs'))
         .addChannelOption((op) => op.setName('logschannel').setDescription('Pick this if you choose logs in query')),
-    guilds:[config.mainServer.id],
-    async execute(client, interaction) {
+    guilds: [config.mainServer.id],
+    async execute(interaction, client) {
         const guildId = interaction.guild.id
         // const options = ['reason', 'message', 'logs']
         // if(!options.includes(args[0].toLowerCase()))return interaction.reply(`Your options are \`${options}\`.`)
@@ -116,7 +116,7 @@ module.exports = {
                     .addField(`Moderation Message`, allsettings.modMsg ? allsettings.modMsg : 'None', true)
                     .addField(`Logging Channel`, allsettings.logs ? `<#${allsettings.logs}>` : 'None', true)
                     .addField('AD Moderation Reasons', allsettings.reasons.map(e => `\`${e}\``).join('\n'))
-                interaction.reply({embeds: [setEmbed]})
+                interaction.reply({ embeds: [setEmbed] })
         }
     },
 };

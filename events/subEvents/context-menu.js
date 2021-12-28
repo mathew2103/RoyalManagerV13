@@ -1,4 +1,4 @@
-const { MessageActionRow, MessageSelectMenu, ContextMenuInteraction } = require('discord.js');
+const { MessageActionRow, MessageSelectMenu } = require('discord.js');
 const Discord = require('discord.js')
 const punishmentSchema = require('../../schemas/punishments-schema');
 const settingsSchema = require('../../schemas/settings-schema');
@@ -53,7 +53,7 @@ module.exports = {
     name: 'interactionCreate',
     /**
      * 
-     * @param {ContextMenuInteraction} interaction 
+     * @param {Discord.MessageContextMenuInteraction} interaction 
      */
     async execute(interaction) {
         if (!interaction.isContextMenu()) return;

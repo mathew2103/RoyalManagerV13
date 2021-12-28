@@ -2,6 +2,7 @@ const { codeBlock } = require("@discordjs/builders");
 const { MessageEmbed, Interaction } = require("discord.js");
 const buttonCreate = require('./subEvents/button');
 const menuCreate = require('./subEvents/context-menu');
+const fs = require('fs');
 module.exports = {
 	name: 'interactionCreate',
 	/**
@@ -16,6 +17,9 @@ module.exports = {
 		if (!interaction.client.commands.has(interaction.commandName)) return interaction.reply('No such cmd found.. *weird*');
 
 		const cmd = interaction.client.commands.get(interaction.commandName)
+		const config = JSON.parse(fs.readFileSync('config.json'));
+
+		if (config.disabled.includes(interaction.commandName)) return interaction.reply({ content: `This command has been disabled by the developers.`, ephemeral: true })
 		// const bypassRoles = ['bot dev', 'server manager', 'administrator'] //bypassRoles.includes(role.name.toLowerCase())
 		const bypassRegex = /(admin|server manager|bot dev)/mi
 		if (interaction.guild && !interaction.member.roles.cache.some(role => role.name.match(bypassRegex))) {
@@ -24,15 +28,13 @@ module.exports = {
 				if (!interaction.member.permissions.has(cmd.permissions)) return interaction.reply({ content: `You need ${interaction.member.permissions.missing(cmd.permissions).map(e => `\`${e.replace('_', ' ')}\``).join(', ')} to use this command.`, ephemeral: false })
 			}
 			if (cmd.roles?.length) {
-				console.time('roles')
+
 				const rolesMapped = cmd.roles.join('|')
 				const requiredRegex = new RegExp(`(admin|manager|bot dev|${rolesMapped})`, 'mi')
 
 				if (!interaction.member.roles.cache.some(role => role.name.match(requiredRegex))) return interaction.reply({ content: `You need to have at least one role with the name ${cmd.roles.map(e => e).join(' OR ')}`, ephemeral: true })
-
-
 				// if(!interaction.member.roles.cache.some(role => cmd.roles.includes(role.name.toLowerCase()) || cmd.roles.find(e => role.name.toLowerCase().includes(e.toLowerCase()))))return interaction.reply({ content: `You need to have at least one role with the name ${cmd.roles.map(e => e).join(' OR ')}`, ephemeral: true})
-				console.timeEnd('roles')
+
 			}
 		}
 

@@ -3,22 +3,25 @@ const Discord = require('discord.js')
 const autoads = require("../schemas/autoAd-schema");
 const config = require('../config.json');
 const utils = require('./utils')
-
+const cron = require('node-cron');
 /**
  * 
  * @param {Client} client 
  */
 
 module.exports.run = async (client) => {
-//   const ra_guild = await client.guilds.cache.get(config.mainServer.id);
-//   if (!ra_guild) return console.log(`Default guild not found`);
+  //   const ra_guild = await client.guilds.cache.get(config.mainServer.id);
+  //   if (!ra_guild) return console.log(`Default guild not found`);
 
   console.log(`Loaded Auto ADs`);
 
   // We check periodically if we have auto post ads
   // and both load message data and autopost time
-  client.intervals.set('auto-post', setInterval(async () => {
-    // Check mongodb for data on autoads. If none, it defaults to false
+  // client.intervals.set('auto-post', setInterval(async () => {
+  // Check mongodb for data on autoads. If none, it defaults to false
+
+  cron.schedule('* * 2,4,6,8,10,12 * * *', async () => {
+
     const rdata = await autoads.findOne({ interval: 4 });
     if (!rdata) return console.log(`No data present`);
 
@@ -58,35 +61,37 @@ module.exports.run = async (client) => {
         await webhook.send(e.ad);
       }
     });
+  }, { timezone: 'Asia/Kolkata' })
 
-    utils.log(client, '**[AUTO-POST]** Posted all autoads successfully', 'auto')
-    // utils.log(client, '**[AUTO-POST]** Posted all autoads successfully.', 'auto')
-    // client.log('**[AUTO-POST]** Posted all autoads.')
-  }, 1000 * 60 * 60 * 4));
+  utils.log(client, '**[AUTO-POST]** Posted all autoads successfully', 'auto')
+  // utils.log(client, '**[AUTO-POST]** Posted all autoads successfully.', 'auto')
+  // client.log('**[AUTO-POST]** Posted all autoads.')
+  // }, 1000 * 60 * 60 * 4));
 
-  client.intervals.set('aa-expire', setInterval(async() => {
+  client.intervals.set('aa-expire', setInterval(async () => {
     const rdata = await autoads.findOne({ interval: 4 });
     if (!rdata) return console.log(`No data present`);
 
     rdata.ads.filter(e => e.expires && e.expires <= Date.now()).forEach(async e => {
 
       const user = e.user ? await client.users.cache.get(e.user) : null
-      if(user){
-      
-        try{
+      if (user) {
+
+        try {
           await user.send('Your auto ad has expired.')
-        }catch(e){}
-        
+        } catch (e) { }
+
       }
 
       utils.log(client, `**[AUTO-EXPIRE]** Auto-ad from \`${user?.tag || "no one"}\` has expired.`, 'auto')
 
-      await autoads.findOneAndUpdate({interval: 4}, {
+      await autoads.findOneAndUpdate({ interval: 4 }, {
         $pull: {
           ads: e
         }
       })
 
     })
+
   }, 1000 * 60 * 60));
 };
