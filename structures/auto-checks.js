@@ -52,7 +52,7 @@ module.exports = (client) => {
             const member = await staffguild.members.fetch(data.userId).catch(() => { });
             const warnEmbed = new Discord.MessageEmbed()
                 .setDescription(`You still dont meet the weekly moderation quota. You need \`${8 - member.current || 8}\` more ad warnings else you will be striked.\nIf you would like to request a break, use \`/break\` in <#748188786386665592>.`)
-                .setColor(member.current == 0 ? "RED" : "YELLOW");
+                .setColor(member.current == 0 ? "RED" : "YELLOW").setTimestamp().setAuthor('Auto Alerts', client.user.displayAvatarURL());
 
             if (member) member.send({ embeds: [warnEmbed] }).catch(() => { });
         })
