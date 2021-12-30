@@ -38,7 +38,9 @@ module.exports.run = async (client) => {
             await member.send(embed).catch(() => { });;
             utils.log(client, `**[AUTO-BREAK]** ${member.user.tag}'s break expired.`, 'auto')
         }
-    })
+    }, { timezone: 'Asia/Kolkata' })
+
+
 
     // client.intervals.set('auto-break', setInterval(async () => {
 

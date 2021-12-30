@@ -60,8 +60,6 @@ module.exports.run = async (client) => {
     });
   }, { timezone: 'Asia/Kolkata' })
 
-  console.log(cron.getTasks())
-
   // utils.log(client, '**[AUTO-POST]** Posted all autoads successfully.', 'auto')
   // client.log('**[AUTO-POST]** Posted all autoads.')
   // }, 1000 * 60 * 60 * 4));

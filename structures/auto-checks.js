@@ -18,6 +18,46 @@ module.exports = (client) => {
         await resetWarns();
     }, { timezone: 'Asia/Kolkata' })
 
+    cron.schedule('0 0 17 * Friday', async () => {
+        const staffguild = await client.guilds.fetch(config.staffServer.id);
+
+        const data = await warnCountSchema.find({});
+
+        await staffguild.members.fetch();
+
+        const modTeamRole = await staffguild.roles.fetch(config.staffServer.modTeamRole);
+
+        let members = [...modTeamRole.members.values()]
+        const bannedRegex = /(management team|bot dev|head mod)/mi
+        members = members.filter(e => !e.roles.cache.some(r => bannedRegex.test(r.name)));//r.name.match(bannedRegex)
+        // console.log(modTeamRole.members.filter(e => !members.includes(e)))
+
+        let modData = await members.map(member => {
+
+            let memberData = data.find(e => e.userId == member.id);
+            if (memberData) {
+                memberData.tag = member.user.tag;
+
+                if (member.roles.cache.has(config.onBreakRole)) memberData.onBreak = true;
+                return memberData;
+            }
+            // if(!memberData)return;
+
+            // if(memberData)odData.push(memberData)
+        })
+
+        modData = modData.filter(e => e !== undefined && e.current < 8 && !e.onBreak);
+
+        modData.forEach(async (data) => {
+            const member = await staffguild.members.fetch(data.userId).catch(() => { });
+            const warnEmbed = new Discord.MessageEmbed()
+                .setDescription(`You still dont meet the weekly moderation quota. You need \`${8 - member.current || 8}\` more ad warnings else you will be striked.\nIf you would like to request a break, use \`/break\` in <#748188786386665592>.`)
+                .setColor(member.current == 0 ? "RED" : "YELLOW");
+
+            if (member) member.send({ embeds: [warnEmbed] }).catch(() => { });
+        })
+    }, { timezone: 'Asia/Kolkata' })
+
 
     /**
      * Generates Leaderboard
@@ -52,7 +92,6 @@ module.exports = (client) => {
         })
 
         modData = modData.filter(e => e !== undefined);
-
         modData = modData.sort((a, b) => b.current - a.current)
 
 

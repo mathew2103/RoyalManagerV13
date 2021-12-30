@@ -62,13 +62,15 @@ module.exports = {
 
             delete require.cache[require.resolve('../../structures/auto-post.js')];
             delete require.cache[require.resolve('../../structures/auto-checks.js')];
+            delete require.cache[require.resolve('../../structures/auto-break.js')];
 
-            const aps = require('../../structures/auto-post.js');
-            const achs = require('../../structures/auto-post.js');
+            const aps = require('../../structures/auto-post');
+            const achs = require('../../structures/auto-checks');
+            const autoBreaks = require('../../structures/auto-break');
 
             aps.run(client);
-            achs.run(client);
-            console.log(cron.getTasks());
+            achs(client)
+            autoBreaks.run(client)
 
             interaction.reply({ content: "Reloaded all modules." })
         }
