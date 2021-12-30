@@ -31,8 +31,9 @@ module.exports = {
 
 
 				await interaction.reply({ content: `Provide the reason for this ${trigger == 'yes' ? 'approval. You can also provide `none`' : 'denial'}`, ephemeral: true });
-				let appealReason = await interaction.channel.awaitMessages({ filter, time: 2 * 60 * 1000, max: 1 }).catch(e => { return interaction.editReply('You didn\'t answer in time. Use the button again.') })
-				appealReason = appealReason.first();
+				let appealReason = await interaction.channel.awaitMessages({ filter, time: 2 * 60 * 1000, max: 1 }).catch(() => { return interaction.editReply('You didn\'t answer in time. Use the button again.') })
+				appealReason = appealReason?.first();
+				if (!appealReason) return;
 
 				const moderator = await interaction.guild.members.fetch(punishment.author).catch(() => { });;
 				const punishedUser = await interaction.guild.members.fetch(punishment.user).catch(() => { });;
@@ -88,8 +89,9 @@ module.exports = {
 				if (member.id == interaction.user.id) return interaction.reply({ content: 'You cannot accept/deny your own break request', ephemeral: true })
 				await interaction.reply({ content: `Provide a reason for this ${trigger == 'yes' ? 'approval. You can also provide `none`' : 'denial'}`, ephemeral: true })
 
-				let breakReason = await interaction.channel.awaitMessages({ filter, max: 1, time: 2 * 60 * 1000, errors: ['time'] }).catch(e => { return interaction.editReply('You didn\'t answer in time. Use the button again.') })
-				breakReason = breakReason.first()
+				let breakReason = await interaction.channel.awaitMessages({ filter, max: 1, time: 2 * 60 * 1000, errors: ['time'] }).catch(() => { return interaction.editReply('You didn\'t answer in time. Use the button again.') })
+				breakReason = breakReason?.first()
+				if (!breakReason) return;
 
 				if (trigger == 'yes') {
 					try {
@@ -97,24 +99,24 @@ module.exports = {
 							accepted: true,
 							at: Date.now()
 						}, { upsert: true })
-					} catch (e) { return await interaction.editReply('Failed to update database. Try again.') }
+					} catch { return await interaction.editReply('Failed to update database. Try again.') }
 
 					await member.roles.add(config.onBreakRole).catch(console.error)
 					await member.setNickname(`On Break | ${member.displayName.slice(0, 21)}`)
-						.catch(e => interaction.editReply('Couldn\'t update nickname.'))
+						.catch(() => interaction.editReply('Couldn\'t update nickname.'))
 
 					embed.setAuthor('Break Accepted')
 						.setDescription(`Your break has been accepted and your break ends ${time(Math.round(Number(Date.now()) + Number(breakData.expires) / 1000), 'R')}\nIf you feel like you can meet the quota and want to be off break, use \`/leave\` in <#748188786386665592>`)
 						.addField(`Reason`, breakReason.content)
 						.setTimestamp()
 						.setColor("GREEN")
-					member.send({ embeds: [embed] }).catch(e => interaction.editReply('Seems the user has closed their dms.'));
+					member.send({ embeds: [embed] }).catch(() => interaction.editReply('Seems the user has closed their dms.'));
 					return;
 				} else {
 
 					try {
 						await breakSchema.findOneAndDelete({ user: id })
-					} catch (e) { interaction.editReply('Couldn\'t decline the break in the database.') }
+					} catch { interaction.editReply('Couldn\'t decline the break in the database.') }
 
 					embed.setAuthor(`Break Denied`)
 						.setDescription(`Your break request has been declined.`)

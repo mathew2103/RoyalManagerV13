@@ -15,12 +15,8 @@ module.exports.run = async (client) => {
 
   console.log(`Loaded Auto ADs`);
 
-  // We check periodically if we have auto post ads
-  // and both load message data and autopost time
-  // client.intervals.set('auto-post', setInterval(async () => {
-  // Check mongodb for data on autoads. If none, it defaults to false
 
-  cron.schedule('* * 2,4,6,8,10,12 * * *', async () => {
+  cron.schedule('0 0 0,4,8,12,16,20 * * *', async () => {
 
     const rdata = await autoads.findOne({ interval: 4 });
     if (!rdata) return console.log(`No data present`);
@@ -60,15 +56,17 @@ module.exports.run = async (client) => {
       } else {
         await webhook.send(e.ad);
       }
+      utils.log(client, '**[AUTO-POST]** Posted all autoads successfully', 'auto')
     });
   }, { timezone: 'Asia/Kolkata' })
 
-  utils.log(client, '**[AUTO-POST]** Posted all autoads successfully', 'auto')
+  console.log(cron.getTasks())
+
   // utils.log(client, '**[AUTO-POST]** Posted all autoads successfully.', 'auto')
   // client.log('**[AUTO-POST]** Posted all autoads.')
   // }, 1000 * 60 * 60 * 4));
 
-  client.intervals.set('aa-expire', setInterval(async () => {
+  cron.schedule('0 0 0 12 * * *', async () => {
     const rdata = await autoads.findOne({ interval: 4 });
     if (!rdata) return console.log(`No data present`);
 
@@ -92,6 +90,10 @@ module.exports.run = async (client) => {
       })
 
     })
+  }, { timezone: 'Asia/Kolkata' })
 
-  }, 1000 * 60 * 60));
+  // client.intervals.set('aa-expire', setInterval(async () => {
+
+
+  // }, 1000 * 60 * 60));
 };

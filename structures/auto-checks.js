@@ -6,11 +6,8 @@ const fs = require('fs');
 
 module.exports = (client) => {
 
-    // cron.schedule('* * * * *', () => {
-
-    //     console.log('testing')
-    // })
-    cron.schedule('* * 17 * Sunday', async () => {
+    console.log('Loading Auto Checks...')
+    cron.schedule('0 0 17 * Sunday', async () => {
         const modTeamChannel = client.channels.cache.get(config.modTeamUpdatesChannel);
         const staffguild = await client.guilds.fetch(config.staffServer.id);
 
@@ -21,9 +18,10 @@ module.exports = (client) => {
         await resetWarns();
     }, { timezone: 'Asia/Kolkata' })
 
+
     /**
-     * 
-     * @param {DIscord.Guild} staffguild 
+     * Generates Leaderboard
+     * @param {Discord.Guild} staffguild The staff guild
      * @returns {Object} The object to be sent
      */
     async function makeLbEmbed(staffguild) {
@@ -78,7 +76,9 @@ module.exports = (client) => {
         return { embeds: [embed], content: content };
     }
 
-
+    /**
+     * Resets warnings for all moderators
+     */
     async function resetWarns() {
         const datas = await warnCountSchema.find({})
         for (const data of datas) {
@@ -90,12 +90,12 @@ module.exports = (client) => {
     }
 
     /**
-     * 
+     * Chooses the staff of the week
      * @param {Discord.Guild} mainguild 
      * @param {String} newSotw
      */
     async function chooseSotw(mainguild, newSotw) {
-        const oldData = JSON.parse(fs.readFileSync('config.json'));
+        let oldData = JSON.parse(fs.readFileSync('config.json'));
         const oldSotw = oldData.sotw;
 
         if (oldSotw) {
@@ -105,6 +105,10 @@ module.exports = (client) => {
 
         const newSotwMember = await mainguild.members.fetch(newSotw).catch(() => { });
         if (newSotwMember) newSotwMember.roles.add(config.sotwRole);
+
+        oldData.sotw = newSotw;
+
+        fs.writeFileSync('config.json', JSON.stringify(oldData, null, 2))
 
         return `**Moderation Team Activity Checks**\nCongrats <@${newSotw}> for being the staff of the week.\n<@${config.staffServer.modTeamRole}>`
     }

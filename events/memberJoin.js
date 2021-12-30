@@ -33,7 +33,7 @@ module.exports = {
 
 
         const embed = new Discord.MessageEmbed()
-            .setDescription(`Welcome to ${member.guild.name}!\n${codeBlock('js', `${no1} ${operator} ${no2}`)}\n\nTo continue, please select the correct answer. You have 5 minutes to answer, or you will be removed from the server.`)
+            .setDescription(`Welcome to ${member.guild.name}!\n${codeBlock('js', `${no1} ${operator} ${no2}`)}\n\nTo continue, please select the correct answer. You have to answer <t:${(Math.round((Date.now() + 3 * 60 * 1000) / 1000)).toString()}:R>, or you will be kicked from the server.`)
             .setColor('YELLOW')
 
         const sent = await member.send({ embeds: [embed], components: [row] }).catch(e => console.error(e));
@@ -43,9 +43,7 @@ module.exports = {
         }
 
         const embed2 = new Discord.MessageEmbed()
-        let resp = await member.user.dmChannel.awaitMessageComponent({ filter, time: 5 * 60 * 1000, componentType: 'BUTTON' }).catch(async () => {
-            await fail('didnt respond', 'No Response')
-        });
+        let resp = await member.user.dmChannel.awaitMessageComponent({ filter, time: 3 * 60 * 1000, componentType: 'BUTTON' }).catch(() => { });
 
         if (!resp) return await fail('didnt respond', 'FAILED');
 
@@ -78,9 +76,18 @@ module.exports = {
 
             await sent.edit({ embeds: [embed2.setDescription(`You have been removed from the server, since you ${reason}.\n You can use the button below to join back.`).setAuthor(author).setColor('RED')], components: [new Discord.MessageActionRow().addComponents([invButton])] })
 
-            await client.channels.cache.get('923541236189655071')?.send({ embeds: [embed.setAuthor(`${member.user.tag} Failed`, member.user.displayAvatarURL()).setDescription(codeBlock('js', `${no1} ${operator} ${no2}`)).addField('Answer Selected', resp ? arrB[Number(resp?.customId)].label : 'None selected', true).addField('Correct Answer', answer, true).setColor('RED')] }) //`Removed ${member.user.tag} | Reason: Failed Captcha Test`
+            if (!resp?.customId) return await client.channels.cache.get('923541236189655071')?.send({ embeds: [embed.setAuthor(`${member.user.tag} Failed`, member.user.displayAvatarURL()).setDescription(codeBlock('js', `${no1} ${operator} ${no2}`)).addField('Answer Selected', 'None selected', true).addField('Correct Answer', answer, true).setColor('RED')] });
 
-            // await member.kick('Failed Captcha Test').catch(() => { });;
+            await client.channels.cache.get('923541236189655071')?.send({ embeds: [embed.setAuthor(`${member.user.tag} Failed`, member.user.displayAvatarURL()).setDescription(codeBlock('js', `${no1} ${operator} ${no2}`)).addField('Answer Selected', arrB[Number(resp.customId)].label, true).addField('Correct Answer', answer, true).setColor('RED')] })
+                .catch(async () => {
+                    await client.channels.cache.get('923541236189655071')?.send({ embeds: [embed.setAuthor(`${member.user.tag} Failed`, member.user.displayAvatarURL()).setDescription(codeBlock('js', `${no1} ${operator} ${no2}`)).addField('Answer Selected', 'None selected', true).addField('Correct Answer', answer, true).setColor('RED')] })
+                })
+
+
+
+
+
+            await member.kick('Failed Captcha Test').catch(() => { });;
         }
     }
 }
