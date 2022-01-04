@@ -74,7 +74,7 @@ module.exports = {
             const invButton = new Discord.MessageButton()
                 .setStyle("LINK").setLabel("Join Back").setURL("https://discord.gg/vAaxA2Qu89")
 
-            await sent.edit({ embeds: [embed2.setDescription(`You have been removed from the server, since you ${reason}.\n You can use the button below to join back.`).setAuthor(author).setColor('RED')], components: [new Discord.MessageActionRow().addComponents([invButton])] })
+            await sent.edit({ embeds: [embed2.setDescription(`You have been removed from the server, since you ${reason}.\n You can use the button below to join back.`).setAuthor(author).setColor('RED')], components: [new Discord.MessageActionRow().addComponents([invButton])] }).catch(() => { })
 
             if (!resp?.customId) return await client.channels.cache.get('923541236189655071')?.send({ embeds: [embed.setAuthor(`${member.user.tag} Failed`, member.user.displayAvatarURL()).setDescription(codeBlock('js', `${no1} ${operator} ${no2}`)).addField('Answer Selected', 'None selected', true).addField('Correct Answer', answer, true).setColor('RED')] });
 
