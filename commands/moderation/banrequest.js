@@ -10,6 +10,11 @@ module.exports = {
         .addStringOption((op) => op.setName('reason').setDescription('Reason for ban request (NOT EVIDENCE)').setRequired(true)),
     guilds: [config.mainServer.id],
     roles: ['Trial Mod'],
+    /**
+     * 
+     * @param {Discord.CommandInteraction} interaction 
+     * @returns 
+     */
     async execute(interaction) {
         await interaction.deferReply({ ephemeral: true });
         const member = interaction.options.getMember('member')
@@ -32,8 +37,8 @@ module.exports = {
             time: 2 * 60 * 1000,
             errors: ['time']
         })
-        if(!response)return interaction.editReply('You didnt respond in time..');
-        
+        if (!response) return interaction.editReply('You didnt respond in time..');
+
         let evidence = response.first().attachments.first() ? response.first().attachments.first().url : response.first().content
         if (evidence && evidence.toLowerCase() === 'cancel') return interaction.editReply(`Cancelled.`)
         if (evidence.toLowerCase() === '6aw') {
@@ -48,7 +53,7 @@ module.exports = {
             evidence = sorted.map(e => `\`${e.punishmentId}\` - ${moment.utc(e.at).format("MMM Do YYYY, h:mm:ss a")}`).join('\n')
         }
 
-        
+
         const embed = new Discord.MessageEmbed()
             .setTitle('New Ban Request')
             .setColor('YELLOW')
@@ -94,6 +99,7 @@ module.exports = {
             })
         }
 
+        await response.first().delete()
         // await banreqchannel.send('@here', { embeds: [embed], components: [row] })
         await webhook.send({ content: '@here', embeds: [embed], components: [row], avatar: interaction.user.displayAvatarURL(), username: interaction.member.displayName })
         await interaction.editReply(`Ban successfully requested.`)

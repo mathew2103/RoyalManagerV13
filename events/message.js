@@ -200,7 +200,7 @@ module.exports = {
                 if (code.includes('token')) code = code.replace('token', 'id')
                 const embed = new MessageEmbed()
                     .addField('Input', codeBlock('js', code))
-                    .setAuthor(message.author.tag, message.author.displayAvatarURL())
+                    .setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
                 try {
                     let evaled = await eval(code)
                     embed.addField('Output', codeBlock(evaled))

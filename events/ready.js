@@ -4,6 +4,7 @@ const voteWebhooks = require('../structures/vote-webhooks');
 const autoChecks = require('../structures/auto-checks');
 const utils = require('../structures/utils')
 const { Client, ActivityOptions } = require('discord.js');
+const config = require('../config.json');
 module.exports = {
 	name: 'ready',
 	once: true,
@@ -73,12 +74,16 @@ module.exports = {
 
 		console.log(`Loaded ${activities.length} activities`)
 		// client.user.setPresence({ activities: activities, status: 'dnd'})
+		let activity = activities[utils.randomBetween(0, activities.length - 1)];
+		client.user.setPresence({ activities: [{ name: activity.name, type: activity.type?.toUpperCase() || 'PLAYING', url: activity.url }], status: 'idle' });
+
 		setInterval(() => {
-			const activity = activities[utils.randomBetween(0, activities.length - 1)];
-			client.user.setPresence({ activities: [{ name: activity.name, type: activity.type?.toUpperCase() || 'PLAYING', url: activity.url }], status: 'dnd' });
+			activity = activities[utils.randomBetween(0, activities.length - 1)];
+			client.user.setPresence({ activities: [{ name: activity.name, type: activity.type?.toUpperCase() || 'PLAYING', url: activity.url }], status: 'idle' });
 			// client.user.setActivity(activity.name, { type: activity.type, url: activity.url });
 		}, 5 * 60 * 1000)
 		client.channels.cache.get("749618873552207872")?.send(':green_circle: Im ready to be used.')
+		client.channels.cache.get(config.rebootChannel)?.send('Rebooted successfully.')
 
 	},
 };

@@ -27,7 +27,7 @@ module.exports = {
 		if (time < ms('2d')) return interaction.followUp({ content: 'You dont need to request a break for less than 2 days.', ephemeral: true })
 
 		const embed = new Discord.MessageEmbed()
-			.setAuthor(interaction.user.tag, interaction.user.displayAvatarURL())
+			.setAuthor({ name: interaction.user.tag, iconURL: interaction.user.displayAvatarURL() })
 			.addField(`Duration`, duration, true)
 			.addField(`User ID`, `\`${interaction.user.id}\``, true)
 			.addField(`Reason`, reason, true)
@@ -42,7 +42,7 @@ module.exports = {
 				at: Date.now(),
 				accepted: false
 			})
-			breakData.save()			
+			breakData.save()
 		} catch (e) { return interaction.followUp(`Failed to update database.`) }
 
 		const yesButton = new Discord.MessageButton()

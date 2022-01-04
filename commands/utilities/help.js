@@ -50,7 +50,7 @@ module.exports = {
         await cmds.forEach(e => e.category ? cmdCats[e.category.toString()]?.push(e) : undefined);
 
         let embed = new Discord.MessageEmbed()
-            .setAuthor('Help Menu', client.user.displayAvatarURL())
+            .setAuthor({ name: 'Help Menu', iconURL: client.user.displayAvatarURL() })
             .setColor('RANDOM');
 
         console.log(cmdCats['moderation'].map(cmd => `\`${cmd?.data?.name}\`` || cmd).join(', '))

@@ -6,8 +6,8 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('membercount')
         .setDescription('Shows a detailed member count of the server.')
-        .addStringOption((op) => op.setName('option').setDescription('Membercount option').addChoice('Mods', 'mods').addChoice('PMs', 'pms').addChoice('Devs', 'devs').addChoice('Tls', 'tls').addChoice('TM', 'tm').addChoice('TM', 'tm').addChoice('Admins', 'admins').addChoice('Managers', 'managers')),
-    async execute(client, interaction) {
+        .addStringOption((op) => op.setName('option').setDescription('Membercount option').addChoice('Mods', 'mods').addChoice('PMs', 'pms').addChoice('Devs', 'devs').addChoice('Tls', 'tls').addChoice('TM', 'tm').addChoice('TM', 'tm').addChoice('Admins', 'admins').addChoice('Managers', 'managers').setRequired(true)),
+    async execute(interaction, client) {
         const option = interaction.options.getString('option')
 
 
@@ -80,13 +80,13 @@ module.exports = {
 };
 
 function emojiFromStatus(status) {
-    if(status == 'dnd')return '\\🔴'
-    if(status == 'idle')return '\\🟡'
-    if(status == 'online')return '\\🟢'
-    if(status == 'offline')return '\\🔲'
+    if (status == 'dnd') return '\\🔴'
+    if (status == 'idle') return '\\🟡'
+    if (status == 'online') return '\\🟢'
+    if (status == 'offline') return '\\🔲'
 }
 
-function getMemberfromRole(guild, roleID){
+function getMemberfromRole(guild, roleID) {
     const role = guild.roles.cache.get(roleID)
     return role.members
 }

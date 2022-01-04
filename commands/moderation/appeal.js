@@ -27,9 +27,9 @@ module.exports = {
         console.log(dmChannel)
         if (interaction.channelId !== dmChannel.id) {
             interaction.reply({ content: 'Check dms.', ephemeral: true })
-            dmChannel.send('Send your advertisement for the appeal.').catch(e => {return interaction.editReply('Open your dms to appeal')})
+            dmChannel.send('Send your advertisement for the appeal.').catch(e => { return interaction.editReply('Open your dms to appeal') })
         } else interaction.reply('Send your advertisement for the appeal.');
-        
+
 
         const filter = m => m.author.id == interaction.user.id;
 
@@ -45,7 +45,6 @@ module.exports = {
             .setCustomId(`appeal_deny_${warning.punishmentId}`)
         const row = new Discord.MessageActionRow()
             .addComponents([yesButton, noButton])
-            console.log(row)
 
         client.mails.set(interaction.user.id, 'appeal')
         collector.on('collect', async msg => {
@@ -54,7 +53,7 @@ module.exports = {
             const appealsChannel = interaction.client.channels.cache.get(config.appealsChannel) || interaction.channel
 
             const embed = new Discord.MessageEmbed()
-                .setAuthor('Appeals')
+                .setAuthor({ name: 'Appeals' })
                 .addFields({
                     name: 'User',
                     value: `${msg.author.tag}\n\`${msg.author.id}\``,
@@ -87,7 +86,7 @@ module.exports = {
                 })
             }
 
-            await webhook.send({ content: '@', embeds: [embed], components: [row] , username: interaction.user.username, avatarURL: interaction.user.displayAvatarURL()})
+            await webhook.send({ content: '@', embeds: [embed], components: [row], username: interaction.user.username, avatarURL: interaction.user.displayAvatarURL() })
             dmChannel.send('Your appeal has been submitted. Please wait for us to review your appeal.')
             client.mails.set(interaction.user.id, undefined)
             // interaction.followUp('Appeal Submitted, Please wait for us to review your appeal')

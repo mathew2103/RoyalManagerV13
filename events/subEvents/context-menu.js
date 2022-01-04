@@ -58,6 +58,7 @@ module.exports = {
     async execute(interaction) {
         if (!interaction.isContextMenu()) return;
         await interaction.deferReply({ ephemeral: true });
+        const { client } = interaction;
 
         const bypassRegex = /(mod|admin|server manager|bot dev)/mi
         if (!interaction.member.roles.cache.some(role => role.name.match(bypassRegex))) return interaction.followUp({ content: 'You are not supposed to be using this.', ephemeral: true })
@@ -115,8 +116,8 @@ module.exports = {
         reasonID = reasonID.values[0]
 
         const mainGuildData = await settingsSchema.findOne({ guildId: config.mainServer.id });
-        const adWarnTemplate = mainGuildData.modMsg;
-        const adWarnChannel = interaction.guild.channels.cache.get('826045281824931882') || interaction.guild.channels.cache.get('758725733840846858') || interaction.channel;
+        const adWarnTemplate = mainGuildData.modMsg; //758725733840846858
+        const adWarnChannel = interaction.guild.channels.cache.get('758725733840846858');
 
         const reason = mainGuildData.reasons[Number(reasonID)];
         const punishmentId = uniqid();
@@ -159,6 +160,150 @@ module.exports = {
         }, { upsert: true });
 
         const newTargetData = await punishmentSchema.find({ user: targetMember.id, guild: interaction.guild.id });
+
+        autoTimeout(targetMember, newTargetData.length);
+        const bal = await giveCoins(interaction.member);
+        await sendEmbeds(bal);
+
+        /**
+         * 
+         * @param {Number} num 
+         * @returns {String} color
+         */
+        function colorFromNum(num) {
+            if (num <= 2) return 'GREEN';
+            else if (num <= 4) return 'YELLOW';
+            else return "RED";
+        }
+
+        /**
+         * 
+         * @param {Discord.GuildMember} member 
+         * @param {Number} warnCount 
+         */
+        async function autoTimeout(member, warnCount) {
+            const timeoutEmbed = new Discord.MessageEmbed()
+                .setAuthor('You have been timed out')
+                .setTimestamp();
+
+            switch (warnCount) {
+                case 2:
+                    interaction.followUp({ content: `?2aw ${member.id}`, ephemeral: true })
+                    // member.timeout(1, `Accumalating ${warnCount} ad warnings`);
+                    break;
+                case 3:
+                    member.send({ embeds: [timeoutEmbed.setDescription(`You have been timed out in Royal Advertising till <t:${Math.round((Date.now() + 21600000) / 1000)}>\nYour mute expires <t:${Math.round((Date.now() + 21600000) / 1000)}:R>\n\n**Reason:** Accumalating ${warnCount} ad warnings`)] }).catch(() => { });
+                    member.timeout(21600000, `Accumalating ${warnCount} ad warnings`);
+
+                    interaction.followUp({ content: `${member.toString()} has been muted until <t:${Math.round((Date.now() + 21600000) / 1000)}:T>`, ephemeral: true })
+                    break;
+                case 4:
+                    member.send({ embeds: [timeoutEmbed.setDescription(`You have been timed out in Royal Advertising till <t:${Math.round((Date.now() + 28800000) / 1000)}>\nYour mute expires <t:${Math.round((Date.now() + 28800000) / 1000)}:R>\n\n**Reason:** Accumalating ${warnCount} ad warnings`)] })
+                        .catch(() => { });
+                    member.timeout(28800000, `Accumalating ${warnCount} ad warnings`);
+
+                    interaction.followUp({ content: `${member.toString()} has been muted until <t:${Math.round((Date.now() + 28800000) / 1000)}:T>`, ephemeral: true })
+                    break;
+                case 5:
+                    member.send({ embeds: [timeoutEmbed.setDescription(`You have been timed out in Royal Advertising till <t:${Math.round((Date.now() + 259200000) / 1000)}>\nYour mute expires <t:${Math.round((Date.now() + 259200000) / 1000)}:R>\n\n**Reason:** Accumalating ${warnCount} ad warnings`)] })
+                        .catch(() => { });
+                    member.timeout(259200000, `Accumalating ${warnCount} ad warnings`);
+
+                    interaction.followUp({ content: `${member.toString()} has been muted until <t:${Math.round((Date.now() + 259200000) / 1000)}:T>`, ephemeral: true })
+                    break;
+                case 6:
+                    if (member.roles.cache.has(config.mainServer.TModRole)) interaction.followUp({ content: `/banrequest member:${member.toString()} reason:6aw`, ephemeral: true });
+                    else interaction.followUp({ content: `?6aw ${member.id}`, ephemeral: true });
+
+                    break;
+            }
+
+        }
+
+        /**
+         * 
+         * @param {Discord.GuildMember} member The staff member you want to give coins to
+         */
+        async function giveCoins(member) {
+            const oldData = await coinsSchema.findOne({ userID: interaction.user.id });
+
+            if (oldData?.cooldownTill >= Date.now()) return;
+            let amountOfCoins = utils.randomBetween(50, 75);
+
+            await coinsSchema.findOneAndUpdate({ userID: interaction.user.id }, {
+                userID: interaction.user.id,
+                $inc: {
+                    balance: amountOfCoins,
+                    last24hrs: (oldData.last24hrs + amountOfCoins) >= 500 ? -oldData.last24hrs : amountOfCoins
+                },
+                cooldownTill: (oldData.last24hrs + amountOfCoins) >= 500 ? Date.now() + 8.64e+7 : 0
+            })
+
+            amountOfCoins > 0 ? utils.log(client, `${member.user.tag} +${amountOfCoins}`, 'EARN') : utils.log(client, `${member.tag} On cooldown`, 'EARN');
+
+            return oldData.balance + amountOfCoins;
+        }
+
+        /**
+         * 
+         * @param {Number} balance 
+         */
+        async function sendEmbeds(balance) {
+
+
+            const adWarnEmbed = new Discord.MessageEmbed()
+                .setAuthor({ name: 'Ad Warning' })
+                .setDescription(adWarnTemplate.replace('{member}', targetMember).replace('{reason}', reason).replace('{wc}', newTargetData.length).replace('{channel}', adDeletedIn))
+                .setFooter(`Warning ID: ${punishmentId}`, targetMember.user.displayAvatarURL())
+                .setColor(colorFromNum(newTargetData.length))
+                .setTimestamp();
+            if (belongstoChannel) adWarnEmbed.addField('Your advertisment belongs to', belongstoChannel.toString());
+
+
+            try {
+                const webhooks = await adWarnChannel.fetchWebhooks();
+                let webhook = webhooks.first();
+
+                if (!webhook) {
+                    webhook = await adWarnChannel.createWebhook('Royal Ad Moderation', {
+                        avatar: interaction.client.user.displayAvatarURL(),
+                    });
+                }
+                await webhook.send({ content: `${targetMember}`, embeds: [adWarnEmbed] });
+            }
+            catch (e) {
+                console.error(e);
+                return interaction.followUp({ content: `Couldn't send message in ${adWarnChannel}`, ephemeral: true });
+            }
+
+            await interaction.followUp({ embeds: [adWarnEmbed.setFooter(`Balance: ${balance}`)], ephemeral: true });
+
+            const dmEmbed = new Discord.MessageEmbed()
+                .setAuthor({ name: 'Ad Warning' })
+                .setDescription(`Your ad has been deleted in ${adDeletedIn}.\n**Reason:** ${reason}\nNow you have ${newTargetData.length} ad warning${(newTargetData.length > 1) ? 's' : ''}\nIf you think that this is a mistake or if you want to appeal this punishment, use \`r!appeal ${punishmentId}\` in <#678181401157304321> or in this DM to appeal.`)
+                .setColor(colorFromNum(newTargetData.length))
+                .setFooter('Warning ID:' + punishmentId);
+
+            await targetMember.send(dmEmbed).catch(() => { });;
+
+
+            const logEmbed = new Discord.MessageEmbed()
+                .setAuthor({ name: 'Warning Issued', iconURL: targetMember.user.displayAvatarURL() })
+                .setColor('RED')
+                .setTimestamp()
+                .setThumbnail(targetMember.user.displayAvatarURL())
+                .setFooter(`Moderator Tag: ${interaction.member.user.tag}`, interaction.member.user.displayAvatarURL())
+                .addFields(
+                    { name: 'User', value: `${targetMember}\n\`${targetMember.id}\``, inline: true },
+                    { name: 'Moderator', value: `${interaction.member}\n\`${interaction.member.id}\``, inline: true },
+                    { name: 'Punishment ID', value: `\`${punishmentId}\``, inline: true },
+                    { name: 'Reason', value: reason, inline: true },
+                );
+
+            await utils.log(interaction.client, logEmbed, 'STAFF')
+        }
+
+        /*
 
         const randomBetween = (min, max) => {
             return Math.round(Math.random() * (max - min) + min);
@@ -250,5 +395,6 @@ module.exports = {
             else if (num <= 4) return 'YELLOW';
             else return "RED";
         }
+        */
     }
 }

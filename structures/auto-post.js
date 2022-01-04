@@ -56,8 +56,9 @@ module.exports.run = async (client) => {
       } else {
         await webhook.send(e.ad);
       }
-      utils.log(client, '**[AUTO-POST]** Posted all autoads successfully', 'auto')
+
     });
+    utils.log(client, '**[AUTO-POST]** Posted all autoads successfully', 'auto')
   }, { timezone: 'Asia/Kolkata' })
 
   // utils.log(client, '**[AUTO-POST]** Posted all autoads successfully.', 'auto')

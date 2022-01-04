@@ -53,7 +53,7 @@ module.exports = {
         const embed = new Discord.MessageEmbed()
             .setDescription(`Hey ${interaction.user.username}! Welcome to Royal Manager Guide. Please use the buttons below to hop between the different guides.`)
             .setFooter(`If you have any suggestions or if you find something is wrong, please DM @Menin#4642`)
-            .setAuthor(client.user.username, client.user.displayAvatarURL())
+            .setAuthor({ name: client.user.username, iconURL: client.user.displayAvatarURL() })
             .setColor("GREEN")
 
         const filter = i => {

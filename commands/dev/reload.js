@@ -42,7 +42,7 @@ module.exports = {
                 await client.removeAllListeners()
 
                 for (const file of eventFiles) {
-                    delete require.cache[require.resolve(`../events/${file}`)]
+                    delete require.cache[require.resolve(`../../events/${file}`)]
                     const event = require(`../../events/${file}`);
                     if (event.once) {
                         client.prependOnceListener(event.name, (...args) => event.execute(...args))

@@ -50,7 +50,7 @@ module.exports = {
         if (resp.customId != ran) return await fail('selected the incorrect answer', 'FAILED');
 
         await sent.edit({ embeds: [embed2.setDescription('You have been verified!').setAuthor('SUCCESS').setColor("GREEN")], components: [] })
-        await client.channels.cache.get('923541236189655071')?.send({ embeds: [embed.setAuthor(`${member.user.tag} Passed`, member.user.displayAvatarURL()).setDescription(codeBlock('js', `${no1} ${operator} ${no2}`)).addField('Answer Selected', arrB[Number(resp.customId)].label, true).addField('Correct Answer', answer, true).setColor('GREEN')] })
+        await client.channels.cache.get('923541236189655071')?.send({ embeds: [embed.setAuthor({ name: `${member.user.tag} Passed`, iconURL: member.user.displayAvatarURL() }).setDescription(codeBlock('js', `${no1} ${operator} ${no2}`)).addField('Answer Selected', arrB[Number(resp.customId)].label, true).addField('Correct Answer', answer, true).setColor('GREEN')] })
         // await member.send({ files: [await captcha.image(captcha.currentString)] }).catch(e => console.error(e));
         // const filter = m => m.author.id == member.id;
         // let resp = await member.user.dmChannel.awaitMessages({ filter, time: 5 * 60 * 1000, max: 1 });
@@ -78,9 +78,9 @@ module.exports = {
 
             if (!resp?.customId) return await client.channels.cache.get('923541236189655071')?.send({ embeds: [embed.setAuthor(`${member.user.tag} Failed`, member.user.displayAvatarURL()).setDescription(codeBlock('js', `${no1} ${operator} ${no2}`)).addField('Answer Selected', 'None selected', true).addField('Correct Answer', answer, true).setColor('RED')] });
 
-            await client.channels.cache.get('923541236189655071')?.send({ embeds: [embed.setAuthor(`${member.user.tag} Failed`, member.user.displayAvatarURL()).setDescription(codeBlock('js', `${no1} ${operator} ${no2}`)).addField('Answer Selected', arrB[Number(resp.customId)].label, true).addField('Correct Answer', answer, true).setColor('RED')] })
+            await client.channels.cache.get('923541236189655071')?.send({ embeds: [embed.setAuthor({ name: `${member.user.tag} Failed`, iconURL: member.user.displayAvatarURL() }).setDescription(codeBlock('js', `${no1} ${operator} ${no2}`)).addField('Answer Selected', arrB[Number(resp.customId)].label, true).addField('Correct Answer', answer, true).setColor('RED')] })
                 .catch(async () => {
-                    await client.channels.cache.get('923541236189655071')?.send({ embeds: [embed.setAuthor(`${member.user.tag} Failed`, member.user.displayAvatarURL()).setDescription(codeBlock('js', `${no1} ${operator} ${no2}`)).addField('Answer Selected', 'None selected', true).addField('Correct Answer', answer, true).setColor('RED')] })
+                    await client.channels.cache.get('923541236189655071')?.send({ embeds: [embed.setAuthor({ name: `${member.user.tag} Failed`, iconURL: member.user.displayAvatarURL() }).setDescription(codeBlock('js', `${no1} ${operator} ${no2}`)).addField('Answer Selected', 'None selected', true).addField('Correct Answer', answer, true).setColor('RED')] })
                 })
 
 
