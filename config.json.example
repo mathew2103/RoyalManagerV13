@@ -1,0 +1,44 @@
+{
+    "owners": ["<developer-userid-here>"],
+    "sotw": "",
+    "sotwRole": "<Staff-of-the-week-Role-id>",
+    "disabled": [],
+    "voterRole": "<Voter-Role-id>",
+    "adWarnChannel": "<Ad-Warn-Channel-id>",
+    "appealsChannel": "<Appeals-Channel-id>",
+    "evidenceChannel": "<Evidence-Channel-id>",
+    "adWarnTemplate": "{member}, Your ad has been deleted in {channel}.\n**Reason:** {reason}\nWarning __#{wc}__",
+    "botLogs": "<Bot-Logs-Channel-id>",
+    "mainServer": {
+        "TModRole": "<Trainee-Mod-Role-id>",
+        "ModRole": "<Moderator-Role-id>",
+        "id": "<Main-Server-id>",
+        "modTeamRole": "<Mod-Team-Role-id>",
+        "staffRole": "<Staff-Role-id>",
+        "pm": "<Partnership-Manager-id>",
+        "pmTeamRole": "<Partnership-Manager-Team-Role-id>"
+    },
+    "staffServer": {
+        "id": "<Staff-Server-id>",
+        "TModRole": "<Staff-Server-Trainee-Mod-Role-id>",
+        "ModRole": "<Staff-Server-Moderator-Role-id>",
+        "modTeamRole": "<Staff-Server-Mod-Team-Role-id>",
+        "staffRole": "<Staff-Server-Staff-Role-id>",
+        "pm": "<Staff-Server-Project-Manager-id>",
+        "pmTeamRole": "<Staff-Server-Project-Manager-Team-Role-id>"
+    },
+    "banRequestChannel": "<Ban-Request-Channel-id>",
+    "onBreakRole": "<On-Break-Role-id>",
+    "breakRequestChannel": "<Break-Request-Channel-id>",
+    "modTeamUpdatesChannel": "<Mod-Team-Updates-Channel-id>",
+    "shopItems": {
+        "<Item-Key>": {
+            "name": "<Item-Name>",
+            "duration": "<Duration-of-Ad>",
+            "type": "autoad",
+            "price": "<Cost-of-Item>"
+        }
+    },
+    "staffLogsChannel": "<Staff-Logs-Channel-id>",
+    "rebootChannel": "<Reboot-Channel-id>"
+}
