@@ -1,7 +1,3 @@
-Here’s a comprehensive README based on the details you’ve provided:
-
----
-
 # Royal Manager v13
 
 **Royal Manager v13** is a Discord bot designed for a two-server setup: a **main server** and a **staff server**. This bot includes a variety of features for moderation, staff management, utility, economy, and music, along with handling **Top.gg votes** via an Express API.
