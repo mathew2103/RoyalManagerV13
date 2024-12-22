@@ -87,15 +87,3 @@ node index.js
 
 - **Outdated Discord.js v13**: This version is no longer supported and does not work with Discord's current API. You will need to update to **Discord.js v14+** or the latest version to restore functionality.
 - **Music Commands**: Due to changes in YouTube and audio libraries, music functionality may also be broken.
-
----
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----
-
-If you need assistance upgrading or modernizing the bot, feel free to open an issue in the repository.
-
-Let me know if you'd like further refinements!
