@@ -9,7 +9,6 @@
     "evidenceChannel": "758582901893103617",
     "adWarnTemplate": "{member}, Your ad has been deleted in {channel}.\n**Reason:** {reason}\nWarning __#{wc}__",
     "botLogs": "871684534926729236",
-    "staffListMsgs": ["879663367512535040", "879663371891384390", "879663387234152488", "879663391172599808", "879663399678644244"],
     "mainServer": {
         "TModRole": "605037551388196865",
         "ModRole": "559277895055441921",
